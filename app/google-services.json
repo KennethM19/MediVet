@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "499242235274",
+    "project_id": "medivet-firebase",
+    "storage_bucket": "medivet-firebase.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:499242235274:android:51f2208a84225f8b9f4473",
+        "android_client_info": {
+          "package_name": "com.example.medivet"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDTfS7aaypHnwWCE373oEkEAxp1t91Wrtw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
