@@ -54,7 +54,7 @@ fun SplashScreen(navController: NavHostController) {
         startAnimation = true
         delay(3000) // tiempo visible del splash
         navController.popBackStack() // evita volver al splash
-        navController.navigate(AppScreens.MainScreen.route)
+        navController.navigate(AppScreens.LoginScreen.route) //direccionar al login
     }
 
     Splash(scale, alpha)
