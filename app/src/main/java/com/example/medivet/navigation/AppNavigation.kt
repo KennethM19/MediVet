@@ -22,7 +22,7 @@ fun AppNavigation() {
             LoginScreen(navController)
         }
         composable(AppScreens.MainScreen.route) {
-            MainScreen()
+            MainScreen(navController)
         }
     }
 }
