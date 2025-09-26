@@ -2,6 +2,8 @@ package com.example.medivet.screens
 
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -18,14 +20,17 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.medivet.R
 import com.example.medivet.navigation.AppScreens
 import com.example.medivet.utils.getFirebaseErrorMessage
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 
 @Composable
 fun LoginScreen(navController: NavHostController) {
@@ -35,6 +40,36 @@ fun LoginScreen(navController: NavHostController) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
+
+    //Configuracion de SignIn with Google
+    val token = context.getString(R.string.default_web_client_id)
+    val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+        .requestIdToken(token)
+        .requestEmail()
+        .build()
+    val googleSignInClient = GoogleSignIn.getClient(context, gso)
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+        try {
+            val account = task.getResult(ApiException::class.java)
+            val credential = GoogleAuthProvider.getCredential(account.idToken, null)
+            auth.signInWithCredential(credential).addOnCompleteListener { authResult ->
+                if (authResult.isSuccessful) {
+                    Toast.makeText(context, "Login con Google exitoso", Toast.LENGTH_SHORT).show()
+                    navController.navigate(AppScreens.MainScreen.route) {
+                        popUpTo(AppScreens.LoginScreen.route) { inclusive = true }
+                    }
+                } else {
+                    Toast.makeText(context, "Error en login con Google", Toast.LENGTH_SHORT).show()
+                }
+            }
+        } catch (e: ApiException) {
+            Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -142,6 +177,25 @@ fun LoginScreen(navController: NavHostController) {
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
                 )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // 🔹 Botón de login con Google
+            Button(
+                onClick = { launcher.launch(googleSignInClient.signInIntent) },
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_google), // usa tu logo real
+                    contentDescription = "Google icon",
+                    modifier = Modifier.size(24.dp) // ajusta el tamaño
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Sign in with Google", color = Color.White, fontWeight = FontWeight.Bold)
             }
 
             Spacer(modifier = Modifier.height(16.dp))

@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">MediVet</string>
+    <string name="default_web_client_id" translatable="false">
+    499242235274-cjqbvb0iv0erkklt1qg88agu3meafrr6.apps.googleusercontent.com</string>
 </resources>

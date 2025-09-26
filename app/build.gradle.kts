@@ -63,6 +63,9 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
     implementation(libs.androidx.navigation.compose)
 
+    implementation("com.google.android.gms:play-services-auth:20.7.0")
+    implementation("com.google.firebase:firebase-auth:22.3.1")
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

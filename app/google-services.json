@@ -12,7 +12,20 @@
           "package_name": "com.example.medivet"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "499242235274-cjqbvb0iv0erkklt1qg88agu3meafrr6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.medivet",
+            "certificate_hash": "d49bc3f92512f15cc920a97321e54290d1e0f19d"
+          }
+        },
+        {
+          "client_id": "499242235274-49v8tocaseda7uncifcj38o52ajhlk70.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDTfS7aaypHnwWCE373oEkEAxp1t91Wrtw"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "499242235274-49v8tocaseda7uncifcj38o52ajhlk70.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

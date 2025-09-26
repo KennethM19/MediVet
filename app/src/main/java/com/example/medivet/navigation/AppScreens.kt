@@ -5,7 +5,7 @@ package com.example.medivet.navigation
 
 sealed class AppScreens (val route: String){
     //representamos los 2 objetos que representan las 2 pantallas que tenemos creadas
-    //Pantalla de iniciales
+    //Pantallas iniciales
     object SplashScreen: AppScreens("splash_screen")
     object MainScreen: AppScreens("main_screen")
 
