@@ -81,7 +81,7 @@ fun LoginScreen(navController: NavHostController) {
             PasswordInput(password) { password = it }
             Spacer(modifier = Modifier.height(8.dp))
 
-            ForgotPasswordText(context)
+            ForgotPasswordText(navController,context)
             Spacer(modifier = Modifier.height(24.dp))
 
             LoginButton(email, password, auth, navController, context, isLoading) { isLoading = it }
@@ -134,14 +134,15 @@ fun PasswordInput(value: String, onValueChange: (String) -> Unit) {
 }
 
 @Composable
-fun ForgotPasswordText(context: Context) {
+fun ForgotPasswordText(navController: NavHostController, context: Context) {
     Text(
         "¿Olvidaste tu contraseña?",
         fontSize = 14.sp,
         color = Color.Black,
         modifier = Modifier
             .clickable {
-                Toast.makeText(context, "Funcionalidad en construcción", Toast.LENGTH_SHORT).show()
+                //Toast.makeText(context, "Funcionalidad en construcción", Toast.LENGTH_SHORT).show()
+                navController.navigate(AppScreens.ResetPasswordScreen.route)
             }
     )
 }
