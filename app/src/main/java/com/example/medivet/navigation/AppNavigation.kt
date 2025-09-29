@@ -7,6 +7,8 @@ import androidx.navigation.compose.rememberNavController
 import com.example.medivet.MainScreen
 import com.example.medivet.SplashScreen
 import com.example.medivet.screens.LoginScreen
+import com.example.medivet.screens.PasswordResetScreen
+import com.example.medivet.screens.UpdatePasswordScreen
 
 @Composable
 fun AppNavigation() {
@@ -23,6 +25,12 @@ fun AppNavigation() {
         }
         composable(AppScreens.MainScreen.route) {
             MainScreen(navController)
+        }
+        composable(AppScreens.ResetPasswordScreen.route) {
+            PasswordResetScreen(navController)
+        }
+        composable(AppScreens.UpdatePasswordScreen.route) {
+            UpdatePasswordScreen(navController)
         }
     }
 }
