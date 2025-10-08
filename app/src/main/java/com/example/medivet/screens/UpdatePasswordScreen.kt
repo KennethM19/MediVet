@@ -64,7 +64,7 @@ fun UpdatePasswordLogo() {
         contentDescription = "Logo",
         modifier = Modifier
             .size(250.dp)
-            .offset(y = 45.dp)
+            .offset(y = 30.dp)
     )
 }
 
@@ -95,6 +95,7 @@ fun PasswordInputField(label: String, value: String, onValueChange: (String) -> 
         singleLine = true,
         visualTransformation = PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+        textStyle = LocalTextStyle.current.copy(color = Color.Black),
         modifier = Modifier
             .fillMaxWidth()
             .background(Color.White.copy(alpha = 0.85f), shape = MaterialTheme.shapes.small)

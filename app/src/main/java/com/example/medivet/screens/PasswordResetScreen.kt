@@ -67,7 +67,7 @@ fun PasswordResetLogo() { // <- cambiar el nombre
         contentDescription = "Logo",
         modifier = Modifier
             .size(250.dp)
-            .offset(y = 45.dp)
+            .offset(y = 30.dp)
     )
 }
 
@@ -89,6 +89,7 @@ fun PasswordResetEmailInput(value: String, onValueChange: (String) -> Unit) {
         label = { Text("Correo electrónico") },
         singleLine = true,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+        textStyle = LocalTextStyle.current.copy(color = Color.Black),
         modifier = Modifier
             .fillMaxWidth()
             .background(Color.White.copy(alpha = 0.85f), shape = MaterialTheme.shapes.small)
