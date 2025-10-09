@@ -50,23 +50,24 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.compose.runtime)
 
-    implementation("androidx.navigation:navigation-compose:2.7.7")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.2")
+    // NAVIGATION
+    implementation(libs.androidx.navigation.compose) // 'libs.androidx.navigation.compose' ya está definido en tus version catalogs, úsalo.
+
+    // VIEWMODEL
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.2")
 
-    // Splash Screen API
+    // SPLASH SCREEN API
     implementation("androidx.core:core-splashscreen:1.0.1")
 
     implementation(platform("com.google.firebase:firebase-bom:34.2.0"))
+
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-analytics")
-    implementation(libs.androidx.navigation.compose)
 
-    implementation("com.google.android.gms:play-services-auth:20.7.0")
-    implementation("com.google.firebase:firebase-auth:22.3.1")
-    implementation(libs.androidx.compose.runtime)
-
+    implementation("com.google.android.gms:play-services-auth:21.2.0")
+    
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
