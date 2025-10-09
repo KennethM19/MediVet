@@ -157,7 +157,7 @@ fun AuthCodeInputFields(code: List<String>, onCodeChange: (Int, String) -> Unit)
 fun SendAuthenticationButton(navController: NavHostController, authcode: String) {
     Button(
         onClick = {
-            navController.navigate(AppScreens.UpdatePasswordScreen.route)
+
         },
         modifier = Modifier
             .fillMaxWidth()

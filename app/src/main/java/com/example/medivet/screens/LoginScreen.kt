@@ -145,7 +145,7 @@ fun ForgotPasswordText(navController: NavHostController, context: Context) {
         modifier = Modifier
             .clickable {
                 //Toast.makeText(context, "Funcionalidad en construcción", Toast.LENGTH_SHORT).show()
-                navController.navigate(AppScreens.ResetPasswordScreen.route)
+                navController.navigate(AppScreens.PasswordResetScreen.route)
             }
     )
 }
