@@ -16,7 +16,13 @@ import com.example.medivet.screens.AuthenticationScreen
 fun AppNavigation() {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = AppScreens.LoginScreen.route) {
+    NavHost(navController = navController, startDestination = AppScreens.SplashScreen.route) {
+        composable(AppScreens.SplashScreen.route) {
+            SplashScreen(navController)
+        }
+        composable(AppScreens.MainScreen.route) {
+            MainScreen(navController)
+        }
         composable(AppScreens.LoginScreen.route) {
             LoginScreen(navController)
         }
