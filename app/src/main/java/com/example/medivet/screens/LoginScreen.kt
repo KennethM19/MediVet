@@ -10,6 +10,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -71,7 +72,7 @@ fun LoginScreen(navController: NavHostController) {
                 .fillMaxSize()
                 .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Top
         ) {
             LogoSection()
             Spacer(modifier = Modifier.height(32.dp))
@@ -89,7 +90,7 @@ fun LoginScreen(navController: NavHostController) {
             GoogleLoginButton { launcher.launch(googleSignInClient.signInIntent) }
             Spacer(modifier = Modifier.height(16.dp))
 
-            RegisterText(context)
+            RegisterText(navController,context)
         }
     }
 }
@@ -98,8 +99,10 @@ fun LoginScreen(navController: NavHostController) {
 fun LogoSection() {
     Image(
         painter = painterResource(id = R.drawable.logo_titulo),
-        contentDescription = "App Logo",
-        modifier = Modifier.size(250.dp)
+        contentDescription = "Logo",
+        modifier = Modifier
+            .size(250.dp)
+            .offset(y = 30.dp)
     )
 }
 
@@ -206,7 +209,7 @@ fun GoogleLoginButton(onClick: () -> Unit) {
 }
 
 @Composable
-fun RegisterText(context: Context) {
+fun RegisterText(navController: NavHostController,context: Context) {
     Row(
         horizontalArrangement = Arrangement.Center,
         modifier = Modifier.fillMaxWidth()
@@ -218,7 +221,9 @@ fun RegisterText(context: Context) {
             fontWeight = FontWeight.Bold,
             color = Color.Black,
             modifier = Modifier.clickable {
-                Toast.makeText(context, "Registro en construcción", Toast.LENGTH_SHORT).show()
+                //Toast.makeText(context, "Registro en construcción", Toast.LENGTH_SHORT).show()
+                navController.navigate(AppScreens.RegisterScreen.route)
+
             }
         )
     }

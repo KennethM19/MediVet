@@ -26,7 +26,7 @@ fun UpdatePasswordScreen(navController: NavHostController) {
     var confirmPassword by remember { mutableStateOf("") }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // 🔹 Fondo
+        // Fondo
         Image(
             painter = painterResource(id = R.drawable.background),
             contentDescription = null,
@@ -34,7 +34,7 @@ fun UpdatePasswordScreen(navController: NavHostController) {
             contentScale = ContentScale.Crop
         )
 
-        // 🔹 Contenido encima del fondo
+        // Contenido encima del fondo
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -56,7 +56,7 @@ fun UpdatePasswordScreen(navController: NavHostController) {
     }
 }
 
-// 🔹 Logo
+// Logo
 @Composable
 fun UpdatePasswordLogo() {
     Image(
@@ -64,11 +64,11 @@ fun UpdatePasswordLogo() {
         contentDescription = "Logo",
         modifier = Modifier
             .size(250.dp)
-            .offset(y = 45.dp)
+            .offset(y = 30.dp)
     )
 }
 
-// 🔹 Texto de instrucción
+// Texto de instrucción
 @Composable
 fun InstructionTextUpdate() {
     Text(
@@ -85,7 +85,7 @@ fun InstructionTextUpdate2() {
     )
 }
 
-// 🔹 Campo de contraseña
+// Campo de contraseña
 @Composable
 fun PasswordInputField(label: String, value: String, onValueChange: (String) -> Unit) {
     OutlinedTextField(
@@ -95,13 +95,14 @@ fun PasswordInputField(label: String, value: String, onValueChange: (String) -> 
         singleLine = true,
         visualTransformation = PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+        textStyle = LocalTextStyle.current.copy(color = Color.Black),
         modifier = Modifier
             .fillMaxWidth()
             .background(Color.White.copy(alpha = 0.85f), shape = MaterialTheme.shapes.small)
     )
 }
 
-// 🔹 Botón Confirmar
+// Botón Confirmar
 @Composable
 fun ConfirmButton() {
     Button(

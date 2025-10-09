@@ -9,28 +9,28 @@ import com.example.medivet.SplashScreen
 import com.example.medivet.screens.LoginScreen
 import com.example.medivet.screens.PasswordResetScreen
 import com.example.medivet.screens.UpdatePasswordScreen
+import com.example.medivet.screens.RegisterScreen
+import com.example.medivet.screens.AuthenticationScreen
 
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
-    NavHost(
-        navController = navController,
-        startDestination = AppScreens.SplashScreen.route
-    ) {
-        composable(AppScreens.SplashScreen.route) {
-            SplashScreen(navController)
-        }
+
+    NavHost(navController = navController, startDestination = AppScreens.LoginScreen.route) {
         composable(AppScreens.LoginScreen.route) {
             LoginScreen(navController)
         }
-        composable(AppScreens.MainScreen.route) {
-            MainScreen(navController)
-        }
-        composable(AppScreens.ResetPasswordScreen.route) {
+        composable(AppScreens.PasswordResetScreen.route) {
             PasswordResetScreen(navController)
         }
         composable(AppScreens.UpdatePasswordScreen.route) {
             UpdatePasswordScreen(navController)
+        }
+        composable(AppScreens.RegisterScreen.route) {
+            RegisterScreen(navController)
+        }
+        composable(AppScreens.AuthenticationScreen.route) {
+            AuthenticationScreen(navController)
         }
     }
 }

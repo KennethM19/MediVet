@@ -13,6 +13,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.medivet.R
@@ -24,63 +25,60 @@ fun PasswordResetScreen(navController: NavHostController) {
     val context = LocalContext.current
     var email by remember { mutableStateOf("") }
 
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        // Imagen de fondo
+        Image(
+            painter = painterResource(id = R.drawable.background),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
 
-        Box(
+        // Contenido encima del fondo
+        Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
         ) {
-            // 🔹 Imagen de fondo
-            Image(
-                painter = painterResource(id = R.drawable.background),
-                contentDescription = null,
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
-            )
-
-            // 🔹 Contenido encima del fondo
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Top
-            ) {
-                //Spacer(modifier = Modifier.height(60.dp)) // mueve logo hacia la parte superior
-                PasswordResetLogo()
-
-                Spacer(modifier = Modifier.height(60.dp))
-                InstructionText()
-                Spacer(modifier = Modifier.height(16.dp))
-                EmailInput(email) { email = it }
-                Spacer(modifier = Modifier.height(24.dp))
-                SendResetButton(navController,email)
-            }
+            PasswordResetLogo()
+            Spacer(modifier = Modifier.height(60.dp))
+            InstructionText()
+            Spacer(modifier = Modifier.height(16.dp))
+            PasswordResetEmailInput(email) { email = it }
+            Spacer(modifier = Modifier.height(24.dp))
+            SendResetButton(navController, email)
         }
     }
+}
 
-
-// 🔹 Logo
+// Logo
 @Composable
-fun PasswordResetLogo() { // <- cambiar el nombre
+fun PasswordResetLogo() {
     Image(
         painter = painterResource(id = R.drawable.logo_titulo),
         contentDescription = "Logo",
         modifier = Modifier
             .size(250.dp)
-            .offset(y = 45.dp)
+            .offset(y = 30.dp)
     )
 }
 
-// 🔹 Texto de instrucción
+// Texto de instrucción
 @Composable
 fun InstructionText() {
     Text(
         "Ingrese su correo",
-        color = Color.Black
+        color = Color.Black,
+        textAlign = TextAlign.Center,
+        modifier = Modifier.fillMaxWidth()
     )
 }
 
-// 🔹 Input de correo
+// Input de correo
 @Composable
 fun PasswordResetEmailInput(value: String, onValueChange: (String) -> Unit) {
     OutlinedTextField(
@@ -89,21 +87,18 @@ fun PasswordResetEmailInput(value: String, onValueChange: (String) -> Unit) {
         label = { Text("Correo electrónico") },
         singleLine = true,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+        textStyle = LocalTextStyle.current.copy(color = Color.Black),
         modifier = Modifier
             .fillMaxWidth()
             .background(Color.White.copy(alpha = 0.85f), shape = MaterialTheme.shapes.small)
     )
 }
 
-
-// 🔹 Botón de enviar enlace
+// Botón de enviar enlace
 @Composable
-fun SendResetButton(navController: NavHostController,email: String) {
+fun SendResetButton(navController: NavHostController, email: String) {
     Button(
-        onClick = {
-
-            navController.navigate(AppScreens.UpdatePasswordScreen.route)
-        },
+        onClick = { navController.navigate(AppScreens.UpdatePasswordScreen.route) },
         modifier = Modifier
             .fillMaxWidth()
             .height(50.dp)
