@@ -28,12 +28,18 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.medivet.R
 import com.example.medivet.navigation.AppScreens
+import com.example.medivet.services.ApiClient
+import com.example.medivet.services.LoginRequest
 import com.example.medivet.utils.getFirebaseErrorMessage
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun LoginScreen(navController: NavHostController) {
@@ -82,15 +88,16 @@ fun LoginScreen(navController: NavHostController) {
             PasswordInput(password) { password = it }
             Spacer(modifier = Modifier.height(8.dp))
 
-            ForgotPasswordText(navController,context)
+            ForgotPasswordText(navController, context)
             Spacer(modifier = Modifier.height(24.dp))
 
+            // Botón Firebase + FastAPI
             LoginButton(email, password, auth, navController, context, isLoading) { isLoading = it }
             Spacer(modifier = Modifier.height(12.dp))
             GoogleLoginButton { launcher.launch(googleSignInClient.signInIntent) }
             Spacer(modifier = Modifier.height(16.dp))
 
-            RegisterText(navController,context)
+            RegisterText(navController, context)
         }
     }
 }
@@ -144,7 +151,6 @@ fun ForgotPasswordText(navController: NavHostController, context: Context) {
         color = Color.Black,
         modifier = Modifier
             .clickable {
-                //Toast.makeText(context, "Funcionalidad en construcción", Toast.LENGTH_SHORT).show()
                 navController.navigate(AppScreens.PasswordResetScreen.route)
             }
     )
@@ -163,6 +169,32 @@ fun LoginButton(
     Button(
         onClick = {
             setLoading(true)
+
+            // ------------------ Login FastAPI ------------------
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    val request = LoginRequest(email = email.trim(), password = password.trim())
+                    val response = ApiClient.apiService.loginUser(request)
+
+                    withContext(Dispatchers.Main) {
+                        if (response.isSuccessful && response.body() != null) {
+                            val token = response.body()!!.access_token
+                            Toast.makeText(context, "Login FastAPI exitoso", Toast.LENGTH_SHORT).show()
+                            navController.navigate(AppScreens.MainScreen.route) {
+                                popUpTo(AppScreens.LoginScreen.route) { inclusive = true }
+                            }
+                        } else {
+                            Toast.makeText(context, "Credenciales FastAPI incorrectas", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(context, "Error FastAPI: ${e.message}", Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+
+            // ------------------ Login Firebase ------------------
             auth.signInWithEmailAndPassword(email.trim(), password.trim())
                 .addOnCompleteListener { task ->
                     setLoading(false)
@@ -176,7 +208,7 @@ fun LoginButton(
                             getFirebaseErrorMessage(task.exception),
                             Toast.LENGTH_LONG
                         ).show()
-                        Log.e("Login", "Error", task.exception)
+                        Log.e("Login", "Error Firebase", task.exception)
                     }
                 }
         },
@@ -209,7 +241,7 @@ fun GoogleLoginButton(onClick: () -> Unit) {
 }
 
 @Composable
-fun RegisterText(navController: NavHostController,context: Context) {
+fun RegisterText(navController: NavHostController, context: Context) {
     Row(
         horizontalArrangement = Arrangement.Center,
         modifier = Modifier.fillMaxWidth()
@@ -221,9 +253,7 @@ fun RegisterText(navController: NavHostController,context: Context) {
             fontWeight = FontWeight.Bold,
             color = Color.Black,
             modifier = Modifier.clickable {
-                //Toast.makeText(context, "Registro en construcción", Toast.LENGTH_SHORT).show()
                 navController.navigate(AppScreens.RegisterScreen.route)
-
             }
         )
     }
@@ -254,5 +284,3 @@ private fun handleGoogleLoginResult(
         Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
     }
 }
-
-
