@@ -14,4 +14,11 @@ sealed class AppScreens(val route: String) {
     object PasswordResetScreen : AppScreens("password_reset_screen")
     object UpdatePasswordScreen : AppScreens("update_password_screen")
     object AuthenticationScreen : AppScreens("authentication_screen")
+
+    //Navegación
+    object PetsScreen : AppScreens("pets_screen")
+    object ProfileScreen : AppScreens("profile_screen")
+    object InfoScreen : AppScreens("info_screen")
+    object ConsultScreen : AppScreens("consult_screen")
+    object VetsScreen : AppScreens("vets_screen")
 }
