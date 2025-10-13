@@ -1,4 +1,4 @@
-package com.example.medivet.screens.authentication
+package com.example.medivet.screens.register
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
