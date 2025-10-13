@@ -15,22 +15,22 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.medivet.R
 import com.example.medivet.navigation.AppScreens
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AuthenticationScreen(navController: NavHostController) {
-    val context = LocalContext.current
     val codeLength = 6
     var code by remember { mutableStateOf(List(codeLength) { "" }) }
 
@@ -157,7 +157,7 @@ fun AuthCodeInputFields(code: List<String>, onCodeChange: (Int, String) -> Unit)
 fun SendAuthenticationButton(navController: NavHostController, authcode: String) {
     Button(
         onClick = {
-
+            navController.navigate(AppScreens.MainScreen.route)
         },
         modifier = Modifier
             .fillMaxWidth()
@@ -165,4 +165,12 @@ fun SendAuthenticationButton(navController: NavHostController, authcode: String)
     ) {
         Text("Registrarte")
     }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun PreviewAuthenticationFirstScreen() {
+    val navController = rememberNavController()
+
+    AuthenticationScreen(navController = navController)
 }

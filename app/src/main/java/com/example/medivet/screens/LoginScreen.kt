@@ -222,7 +222,7 @@ fun RegisterText(navController: NavHostController,context: Context) {
             color = Color.Black,
             modifier = Modifier.clickable {
                 //Toast.makeText(context, "Registro en construcción", Toast.LENGTH_SHORT).show()
-                navController.navigate(AppScreens.RegisterScreen.route)
+                navController.navigate(AppScreens.RegisterFirstScreen.route)
 
             }
         )
