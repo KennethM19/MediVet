@@ -17,7 +17,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.medivet.navigation.AppScreens
 import com.example.medivet.ui.components.BottomNavBar
-import com.example.medivet.ui.pets.components.PetCard
+import com.example.medivet.ui.components.PetCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
