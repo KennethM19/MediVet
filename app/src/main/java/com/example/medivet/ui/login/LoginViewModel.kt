@@ -1,4 +1,4 @@
-package com.example.medivet.viewmodel
+package com.example.medivet.ui.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

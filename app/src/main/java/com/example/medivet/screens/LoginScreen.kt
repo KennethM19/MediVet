@@ -1,7 +1,6 @@
 package com.example.medivet.screens
 
 import android.content.Context
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
@@ -28,9 +27,8 @@ import androidx.navigation.NavHostController
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.medivet.R
 import com.example.medivet.navigation.AppScreens
-import com.example.medivet.viewmodel.LoginViewModel
-import com.example.medivet.viewmodel.AuthState
-import com.example.medivet.utils.getFirebaseErrorMessage // Asumo que esta función existe
+import com.example.medivet.ui.login.LoginViewModel
+import com.example.medivet.ui.login.AuthState
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
