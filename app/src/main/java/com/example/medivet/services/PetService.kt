@@ -1,0 +1,27 @@
+package com.example.medivet.services
+
+import com.example.medivet.model.PetRequest
+import com.example.medivet.model.PetResponse
+import retrofit2.http.*
+import retrofit2.Response
+
+interface PetService {
+
+    @GET("utils/sex")
+    suspend fun getSexOptions(): Response<List<Map<String, Any>>>
+
+    @GET("utils/species")
+    suspend fun getSpeciesOptions(): Response<List<Map<String, Any>>>
+
+    @GET("utils/breed")
+    suspend fun getBreedOptions(): Response<List<Map<String, Any>>>
+
+    @POST("pets")
+    suspend fun createPet(
+        @Header("Authorization") token: String,
+        @Body pet: PetRequest
+    ): Response<PetResponse>
+
+    @GET("pets")
+    suspend fun getPets(@Header("Authorization") token: String): Response<List<PetResponse>>
+}

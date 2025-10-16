@@ -1,30 +1,30 @@
 package com.example.medivet.repository
 
-import com.example.medivet.model.Pet
+import com.example.medivet.model.PetRequest
+import com.example.medivet.model.PetResponse
+import com.example.medivet.services.ApiClient // <-- Importa tu ApiClient
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import retrofit2.Response
 
 class PetRepository {
 
-    // Simulación de datos locales (mock)
-    fun getUserPets(): List<Pet> {
-        return listOf(
-            Pet(
-                id = "1",
-                name = "Luna",
-                gender = "Hembra",
-                weight = "11.4 kg",
-                age = "1 año 4 meses",
-                breed = "Sin raza",
-                imageUrl = "https://images.unsplash.com/photo-1518717758536-85ae29035b6d"
-            ),
-            Pet(
-                id = "2",
-                name = "Rocky",
-                gender = "Macho",
-                weight = "15.2 kg",
-                age = "2 años",
-                breed = "Labrador",
-                imageUrl = "https://images.unsplash.com/photo-1558788353-f76d92427f16"
-            )
-        )
+    private val service = ApiClient.petService
+
+    suspend fun getSexOptions() = withContext(Dispatchers.IO) { service.getSexOptions() }
+    suspend fun getSpeciesOptions() = withContext(Dispatchers.IO) { service.getSpeciesOptions() }
+    suspend fun getBreedOptions() = withContext(Dispatchers.IO) { service.getBreedOptions() }
+
+    suspend fun createPet(token: String, pet: PetRequest): Response<PetResponse> {
+        return withContext(Dispatchers.IO) {
+            service.createPet("Bearer $token", pet)
+        }
     }
+
+    suspend fun getPets(token: String): Response<List<PetResponse>> {
+        return withContext(Dispatchers.IO) {
+            service.getPets("Bearer $token")
+        }
+    }
+
 }

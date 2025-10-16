@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import android.util.Log
+import com.example.medivet.utils.SessionManager
 
 // Estados posibles de la UI
 sealed class AuthState {
@@ -19,7 +20,8 @@ sealed class AuthState {
 }
 
 class LoginViewModel(
-    private val repository: UserRepository = UserRepository(ApiClient.apiService)
+    private val repository: UserRepository = UserRepository(ApiClient.apiService),
+    private val sessionManager: SessionManager
 ) : ViewModel() {
 
     private val _authState = MutableStateFlow<AuthState>(AuthState.Idle)
@@ -34,20 +36,29 @@ class LoginViewModel(
         _authState.value = AuthState.Loading
         viewModelScope.launch {
             try {
-                // PRIMER INTENTO: Login con FastAPI
+                // 🔹 PRIMER INTENTO: FastAPI
                 val response = repository.loginWithFastApi(email, password)
-                _authState.value = AuthState.Success(response.access_token, "FastAPI")
+                val token = response.access_token
+                val method = "FastAPI"
+
+                // Guardamos token en DataStore
+                sessionManager.saveAuthData(token, method)
+
+                _authState.value = AuthState.Success(token, method)
 
             } catch (fastApiError: Exception) {
                 Log.e("LoginVM", "FastAPI falló: ${fastApiError.message}. Intentando con Firebase...")
 
                 try {
-                    // SEGUNDO INTENTO: Login con Firebase si FastAPI falla
+                    // 🔹 SEGUNDO INTENTO: Firebase
                     repository.loginWithFirebase(email, password)
-                    _authState.value = AuthState.Success("FIREBASE_TOKEN", "Firebase")
+                    val token = "FIREBASE_TOKEN" // Aquí puedes recuperar el real si lo usas
+                    val method = "Firebase"
+
+                    sessionManager.saveAuthData(token, method)
+                    _authState.value = AuthState.Success(token, method)
 
                 } catch (firebaseError: Exception) {
-                    // Fallo TOTAL
                     val msg = firebaseError.message ?: "Fallo de autenticación en ambos sistemas."
                     _authState.value = AuthState.Error(msg)
                 }

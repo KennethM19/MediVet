@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.medivet.R
+import com.example.medivet.utils.SessionManager
 import com.example.medivet.navigation.AppScreens
 import com.example.medivet.ui.login.LoginViewModel
 import com.example.medivet.ui.login.AuthState
@@ -34,23 +35,32 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
+import com.example.medivet.ui.login.LoginViewModelFactory
 
 // ---------------------------------------------------------------------
 // FUNCIÓN PRINCIPAL - LoginScreen
 // ---------------------------------------------------------------------
 @Composable
 fun LoginScreen(
-    navController: NavHostController,
-    viewModel: LoginViewModel = viewModel() //INYECTAR VIEWMODEL
+    navController: NavHostController
 ) {
     val context = LocalContext.current
     val auth = FirebaseAuth.getInstance() // Mantener para el Google Sign-In
+
+    // ✅ Crear instancia de SessionManager
+    val sessionManager = remember { SessionManager(context) }
+
+    // ✅ Inyectar el ViewModel usando la factory personalizada
+    val viewModel: LoginViewModel = viewModel(
+        factory = LoginViewModelFactory(sessionManager)
+
+    )
 
     // Variables de estado local para los inputs
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
-    //Observar el estado de autenticación del ViewModel
+    // Observar el estado de autenticación del ViewModel
     val authState by viewModel.authState.collectAsState()
 
     // Configuración de Google Sign-In
@@ -93,25 +103,24 @@ fun LoginScreen(
             PasswordInput(password) { password = it }
             Spacer(modifier = Modifier.height(8.dp))
 
-            ForgotPasswordText(navController,context)
+            ForgotPasswordText(navController, context)
             Spacer(modifier = Modifier.height(24.dp))
 
-            val isLoading = authState is AuthState.Loading // Determinar carga desde el VM
+            val isLoading = authState is AuthState.Loading
 
-            // 👈 Llamar a la versión actualizada de LoginButton
             LoginButton(email, password, viewModel, isLoading)
-
             Spacer(modifier = Modifier.height(12.dp))
             GoogleLoginButton { launcher.launch(googleSignInClient.signInIntent) }
             Spacer(modifier = Modifier.height(16.dp))
 
-            RegisterText(navController,context)
+            RegisterText(navController, context)
 
-            // 👈 MANEJADOR DE ESTADO: Reacciona al éxito o error del ViewModel
+            // 👇 Reacciona al estado de autenticación
             AuthHandler(authState = authState, navController = navController, context = context)
         }
     }
 }
+
 
 // ---------------------------------------------------------------------
 // COMPONENTES EXISTENTES (SIN CAMBIOS)

@@ -13,6 +13,7 @@ import com.example.medivet.screens.UpdatePasswordScreen
 import com.example.medivet.screens.register.RegisterFirstScreen
 import com.example.medivet.screens.AuthenticationScreen
 import com.example.medivet.screens.register.RegisterSecondScreen
+import com.example.medivet.ui.pets.CreatePetScreen
 import com.example.medivet.ui.pets.PetsScreen
 
 @Composable
@@ -28,6 +29,9 @@ fun AppNavigation() {
         }
         composable(AppScreens.PetsScreen.route) {
             PetsScreen(navController)
+        }
+        composable(AppScreens.CreatePetScreen.route) {
+            CreatePetScreen(navController)
         }
         composable(AppScreens.LoginScreen.route) {
             LoginScreen(navController)
