@@ -1,4 +1,4 @@
-package com.example.medivet.ui.pets.components
+package com.example.medivet.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
