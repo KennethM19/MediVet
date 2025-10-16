@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.medivet.navigation.AppScreens
 import com.example.medivet.ui.components.BottomNavBar
 import com.example.medivet.ui.pets.components.PetCard
 
@@ -38,7 +39,9 @@ fun PetsScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { /* Navegar a pantalla de agregar mascota */ },
+                onClick = {
+                    navController.navigate(AppScreens.AddPetScreen.route)
+                },
                 containerColor = Color(0xFF00BFA5),
                 contentColor = Color.White
             ) {
@@ -60,6 +63,7 @@ fun PetsScreen(
                 PetCard(
                     pet = pet,
                     onEditClick = {
+
                         // navController.navigate(AppScreens.EditPetScreen.route + "/${pet.id}")
                     }
                 )
