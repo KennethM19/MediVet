@@ -1,7 +1,6 @@
 package com.example.medivet.screens
 
 import android.content.Context
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
@@ -10,7 +9,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -26,24 +24,36 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.medivet.R
 import com.example.medivet.navigation.AppScreens
-import com.example.medivet.utils.getFirebaseErrorMessage
+import com.example.medivet.ui.login.LoginViewModel
+import com.example.medivet.ui.login.AuthState
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 
+// ---------------------------------------------------------------------
+// FUNCIÓN PRINCIPAL - LoginScreen
+// ---------------------------------------------------------------------
 @Composable
-fun LoginScreen(navController: NavHostController) {
+fun LoginScreen(
+    navController: NavHostController,
+    viewModel: LoginViewModel = viewModel() //INYECTAR VIEWMODEL
+) {
     val context = LocalContext.current
-    val auth = FirebaseAuth.getInstance()
+    val auth = FirebaseAuth.getInstance() // Mantener para el Google Sign-In
 
+    // Variables de estado local para los inputs
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var isLoading by remember { mutableStateOf(false) }
 
+    //Observar el estado de autenticación del ViewModel
+    val authState by viewModel.authState.collectAsState()
+
+    // Configuración de Google Sign-In
     val token = context.getString(R.string.default_web_client_id)
     val googleSignInClient = GoogleSignIn.getClient(
         context,
@@ -56,6 +66,7 @@ fun LoginScreen(navController: NavHostController) {
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
+        // Google Sign-In aún usa el AuthHandler de Firebase
         handleGoogleLoginResult(result, auth, navController, context)
     }
 
@@ -85,16 +96,26 @@ fun LoginScreen(navController: NavHostController) {
             ForgotPasswordText(navController,context)
             Spacer(modifier = Modifier.height(24.dp))
 
-            LoginButton(email, password, auth, navController, context, isLoading) { isLoading = it }
+            val isLoading = authState is AuthState.Loading // Determinar carga desde el VM
+
+            // 👈 Llamar a la versión actualizada de LoginButton
+            LoginButton(email, password, viewModel, isLoading)
+
             Spacer(modifier = Modifier.height(12.dp))
             GoogleLoginButton { launcher.launch(googleSignInClient.signInIntent) }
             Spacer(modifier = Modifier.height(16.dp))
 
             RegisterText(navController,context)
+
+            // 👈 MANEJADOR DE ESTADO: Reacciona al éxito o error del ViewModel
+            AuthHandler(authState = authState, navController = navController, context = context)
         }
     }
 }
 
+// ---------------------------------------------------------------------
+// COMPONENTES EXISTENTES (SIN CAMBIOS)
+// ---------------------------------------------------------------------
 @Composable
 fun LogoSection() {
     Image(
@@ -144,51 +165,42 @@ fun ForgotPasswordText(navController: NavHostController, context: Context) {
         color = Color.Black,
         modifier = Modifier
             .clickable {
-                //Toast.makeText(context, "Funcionalidad en construcción", Toast.LENGTH_SHORT).show()
                 navController.navigate(AppScreens.PasswordResetScreen.route)
             }
     )
 }
 
+// ---------------------------------------------------------------------
+// FUNCIÓN MODIFICADA - LoginButton
+// ---------------------------------------------------------------------
 @Composable
 fun LoginButton(
     email: String,
     password: String,
-    auth: FirebaseAuth,
-    navController: NavHostController,
-    context: Context,
-    isLoading: Boolean,
-    setLoading: (Boolean) -> Unit
+    viewModel: LoginViewModel, // viewmodel
+    isLoading: Boolean //estado de carga
 ) {
     Button(
         onClick = {
-            setLoading(true)
-            auth.signInWithEmailAndPassword(email.trim(), password.trim())
-                .addOnCompleteListener { task ->
-                    setLoading(false)
-                    if (task.isSuccessful) {
-                        navController.navigate(AppScreens.MainScreen.route) {
-                            popUpTo(AppScreens.LoginScreen.route) { inclusive = true }
-                        }
-                    } else {
-                        Toast.makeText(
-                            context,
-                            getFirebaseErrorMessage(task.exception),
-                            Toast.LENGTH_LONG
-                        ).show()
-                        Log.e("Login", "Error", task.exception)
-                    }
-                }
+            // Llama a la lógica centralizada (FastAPI -> Firebase)
+            viewModel.signIn(email, password)
         },
         modifier = Modifier
             .fillMaxWidth()
             .height(50.dp),
-        enabled = !isLoading
+        enabled = !isLoading // Deshabilitar si está cargando
     ) {
-        Text("Iniciar sesión", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+        if (isLoading) {
+            CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+        } else {
+            Text("Iniciar sesión", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+        }
     }
 }
 
+// ---------------------------------------------------------------------
+// COMPONENTES EXISTENTES (SIN CAMBIOS)
+// ---------------------------------------------------------------------
 @Composable
 fun GoogleLoginButton(onClick: () -> Unit) {
     Button(
@@ -209,7 +221,7 @@ fun GoogleLoginButton(onClick: () -> Unit) {
 }
 
 @Composable
-fun RegisterText(navController: NavHostController,context: Context) {
+fun RegisterText(navController: NavHostController, context: Context) {
     Row(
         horizontalArrangement = Arrangement.Center,
         modifier = Modifier.fillMaxWidth()
@@ -221,14 +233,41 @@ fun RegisterText(navController: NavHostController,context: Context) {
             fontWeight = FontWeight.Bold,
             color = Color.Black,
             modifier = Modifier.clickable {
-                //Toast.makeText(context, "Registro en construcción", Toast.LENGTH_SHORT).show()
                 navController.navigate(AppScreens.RegisterFirstScreen.route)
-
             }
         )
     }
 }
 
+// ---------------------------------------------------------------------
+// NUEVA FUNCIÓN - AuthHandler (Maneja la navegación basada en el VM)
+// ---------------------------------------------------------------------
+@Composable
+fun AuthHandler(
+    authState: AuthState,
+    navController: NavHostController,
+    context: Context
+) {
+    LaunchedEffect(authState) {
+        when (authState) {
+            is AuthState.Success -> {
+                Toast.makeText(context, "Login con ${authState.method} exitoso.", Toast.LENGTH_SHORT).show()
+                navController.navigate(AppScreens.MainScreen.route) {
+                    popUpTo(AppScreens.LoginScreen.route) { inclusive = true }
+                }
+            }
+            is AuthState.Error -> {
+                Toast.makeText(context, authState.message, Toast.LENGTH_LONG).show()
+            }
+            else -> Unit
+        }
+    }
+}
+
+
+// ---------------------------------------------------------------------
+// FUNCIÓN DE FIREBASE (Mantiene su implementación existente)
+// ---------------------------------------------------------------------
 private fun handleGoogleLoginResult(
     result: ActivityResult,
     auth: FirebaseAuth,
@@ -254,5 +293,3 @@ private fun handleGoogleLoginResult(
         Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
     }
 }
-
-

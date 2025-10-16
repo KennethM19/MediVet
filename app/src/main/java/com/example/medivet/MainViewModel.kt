@@ -7,9 +7,10 @@ import com.example.medivet.model.User
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import com.example.medivet.services.ApiClient
 
 class MainViewModel(
-    private val userRepository: UserRepository = UserRepository()
+    private val userRepository: UserRepository = UserRepository(ApiClient.apiService)
 ) : ViewModel() {
 
     private val _user = MutableStateFlow<User?>(null)
