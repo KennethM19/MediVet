@@ -74,23 +74,36 @@ class CreatePetViewModel(
 
     // 🔹 Crear mascota
     fun createPet(pet: PetRequest) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
+            _creationState.value = PetCreationState.Loading // Poner el estado de carga primero
+
             val token = sessionManager.token.first() ?: run {
-                _creationState.value = PetCreationState.Error("Token no disponible")
+                _creationState.value =
+                    PetCreationState.Error("Token no disponible. Inicia sesión de nuevo.")
                 return@launch
             }
 
-            _creationState.value = PetCreationState.Loading
             try {
+                // Asegúrate de que tu repositorio formatea el token como "Bearer [token]"
                 val response = repository.createPet(token, pet)
+
                 if (response.isSuccessful) {
                     _creationState.value = PetCreationState.Success
                 } else {
-                    _creationState.value =
-                        PetCreationState.Error("Error ${response.code()}: ${response.message()}")
+                    // **MEJORA CRÍTICA AQUÍ**
+                    // Intentamos leer el cuerpo del error para obtener un mensaje detallado.
+                    val errorBody = response.errorBody()?.string()
+                    val detailedError = if (errorBody.isNullOrBlank()) {
+                        "Error ${response.code()}: ${response.message()}"
+                    } else {
+                        "Error ${response.code()}: $errorBody"
+                    }
+                    _creationState.value = PetCreationState.Error(detailedError)
                 }
             } catch (e: Exception) {
-                _creationState.value = PetCreationState.Error("Excepción: ${e.message}")
+                // Captura de errores de red (sin conexión, timeout, etc.)
+                e.printStackTrace() // Esencial para ver el error completo en Logcat
+                _creationState.value = PetCreationState.Error("Error de conexión: ${e.message}")
             }
         }
     }

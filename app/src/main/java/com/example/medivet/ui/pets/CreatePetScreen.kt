@@ -63,17 +63,47 @@ fun CreatePetScreen(
 
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
 
-    // Lanzador para abrir la galería
+// Lanzador para abrir la galería
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         selectedImageUri = uri
     }
 
+// --- 👇 INICIO DE LA MODIFICACIÓN 1: MANEJO DE ESTADOS ---
+    var showErrorDialog by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(creationState) {
+        when (val state = creationState) {
+            is PetCreationState.Success -> {
+                navController.popBackStack()
+            }
+            is PetCreationState.Error -> {
+                showErrorDialog = state.message
+            }
+            else -> { /* No hacer nada */ }
+        }
+    }
+// --- FIN DE LA MODIFICACIÓN 1 ---
+
     LaunchedEffect(Unit) { viewModel.loadDropdownData() }
 
+// --- 👇 INICIO DE LA MODIFICACIÓN 2: DIÁLOGO DE ERROR ---
+    if (showErrorDialog != null) {
+        AlertDialog(
+            onDismissRequest = { showErrorDialog = null },
+            title = { Text("Error al Crear Mascota") },
+            text = { Text(showErrorDialog!!) },
+            confirmButton = {
+                Button(onClick = { showErrorDialog = null }) {
+                    Text("Aceptar")
+                }
+            }
+        )
+    }
+// --- FIN DE LA MODIFICACIÓN 2 ---
+
     Column(modifier = Modifier.fillMaxSize()) {
-        // Encabezado con fondo
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -95,7 +125,6 @@ fun CreatePetScreen(
             )
         }
 
-        // Contenido principal
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -190,15 +219,12 @@ fun CreatePetScreen(
                     )
                     Spacer(Modifier.height(24.dp))
 
-                    // Imagen / Subir foto
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(180.dp)
                             .background(Color(0xFFF4F4F4), RoundedCornerShape(12.dp))
-                            .clickable {
-                                galleryLauncher.launch("image/*")
-                            },
+                            .clickable { galleryLauncher.launch("image/*") },
                         contentAlignment = Alignment.Center
                     ) {
                         if (selectedImageUri != null) {
@@ -225,6 +251,7 @@ fun CreatePetScreen(
 
                     Spacer(Modifier.height(24.dp))
 
+                    // --- 👇 INICIO DE LA MODIFICACIÓN 3: LÓGICA DEL BOTÓN ---
                     Row(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         modifier = Modifier.fillMaxWidth()
@@ -241,43 +268,49 @@ fun CreatePetScreen(
 
                         Button(
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00BFA5)),
+                            enabled = creationState !is PetCreationState.Loading,
                             onClick = {
-                                scope.launch {
-                                    val userId = sessionManager.getUserIdFromToken() ?: return@launch
+                                    if (name.isBlank() || selectedSex == null || selectedSpecies == null || selectedBreed == null) {
+                                        showErrorDialog = "Por favor, completa todos los campos obligatorios (*)."
+                                    }else {
 
                                     val pet = PetRequest(
-                                        user_id = userId,
-                                        num_doc = numDoc,
+                                        //user_id = userId,
+                                        num_doc = numDoc.ifBlank { null },
                                         name = name,
-                                        photo = selectedImageUri?.toString(), // ✅ Guardamos la URI seleccionada
-                                        sex_id = selectedSex ?: return@launch,
-                                        specie_id = selectedSpecies ?: return@launch,
-                                        year_birth = year.toIntOrNull() ?: return@launch,
-                                        month_birth = month.toIntOrNull() ?: return@launch,
+                                        photo = selectedImageUri?.toString(),
+                                        sex_id = selectedSex!!,
+                                        specie_id = selectedSpecies!!,
+                                        year_birth = year.toIntOrNull() ?: 0,
+                                        month_birth = month.toIntOrNull() ?: 0,
                                         weight = weight.toDoubleOrNull(),
                                         neutered = isNeutered,
-                                        breed_id = selectedBreed ?: return@launch
+                                        breed_id = selectedBreed!!
                                     )
                                     viewModel.createPet(pet)
-                                }
+                                    }
                             },
                             modifier = Modifier.weight(1f)
                         ) {
-                            Text("Agregar", color = Color.White)
+                            if (creationState is PetCreationState.Loading) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(24.dp),
+                                    color = Color.White,
+                                    strokeWidth = 2.dp
+                                )
+                            } else {
+                                Text("Agregar", color = Color.White)
+                            }
                         }
                     }
-
-                    if (creationState is PetCreationState.Loading)
-                        CircularProgressIndicator(Modifier.align(Alignment.CenterHorizontally))
+                    // --- FIN DE LA MODIFICACIÓN 3 ---
                 }
             }
         }
     }
 }
 
-/**
- * Dropdown estilizado con texto negro
- */
+// Dropdown estilizado
 @Composable
 fun DropdownSelector(
     label: String,
@@ -286,9 +319,8 @@ fun DropdownSelector(
     onOptionSelected: (Int) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
-
     Column {
-        Text(label, color = Color.Black)
+        Text(label, color = Color.White)
         Box {
             OutlinedTextField(
                 value = options.getOrNull(selectedIndex) ?: "",
@@ -308,7 +340,7 @@ fun DropdownSelector(
             ) {
                 options.forEachIndexed { index, option ->
                     DropdownMenuItem(
-                        text = { Text(option, color = Color.Black) },
+                        text = { Text(option, color = Color.White) },
                         onClick = {
                             onOptionSelected(index)
                             expanded = false
@@ -319,3 +351,4 @@ fun DropdownSelector(
         }
     }
 }
+
