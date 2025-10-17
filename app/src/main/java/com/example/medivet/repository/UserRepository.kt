@@ -10,6 +10,8 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 import com.example.medivet.model.RegisterRequest
+import com.example.medivet.model.VerifyCodeRequest
+import com.example.medivet.services.ApiClient
 
 class UserRepository(
 
@@ -80,6 +82,16 @@ class UserRepository(
             )
         }
     }
+
+    suspend fun verifyCode(email: String, code: String) {
+        val request = VerifyCodeRequest(email, code)
+        val response = ApiClient.apiService.verifyCode(request)
+        if (!response.isSuccessful) {
+            throw Exception("Código inválido o expirado")
+        }
+    }
+
+
 
     // Tu función existente para cerrar sesión
     fun signOut() {

@@ -43,7 +43,7 @@ fun AuthenticationScreen(
     // Eliminamos la inicialización directa aquí, y la haremos dentro del bloque:
 ) {
     val context = LocalContext.current
-    val codeLength = 6
+    val codeLength = 5
     var code by remember { mutableStateOf(List(codeLength) { "" }) }
 
     // 1. Crear la instancia UNICA del SessionManager
@@ -53,7 +53,12 @@ fun AuthenticationScreen(
     val factory = remember { RegisterViewModelFactory(sessionManager) }
 
     // 3. Obtener el ViewModel usando la Factory (REEMPLAZA LA LÍNEA ANTERIOR)
-    val viewModel: RegisterViewModel = viewModel(factory = factory)
+    val backStackEntry = navController.getBackStackEntry(AppScreens.RegisterFirstScreen.route)
+    val viewModel: RegisterViewModel = viewModel(
+        viewModelStoreOwner = backStackEntry,
+        factory = factory
+    )
+
 
     // 4. OBSERVAR EL ESTADO Y LOS DATOS DE REGISTRO
     val state by viewModel.registerState.collectAsState()
@@ -89,10 +94,13 @@ fun AuthenticationScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            AuthCodeInputFields(code) { index, value ->
+            AuthCodeInputFields(
+                code=code,
+                codeLength=codeLength,
+                onCodeChange = { index, value ->
                 code = code.toMutableList().also { it[index] = value }
             }
-
+            )
             Spacer(modifier = Modifier.height(24.dp))
 
             // 👈 4. BOTÓN CON LÓGICA DE VERIFICACIÓN
@@ -103,7 +111,7 @@ fun AuthenticationScreen(
             )
 
             // 👈 5. MANEJADOR DE ESTADO
-            RegisterAuthHandler(state, navController, context)
+            RegisterAuthHandler(state, navController, context, viewModel)
         }
     }
 }
@@ -134,18 +142,20 @@ fun AuthInstructionText(email: String) {
 
 // Input de código en recuadros individuales (SIN CAMBIOS)
 @Composable
-fun AuthCodeInputFields(code: List<String>, onCodeChange: (Int, String) -> Unit) {
+fun AuthCodeInputFields(code: List<String>, codeLength: Int,onCodeChange: (Int, String) -> Unit) {
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
+
 
     Box {
         // Campo invisible para capturar todo el input
         BasicTextField(
             value = code.joinToString(""),
             onValueChange = { input ->
-                val digits = input.filter { it.isDigit() }.take(6)
-                digits.forEachIndexed { i, c -> onCodeChange(i, c.toString()) }
-                for (i in digits.length until 6) onCodeChange(i, "")
+                val chars = input.filter { it.isLetterOrDigit() }.take(codeLength)
+                chars.forEachIndexed { i, c -> onCodeChange(i, c.toString()) }
+                for (i in chars.length until codeLength) onCodeChange(i, "")
+
             },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number,
@@ -202,7 +212,7 @@ fun SendAuthenticationButton(
     Button(
         onClick = {
             // Llama a la lógica de verificación del ViewModel
-            //viewModel.verifyCode(authcode)
+            viewModel.verifyCode(authcode)
         },
         modifier = Modifier
             .fillMaxWidth()
@@ -219,9 +229,12 @@ fun SendAuthenticationButton(
 
 // 👈 FUNCIÓN ADICIONAL: Manejador de estado de verificación (añadir al mismo archivo)
 @Composable
-fun RegisterAuthHandler(state: RegisterState, navController: NavHostController, context: Context) {
-    val viewModel: RegisterViewModel = viewModel() // Acceso al VM para resetear
-
+fun RegisterAuthHandler(
+    state: RegisterState,
+    navController: NavHostController,
+    context: Context,
+    viewModel: RegisterViewModel
+) {
     LaunchedEffect(state) {
         when (state) {
             is RegisterState.Success -> {
@@ -239,6 +252,7 @@ fun RegisterAuthHandler(state: RegisterState, navController: NavHostController, 
         }
     }
 }
+
 
 
 @Preview(showBackground = true, showSystemUi = true)

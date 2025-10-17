@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import android.util.Log
+import com.example.medivet.model.VerifyCodeRequest
 
 // -----------------------------------------------------------
 // A. Mapeo de Tipos de Documento (Lógica de Negocio)
@@ -156,4 +157,33 @@ class RegisterViewModel(
     fun resetState() {
         _registerState.value = RegisterState.Idle
     }
+
+    fun verifyCode(authCode: String) {
+        val email = _registrationData.value.email
+        if (email.isBlank()) {
+            _registerState.value = RegisterState.Error("Email no disponible para verificar.")
+            return
+        }
+
+        val request = VerifyCodeRequest(
+            email = email,
+            code = authCode
+        )
+
+        _registerState.value = RegisterState.Loading
+        viewModelScope.launch {
+            try {
+                val response = ApiClient.apiService.verifyCode(request)
+                if (response.isSuccessful) {
+                    _registerState.value = RegisterState.Success("VERIFICACION_EXITOSA")
+                } else {
+                    _registerState.value = RegisterState.Error("Código incorrecto o expirado")
+                }
+            } catch (e: Exception) {
+                _registerState.value = RegisterState.Error(e.message ?: "Error desconocido")
+            }
+        }
+    }
+
+
 }
