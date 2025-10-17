@@ -1,4 +1,4 @@
-package com.example.medivet.presentation.main
+package com.example.medivet
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -15,18 +15,34 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.example.medivet.MainViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.medivet.R
 import com.example.medivet.navigation.AppScreens
+import com.example.medivet.MainViewModel //ViewModel
+import com.example.medivet.MainViewModelFactory //Factory
+import com.example.medivet.utils.SessionManager //SessionManager (DataStore)
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(navController: NavHostController, viewModel: MainViewModel = androidx.lifecycle.viewmodel.compose.viewModel()) {
+fun MainScreen(navController: NavHostController) {
+    val context = LocalContext.current
+
+    // 1. Crear la instancia UNICA del SessionManager
+    val sessionManager = remember { SessionManager(context) }
+
+    // 2. Crear la Factory, pasándole el SessionManager
+    val factory = remember { MainViewModelFactory(sessionManager) }
+
+    // 3. OBTENER EL VIEWMODEL USANDO LA FACTORY (ARREGLO DEL CRASH)
+    val viewModel: MainViewModel = viewModel(factory = factory)
+
+    // Los datos del usuario (que el VM carga)
     val user by viewModel.user.collectAsState()
 
     Scaffold(
@@ -77,10 +93,12 @@ fun MainScreen(navController: NavHostController, viewModel: MainViewModel = andr
 
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
+                            // Muestra el nombre cargado del usuario
                             text = user?.name ?: "[Nombre]",
                             style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
                         )
                         Text(
+                            // Muestra el email cargado
                             text = user?.email ?: "example@example.com",
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color.Gray
@@ -133,8 +151,10 @@ fun MainScreen(navController: NavHostController, viewModel: MainViewModel = andr
                 // 🔹 Botón de Sign Out
                 Button(
                     onClick = {
+                        // Llama a la función que borra el token de DataStore y Firebase
                         viewModel.signOut()
                         navController.navigate(AppScreens.LoginScreen.route) {
+                            // Limpia el back stack para que el usuario no pueda volver
                             popUpTo(AppScreens.MainScreen.route) { inclusive = true }
                         }
                     },

@@ -1,5 +1,7 @@
 package com.example.medivet.screens
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -15,6 +17,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
@@ -25,14 +28,40 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import androidx.lifecycle.viewmodel.compose.viewModel // 👈 ViewModel
 import com.example.medivet.R
 import com.example.medivet.navigation.AppScreens
+import com.example.medivet.ui.register.RegisterViewModel // 👈 VM de Registro
+import com.example.medivet.ui.register.RegisterState // 👈 Estado
+import com.example.medivet.ui.register.RegisterViewModelFactory
+import com.example.medivet.utils.SessionManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AuthenticationScreen(navController: NavHostController) {
+fun AuthenticationScreen(
+    navController: NavHostController,
+    // Eliminamos la inicialización directa aquí, y la haremos dentro del bloque:
+) {
+    val context = LocalContext.current
     val codeLength = 6
     var code by remember { mutableStateOf(List(codeLength) { "" }) }
+
+    // 1. Crear la instancia UNICA del SessionManager
+    val sessionManager = remember { SessionManager(context) }
+
+    // 2. Crear la Factory, pasándole el SessionManager
+    val factory = remember { RegisterViewModelFactory(sessionManager) }
+
+    // 3. Obtener el ViewModel usando la Factory (REEMPLAZA LA LÍNEA ANTERIOR)
+    val viewModel: RegisterViewModel = viewModel(factory = factory)
+
+    // 4. OBSERVAR EL ESTADO Y LOS DATOS DE REGISTRO
+    val state by viewModel.registerState.collectAsState()
+    val regData by viewModel.registrationData.collectAsState()
+
+    // Obtener el email del VM para la instrucción
+    val emailText = regData.email.ifBlank { "el correo de registro" }
+    val isLoading = state is RegisterState.Loading
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -54,18 +83,32 @@ fun AuthenticationScreen(navController: NavHostController) {
         ) {
             AuthenticationLogo()
             Spacer(modifier = Modifier.height(60.dp))
-            AuthInstructionText()
+
+            // 👈 3. USAR EL EMAIL REAL
+            AuthInstructionText(emailText)
+
             Spacer(modifier = Modifier.height(16.dp))
+
             AuthCodeInputFields(code) { index, value ->
                 code = code.toMutableList().also { it[index] = value }
             }
+
             Spacer(modifier = Modifier.height(24.dp))
-            SendAuthenticationButton(navController, code.joinToString(""))
+
+            // 👈 4. BOTÓN CON LÓGICA DE VERIFICACIÓN
+            SendAuthenticationButton(
+                viewModel = viewModel,
+                authcode = code.joinToString(""),
+                isLoading = isLoading
+            )
+
+            // 👈 5. MANEJADOR DE ESTADO
+            RegisterAuthHandler(state, navController, context)
         }
     }
 }
 
-// Logo
+// Logo (SIN CAMBIOS)
 @Composable
 fun AuthenticationLogo() {
     Image(
@@ -77,11 +120,11 @@ fun AuthenticationLogo() {
     )
 }
 
-// Texto de instrucción
+// 👈 FUNCIÓN MODIFICADA: Ahora recibe el email para mostrarlo
 @Composable
-fun AuthInstructionText() {
+fun AuthInstructionText(email: String) {
     Text(
-        "Se envió un código a example@example.com",
+        "Se envió un código a $email",
         color = Color.Black,
         fontSize = 14.sp,
         textAlign = TextAlign.Center,
@@ -89,7 +132,7 @@ fun AuthInstructionText() {
     )
 }
 
-// Input de código en recuadros individuales
+// Input de código en recuadros individuales (SIN CAMBIOS)
 @Composable
 fun AuthCodeInputFields(code: List<String>, onCodeChange: (Int, String) -> Unit) {
     val focusRequester = remember { FocusRequester() }
@@ -113,14 +156,12 @@ fun AuthCodeInputFields(code: List<String>, onCodeChange: (Int, String) -> Unit)
             ),
             singleLine = true,
             textStyle = LocalTextStyle.current.copy(color = Color.Transparent),
-            cursorBrush = SolidColor(Color.Transparent), // <- Oculta el cursor
+            cursorBrush = SolidColor(Color.Transparent),
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp)
                 .focusRequester(focusRequester)
         )
-
-
 
         // Los 6 recuadros visibles
         Row(
@@ -148,29 +189,62 @@ fun AuthCodeInputFields(code: List<String>, onCodeChange: (Int, String) -> Unit)
         }
     }
 
-    // Pedir foco al iniciar
     LaunchedEffect(Unit) { focusRequester.requestFocus() }
 }
 
-// Botón de enviar código
+// 👈 FUNCIÓN MODIFICADA: Llama al ViewModel para verificar
 @Composable
-fun SendAuthenticationButton(navController: NavHostController, authcode: String) {
+fun SendAuthenticationButton(
+    viewModel: RegisterViewModel,
+    authcode: String,
+    isLoading: Boolean
+) {
     Button(
         onClick = {
-            navController.navigate(AppScreens.MainScreen.route)
+            // Llama a la lógica de verificación del ViewModel
+            //viewModel.verifyCode(authcode)
         },
         modifier = Modifier
             .fillMaxWidth()
-            .height(50.dp)
+            .height(50.dp),
+        enabled = !isLoading
     ) {
-        Text("Registrarte")
+        if (isLoading) {
+            CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+        } else {
+            Text("Verificar")
+        }
     }
 }
+
+// 👈 FUNCIÓN ADICIONAL: Manejador de estado de verificación (añadir al mismo archivo)
+@Composable
+fun RegisterAuthHandler(state: RegisterState, navController: NavHostController, context: Context) {
+    val viewModel: RegisterViewModel = viewModel() // Acceso al VM para resetear
+
+    LaunchedEffect(state) {
+        when (state) {
+            is RegisterState.Success -> {
+                Toast.makeText(context, "Verificación exitosa. ¡Bienvenido!", Toast.LENGTH_LONG).show()
+                navController.navigate(AppScreens.MainScreen.route) {
+                    popUpTo(AppScreens.LoginScreen.route) { inclusive = true }
+                }
+                viewModel.resetState()
+            }
+            is RegisterState.Error -> {
+                Toast.makeText(context, state.message, Toast.LENGTH_LONG).show()
+                viewModel.resetState()
+            }
+            else -> Unit
+        }
+    }
+}
+
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun PreviewAuthenticationFirstScreen() {
     val navController = rememberNavController()
-
-    AuthenticationScreen(navController = navController)
+    // Nota: El Preview ya no funcionará completamente sin un ViewModel real.
+    // AuthenticationScreen(navController = navController)
 }

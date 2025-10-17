@@ -9,6 +9,7 @@ import retrofit2.Response
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
+import com.example.medivet.model.RegisterRequest
 
 class UserRepository(
 
@@ -46,6 +47,21 @@ class UserRepository(
                         continuation.resumeWithException(task.exception ?: Exception("Error desconocido de Firebase"))
                     }
                 }
+        }
+    }
+
+    //NUEVA FUNCIÓN: Registro con FastAPI
+    suspend fun registerWithFastApi(request: RegisterRequest): AuthResponse {
+        // Llama al servicio API para enviar la solicitud de registro
+        val response = authService.registerUser(request)
+
+        if (response.isSuccessful && response.body() != null) {
+            // Devuelve el token de autenticación (AuthResponse) si el registro fue exitoso
+            return response.body()!!
+        } else {
+            // Manejo de error (ej. 409 Conflict si el email ya existe)
+            // Puedes añadir aquí lógica para leer el cuerpo de error (response.errorBody())
+            throw Exception("Registro fallido. El email podría estar en uso, o error: ${response.code()}")
         }
     }
 

@@ -1,5 +1,7 @@
 package com.example.medivet.screens.register
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -11,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.LocalTextStyle
@@ -18,6 +21,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,13 +40,43 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.medivet.R
 import com.example.medivet.navigation.AppScreens
-
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.medivet.ui.register.RegisterViewModel
+import com.example.medivet.ui.register.RegisterState
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.runtime.LaunchedEffect
+import com.example.medivet.ui.register.RegisterViewModelFactory
+import com.example.medivet.utils.SessionManager
 @Composable
-fun RegisterSecondScreen(navController: NavHostController) {
-    LocalContext.current
+fun RegisterSecondScreen(
+    navController: NavHostController,
+) {
+    val context = LocalContext.current
+
+    // 1. Crear la instancia UNICA del SessionManager
+    val sessionManager = remember { SessionManager(context) }
+
+    // 2. Crear la Factory, pasándole el SessionManager
+    val factory = remember { RegisterViewModelFactory(sessionManager) }
+
+    // 3. Obtener el ViewModel usando la Factory (ESTE ES EL CAMBIO CLAVE)
+    val navBackStackEntry = remember { navController.getBackStackEntry(AppScreens.RegisterFirstScreen.route) }
+    val viewModel: RegisterViewModel = viewModel(
+        factory = factory,
+        viewModelStoreOwner = navBackStackEntry
+    )
+
+
+    // Variables de estado locales
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
+
+    // 4. Observar el estado de registro
+    val state by viewModel.registerState.collectAsState()
+    val isLoading = state is RegisterState.Loading
+
+
     Box(modifier = Modifier.fillMaxWidth()) {
         Image(
             painter = painterResource(id = R.drawable.background),
@@ -89,8 +123,15 @@ fun RegisterSecondScreen(navController: NavHostController) {
                     )
                 }
             }
-            RegisterButton(navController)
+            RegisterButton(
+                viewModel = viewModel,
+                email = email,
+                password = password,
+                confirmPassword = confirmPassword,
+                isLoading = isLoading
+            )
         }
+        RegisterAuthHandler(state, navController, context, viewModel)
     }
 }
 
@@ -119,18 +160,68 @@ fun PasswordFieldWithSubtitle(
     }
 }
 
+//5. FUNCIÓN MODIFICADA DEL BOTÓN REGISTRARSE
 @Composable
-fun RegisterButton(navController: NavHostController) {
+fun RegisterButton(
+    viewModel: RegisterViewModel,
+    email: String,
+    password: String,
+    confirmPassword: String,
+    isLoading: Boolean
+) {
+    val context = LocalContext.current
+
     Button(
         onClick = {
-            /* Funcionalidad se agregará después */
-            navController.navigate(AppScreens.AuthenticationScreen.route)
+            // 1. VALIDACIÓN DE COINCIDENCIA DE CONTRASEÑAS
+            if (password != confirmPassword) {
+                Toast.makeText(context, "Las contraseñas no coinciden.", Toast.LENGTH_SHORT).show()
+                return@Button
+            }
+
+            // 2. 🚨 GUARDAR EMAIL Y PASSWORD EN EL VIEWMODEL PRIMERO 🚨
+            // Usamos los setters para actualizar el estado interno del VM
+            viewModel.setEmail(email.trim())
+            viewModel.setPassword(password.trim())
+
+            // 3. VALIDACIÓN FINAL EN EL VM
+            // Llamar a la función de registro (que ahora lee el email/password directamente de su estado interno)
+            viewModel.registerUser()
         },
         modifier = Modifier
             .fillMaxWidth()
             .height(50.dp),
+        enabled = !isLoading
     ) {
-        Text("Registrarse")
+        if (isLoading) {
+            CircularProgressIndicator(Modifier.size(24.dp))
+        } else {
+            Text("Registrarse")
+        }
+    }
+}
+
+// 👈 6. FUNCIÓN MANEJADORA DE ESTADO
+@Composable
+fun RegisterAuthHandler(
+    state: RegisterState,
+    navController: NavHostController,
+    context: Context,
+    viewModel: RegisterViewModel
+) {
+    LaunchedEffect(state) {
+        when (state) {
+            is RegisterState.Success -> {
+                Toast.makeText(context, "Registro exitoso. Verifique su correo.", Toast.LENGTH_LONG).show()
+                // Navegar a la pantalla de Autenticación de código
+                navController.navigate(AppScreens.AuthenticationScreen.route)
+                viewModel.resetState() // Limpiar el estado después de navegar
+            }
+            is RegisterState.Error -> {
+                Toast.makeText(context, state.message, Toast.LENGTH_LONG).show()
+            }
+            else -> Unit
+        }
     }
 }
 

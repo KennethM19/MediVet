@@ -1,9 +1,9 @@
 package com.example.medivet.screens.register
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -18,22 +18,34 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.medivet.R
 import com.example.medivet.navigation.AppScreens
-
+import com.example.medivet.ui.register.RegisterViewModel
+import com.example.medivet.ui.register.RegisterViewModelFactory
+import com.example.medivet.ui.register.RegistrationData
+import com.example.medivet.utils.SessionManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegisterFirstScreen(navController: NavHostController) {
-    LocalContext.current
-    var docType by remember { mutableStateOf("") }
-    var docNumber by remember { mutableStateOf("") }
-    var firstName by remember { mutableStateOf("") }
-    var lastName by remember { mutableStateOf("") }
-    var address by remember { mutableStateOf("") }
-    var birthDate by remember { mutableStateOf("") }
-    var cellphoneNum by remember { mutableStateOf("") }
-    var telephoneNum by remember { mutableStateOf("") }
+fun RegisterFirstScreen(
+    navController: NavHostController,
+) {
+    val context = LocalContext.current
+
+    // 1. Crear la instancia UNICA del SessionManager
+    val sessionManager = remember { SessionManager(context) }
+
+    // 2. Crear la Factory, pasándole el SessionManager
+    val factory = remember { RegisterViewModelFactory(sessionManager) }
+
+    // 3. Obtener el ViewModel usando la Factory
+    val viewModel: RegisterViewModel = viewModel(factory = factory)
+
+    // 4. Leemos el estado completo del formulario (EN VIVO desde el VM)
+    val regData by viewModel.registrationData.collectAsState()
+
+    // ⚠️ Se eliminaron todas las variables locales 'var x by remember'
 
     Box(modifier = Modifier.fillMaxSize()) {
         // Fondo
@@ -57,74 +69,89 @@ fun RegisterFirstScreen(navController: NavHostController) {
             ) {
                 RegisterLogo()
                 Spacer(modifier = Modifier.height(8.dp))
-                // FILA DE DOCUMENTO
+
+                // FILA DE DOCUMENTO (ENLACE DIRECTO AL VM)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     DocumentTypeDropdown(
-                        selectedType = docType,
-                        onTypeSelected = {docType = it},
+                        selectedType = regData.docType,
+                        onTypeSelected = viewModel::setDocType, // 👈 ENLACE
                         modifier = Modifier.weight(1f)
                     )
                     InputFieldWithSubtitle(
                         subtitle = "N° documento",
-                        value = docNumber,
-                        onValueChange = { docNumber = it },
+                        value = regData.docNumber,
+                        onValueChange = viewModel::setDocNumber, // 👈 ENLACE
+                        keyboardType = KeyboardType.Number, // Asumo que el documento es numérico
                         modifier = Modifier.weight(1f)
                     )
                 }
                 Spacer(modifier = Modifier.height(8.dp))
-                // FILA DE NOMBRE Y APELLIDO
+
+                // FILA DE NOMBRE Y APELLIDO (ENLACE DIRECTO AL VM)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     InputFieldWithSubtitle(
                         subtitle = "Nombre",
-                        value = firstName,
-                        onValueChange = { firstName = it },
+                        value = regData.firstName,
+                        onValueChange = viewModel::setFirstName,
                         modifier = Modifier.weight(1f)
                     )
                     InputFieldWithSubtitle(
                         subtitle = "Apellido",
-                        value = lastName,
-                        onValueChange = { lastName = it },
+                        value = regData.lastName,
+                        onValueChange = viewModel::setLastName,
                         modifier = Modifier.weight(1f)
                     )
                 }
                 Spacer(modifier = Modifier.height(8.dp))
-                //FILA DE NACIMIENTO Y DIRECCIÓN
+
+                // FILA DE NACIMIENTO Y DIRECCIÓN (ENLACE DIRECTO AL VM)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     InputFieldWithSubtitle(
                         subtitle = "Nacimiento",
-                        value = birthDate,
-                        onValueChange = { birthDate = it },
+                        value = regData.birthDate,
+                        onValueChange = viewModel::setBirthDate, // 👈 ENLACE: Usuario debe usar YYYY-MM-DD
                         modifier = Modifier.weight(1f)
                     )
                     InputFieldWithSubtitle(
                         subtitle = "Dirección",
-                        value = address,
-                        onValueChange = { address = it },
+                        value = regData.address,
+                        onValueChange = viewModel::setAddress,
                         modifier = Modifier.weight(1f)
                     )
                 }
                 Spacer(modifier = Modifier.height(8.dp))
-                //FILA DE NUMERO DE TELEFONO O CELULAR
+
+                // FILA DE NUMERO DE TELEFONO O CELULAR (ENLACE DIRECTO AL VM)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     InputFieldWithSubtitle(
                         subtitle = "Celular",
-                        value = cellphoneNum,
-                        onValueChange = { cellphoneNum = it },
+                        value = regData.cellphoneNum,
+                        onValueChange = viewModel::setCellphoneNum,
+                        keyboardType = KeyboardType.Phone,
                         modifier = Modifier.weight(1f)
                     )
                     InputFieldWithSubtitle(
                         subtitle = "Teléfono",
-                        value = telephoneNum,
-                        onValueChange = { telephoneNum = it },
+                        value = regData.telephoneNum,
+                        onValueChange = viewModel::setTelephoneNum,
+                        keyboardType = KeyboardType.Phone,
                         modifier = Modifier.weight(1f)
                     )
                 }
             }
-            //BOTÓN PARA CONTINUAR EL REGISTRO
-            ContinueButton(navController)
+
+            // BOTÓN PARA CONTINUAR EL REGISTRO
+            ContinueButton(
+                navController = navController,
+                regData = regData // Pasamos el estado para la validación
+            )
         }
     }
 }
+
+// --------------------------------------------------
+// COMPONENTES AUXILIARES
+// --------------------------------------------------
 
 // Logo
 @Composable
@@ -164,12 +191,24 @@ fun InputFieldWithSubtitle(
     }
 }
 
-// Botón Continuar con el registro
+// FUNCIÓN MODIFICADA PARA GUARDAR DATOS EN EL VM (VALIDACIÓN)
 @Composable
-fun ContinueButton(navController: NavHostController) {
+fun ContinueButton(
+    navController: NavHostController,
+    regData: RegistrationData // Recibe el estado actual para la validación
+) {
+    val context = LocalContext.current
     Button(
         onClick = {
-            /* Funcionalidad se agregará después */
+            // 🛑 VALIDACIÓN FINAL: Usar el estado actual para validar obligatorios
+            if (regData.docType.isBlank() || regData.docNumber.isBlank() || regData.firstName.isBlank() ||
+                regData.lastName.isBlank() || regData.address.isBlank() || regData.birthDate.isBlank()) {
+
+                Toast.makeText(context, "Por favor, complete todos los campos obligatorios.", Toast.LENGTH_LONG).show()
+                return@Button
+            }
+
+            // Si la validación pasa, navega (el ViewModel ya tiene los datos en su estado interno)
             navController.navigate(AppScreens.RegisterSecondScreen.route)
         },
         modifier = Modifier
@@ -231,6 +270,6 @@ fun DocumentTypeDropdown(
 @Composable
 fun PreviewRegisterFirstScreen() {
     val navController = rememberNavController()
-    RegisterFirstScreen(navController)
+    // Nota: Necesitarías un VM mock para que el Preview no falle por la inyección
+    // RegisterFirstScreen(navController)
 }
-
