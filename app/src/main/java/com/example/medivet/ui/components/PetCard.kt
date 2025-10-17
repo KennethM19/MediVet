@@ -18,7 +18,7 @@ import com.example.medivet.model.PetResponse
 
 @Composable
 fun PetCard(
-    pet: PetResponse, // El parámetro correcto
+    pet: PetResponse,
     onEditClick: () -> Unit
 ) {
     Card(
@@ -29,10 +29,9 @@ fun PetCard(
         elevation = CardDefaults.cardElevation(6.dp)
     ) {
         Row(modifier = Modifier.padding(8.dp)) {
-            // --- CORRECCIONES AQUÍ ---
             Image(
-                painter = rememberAsyncImagePainter(pet.photo), // Usa 'pet'
-                contentDescription = pet.name, // Usa 'pet'
+                painter = rememberAsyncImagePainter(pet.photo),
+                contentDescription = pet.name,
                 modifier = Modifier
                     .size(100.dp)
                     .clip(RoundedCornerShape(12.dp)),
@@ -46,7 +45,7 @@ fun PetCard(
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = pet.name, // Usa 'pet'
+                        text = pet.name,
                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
@@ -54,11 +53,10 @@ fun PetCard(
                         Icon(Icons.Default.Edit, contentDescription = "Editar mascota")
                     }
                 }
-                // --- Y AQUÍ ---
-                Text("Sexo: ${pet.sex_id}", style = MaterialTheme.typography.bodySmall) // Usa 'pet'
-                Text("Peso: ${pet.weight}", style = MaterialTheme.typography.bodySmall) // Usa 'pet'
-                //Text("Edad: ${pet.}", style = MaterialTheme.typography.bodySmall) // Usa 'pet'
-                Text("Raza: ${pet.breed_id}", style = MaterialTheme.typography.bodySmall) // Usa 'pet'
+                Text("Sexo: ${pet.sex_id}", style = MaterialTheme.typography.bodySmall)
+                Text("Peso: ${pet.weight}", style = MaterialTheme.typography.bodySmall)
+                //Text("Edad: ${pet.}", style = MaterialTheme.typography.bodySmall)
+                Text("Raza: ${pet.breed_id}", style = MaterialTheme.typography.bodySmall)
             }
         }
     }

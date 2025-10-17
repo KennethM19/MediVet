@@ -69,8 +69,6 @@ fun CreatePetScreen(
     ) { uri: Uri? ->
         selectedImageUri = uri
     }
-
-// --- 👇 INICIO DE LA MODIFICACIÓN 1: MANEJO DE ESTADOS ---
     var showErrorDialog by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(creationState) {
@@ -84,11 +82,8 @@ fun CreatePetScreen(
             else -> { /* No hacer nada */ }
         }
     }
-// --- FIN DE LA MODIFICACIÓN 1 ---
-
     LaunchedEffect(Unit) { viewModel.loadDropdownData() }
 
-// --- 👇 INICIO DE LA MODIFICACIÓN 2: DIÁLOGO DE ERROR ---
     if (showErrorDialog != null) {
         AlertDialog(
             onDismissRequest = { showErrorDialog = null },
@@ -101,8 +96,6 @@ fun CreatePetScreen(
             }
         )
     }
-// --- FIN DE LA MODIFICACIÓN 2 ---
-
     Column(modifier = Modifier.fillMaxSize()) {
         Box(
             modifier = Modifier
@@ -251,7 +244,6 @@ fun CreatePetScreen(
 
                     Spacer(Modifier.height(24.dp))
 
-                    // --- 👇 INICIO DE LA MODIFICACIÓN 3: LÓGICA DEL BOTÓN ---
                     Row(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         modifier = Modifier.fillMaxWidth()
@@ -275,7 +267,6 @@ fun CreatePetScreen(
                                     }else {
 
                                     val pet = PetRequest(
-                                        //user_id = userId,
                                         num_doc = numDoc.ifBlank { null },
                                         name = name,
                                         photo = selectedImageUri?.toString(),
@@ -303,14 +294,12 @@ fun CreatePetScreen(
                             }
                         }
                     }
-                    // --- FIN DE LA MODIFICACIÓN 3 ---
                 }
             }
         }
     }
 }
 
-// Dropdown estilizado
 @Composable
 fun DropdownSelector(
     label: String,

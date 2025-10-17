@@ -41,14 +41,14 @@ fun PetsScreen(
     val viewModel: PetsViewModel = viewModel(factory = factory)
 
     val pets by viewModel.pets.collectAsState()
-    val error by viewModel.error.collectAsState() // Recoge los errores para mostrarlos
+    val error by viewModel.error.collectAsState()
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text("Mis mascotas") },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color(0xFF00BFA5), // color de tu app
+                    containerColor = Color(0xFF00BFA5),
                     titleContentColor = Color.White
                 )
             )

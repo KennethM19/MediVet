@@ -12,7 +12,7 @@ import com.example.medivet.navigation.AppScreens
 @Composable
 fun BottomNavBar(navController: NavHostController, modifier: Modifier = Modifier) {
     NavigationBar(
-        containerColor = Color(0xFF00BFA5), // Color turquesa
+        containerColor = Color(0xFF00BFA5),
         modifier = modifier
     ) {
         NavigationBarItem(

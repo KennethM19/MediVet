@@ -36,7 +36,6 @@ class CreatePetViewModel(
     private val _creationState = MutableStateFlow<PetCreationState>(PetCreationState.Idle)
     val creationState: StateFlow<PetCreationState> = _creationState.asStateFlow()
 
-    // 🔹 Cargar los dropdowns desde el backend
     fun loadDropdownData() {
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -72,11 +71,9 @@ class CreatePetViewModel(
         }
     }
 
-    // 🔹 Crear mascota
     fun createPet(pet: PetRequest) {
         viewModelScope.launch {
-            _creationState.value = PetCreationState.Loading // Poner el estado de carga primero
-
+            _creationState.value = PetCreationState.Loading
             val token = sessionManager.token.first() ?: run {
                 _creationState.value =
                     PetCreationState.Error("Token no disponible. Inicia sesión de nuevo.")
@@ -84,14 +81,11 @@ class CreatePetViewModel(
             }
 
             try {
-                // Asegúrate de que tu repositorio formatea el token como "Bearer [token]"
                 val response = repository.createPet(token, pet)
 
                 if (response.isSuccessful) {
                     _creationState.value = PetCreationState.Success
                 } else {
-                    // **MEJORA CRÍTICA AQUÍ**
-                    // Intentamos leer el cuerpo del error para obtener un mensaje detallado.
                     val errorBody = response.errorBody()?.string()
                     val detailedError = if (errorBody.isNullOrBlank()) {
                         "Error ${response.code()}: ${response.message()}"
@@ -101,8 +95,7 @@ class CreatePetViewModel(
                     _creationState.value = PetCreationState.Error(detailedError)
                 }
             } catch (e: Exception) {
-                // Captura de errores de red (sin conexión, timeout, etc.)
-                e.printStackTrace() // Esencial para ver el error completo en Logcat
+                e.printStackTrace()
                 _creationState.value = PetCreationState.Error("Error de conexión: ${e.message}")
             }
         }
