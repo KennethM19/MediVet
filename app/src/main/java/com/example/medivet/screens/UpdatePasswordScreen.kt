@@ -56,7 +56,6 @@ fun UpdatePasswordScreen(navController: NavHostController) {
     }
 }
 
-// Logo
 @Composable
 fun UpdatePasswordLogo() {
     Image(
@@ -68,7 +67,6 @@ fun UpdatePasswordLogo() {
     )
 }
 
-// Texto de instrucción
 @Composable
 fun InstructionTextUpdate() {
     Text(
@@ -85,7 +83,6 @@ fun InstructionTextUpdate2() {
     )
 }
 
-// Campo de contraseña
 @Composable
 fun PasswordInputField(label: String, value: String, onValueChange: (String) -> Unit) {
     OutlinedTextField(
@@ -102,7 +99,6 @@ fun PasswordInputField(label: String, value: String, onValueChange: (String) -> 
     )
 }
 
-// Botón Confirmar
 @Composable
 fun ConfirmButton() {
     Button(

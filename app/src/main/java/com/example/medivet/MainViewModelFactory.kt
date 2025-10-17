@@ -8,11 +8,7 @@ import com.example.medivet.services.ApiClient // Necesario para instanciar el Re
 import com.example.medivet.utils.SessionManager // Tu SessionManager de DataStore
 import java.lang.IllegalArgumentException
 
-/**
- * Factory para crear instancias del MainViewModel, inyectando todas sus dependencias.
- */
 class MainViewModelFactory(
-    // El Factory necesita la instancia única de SessionManager
     private val sessionManager: SessionManager
 ) : ViewModelProvider.Factory {
 
@@ -20,10 +16,8 @@ class MainViewModelFactory(
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
 
-            // 1. Instanciar el Repositorio (requiere el servicio API)
             val userRepository = UserRepository(ApiClient.apiService)
 
-            // 2. Crear el ViewModel, inyectando el Repositorio y el SessionManager
             return MainViewModel(userRepository, sessionManager) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")

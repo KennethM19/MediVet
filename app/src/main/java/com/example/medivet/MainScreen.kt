@@ -33,16 +33,12 @@ import kotlinx.coroutines.launch
 fun MainScreen(navController: NavHostController) {
     val context = LocalContext.current
 
-    // 1. Crear la instancia UNICA del SessionManager
     val sessionManager = remember { SessionManager(context) }
 
-    // 2. Crear la Factory, pasándole el SessionManager
     val factory = remember { MainViewModelFactory(sessionManager) }
 
-    // 3. OBTENER EL VIEWMODEL USANDO LA FACTORY (ARREGLO DEL CRASH)
     val viewModel: MainViewModel = viewModel(factory = factory)
 
-    // Los datos del usuario (que el VM carga)
     val user by viewModel.user.collectAsState()
 
     Scaffold(
@@ -57,7 +53,7 @@ fun MainScreen(navController: NavHostController) {
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            // Fondo
+
             Image(
                 painter = painterResource(id = R.drawable.background),
                 contentDescription = "Fondo",
@@ -72,7 +68,7 @@ fun MainScreen(navController: NavHostController) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Top
             ) {
-                // 🔹 Tarjeta de perfil
+
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
@@ -83,7 +79,6 @@ fun MainScreen(navController: NavHostController) {
                             .padding(16.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        // Imagen circular vacía (por ahora)
                         Box(
                             modifier = Modifier
                                 .size(80.dp)
@@ -93,12 +88,10 @@ fun MainScreen(navController: NavHostController) {
 
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            // Muestra el nombre cargado del usuario
                             text = user?.name ?: "[Nombre]",
                             style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
                         )
                         Text(
-                            // Muestra el email cargado
                             text = user?.email ?: "example@example.com",
                             style = MaterialTheme.typography.bodyMedium,
                             color = Color.Gray
@@ -108,7 +101,6 @@ fun MainScreen(navController: NavHostController) {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // 🔹 Opciones del menú principal
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
@@ -127,7 +119,6 @@ fun MainScreen(navController: NavHostController) {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // 🔹 Tarjeta de recordatorios
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
@@ -148,13 +139,11 @@ fun MainScreen(navController: NavHostController) {
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // 🔹 Botón de Sign Out
                 Button(
                     onClick = {
-                        // Llama a la función que borra el token de DataStore y Firebase
+
                         viewModel.signOut()
                         navController.navigate(AppScreens.LoginScreen.route) {
-                            // Limpia el back stack para que el usuario no pueda volver
                             popUpTo(AppScreens.MainScreen.route) { inclusive = true }
                         }
                     },

@@ -40,38 +40,30 @@ import com.example.medivet.utils.SessionManager
 @Composable
 fun AuthenticationScreen(
     navController: NavHostController,
-    // Eliminamos la inicialización directa aquí, y la haremos dentro del bloque:
 ) {
     val context = LocalContext.current
     val codeLength = 5
     var code by remember { mutableStateOf(List(codeLength) { "" }) }
 
-    // 1. Crear la instancia UNICA del SessionManager
     val sessionManager = remember { SessionManager(context) }
 
-    // 2. Crear la Factory, pasándole el SessionManager
     val factory = remember { RegisterViewModelFactory(sessionManager) }
 
-    // 3. Obtener el ViewModel usando la Factory (REEMPLAZA LA LÍNEA ANTERIOR)
     val backStackEntry = navController.getBackStackEntry(AppScreens.RegisterFirstScreen.route)
     val viewModel: RegisterViewModel = viewModel(
         viewModelStoreOwner = backStackEntry,
         factory = factory
     )
 
-
-    // 4. OBSERVAR EL ESTADO Y LOS DATOS DE REGISTRO
     val state by viewModel.registerState.collectAsState()
     val regData by viewModel.registrationData.collectAsState()
 
-    // Obtener el email del VM para la instrucción
     val emailText = regData.email.ifBlank { "el correo de registro" }
     val isLoading = state is RegisterState.Loading
 
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        // Imagen de fondo
         Image(
             painter = painterResource(id = R.drawable.background),
             contentDescription = null,
@@ -89,7 +81,6 @@ fun AuthenticationScreen(
             AuthenticationLogo()
             Spacer(modifier = Modifier.height(60.dp))
 
-            // 👈 3. USAR EL EMAIL REAL
             AuthInstructionText(emailText)
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -103,20 +94,17 @@ fun AuthenticationScreen(
             )
             Spacer(modifier = Modifier.height(24.dp))
 
-            // 👈 4. BOTÓN CON LÓGICA DE VERIFICACIÓN
             SendAuthenticationButton(
                 viewModel = viewModel,
                 authcode = code.joinToString(""),
                 isLoading = isLoading
             )
 
-            // 👈 5. MANEJADOR DE ESTADO
             RegisterAuthHandler(state, navController, context, viewModel)
         }
     }
 }
 
-// Logo (SIN CAMBIOS)
 @Composable
 fun AuthenticationLogo() {
     Image(
@@ -128,7 +116,6 @@ fun AuthenticationLogo() {
     )
 }
 
-// 👈 FUNCIÓN MODIFICADA: Ahora recibe el email para mostrarlo
 @Composable
 fun AuthInstructionText(email: String) {
     Text(
@@ -140,7 +127,6 @@ fun AuthInstructionText(email: String) {
     )
 }
 
-// Input de código en recuadros individuales (SIN CAMBIOS)
 @Composable
 fun AuthCodeInputFields(code: List<String>, codeLength: Int,onCodeChange: (Int, String) -> Unit) {
     val focusRequester = remember { FocusRequester() }
@@ -148,7 +134,6 @@ fun AuthCodeInputFields(code: List<String>, codeLength: Int,onCodeChange: (Int, 
 
 
     Box {
-        // Campo invisible para capturar todo el input
         BasicTextField(
             value = code.joinToString(""),
             onValueChange = { input ->
@@ -173,7 +158,6 @@ fun AuthCodeInputFields(code: List<String>, codeLength: Int,onCodeChange: (Int, 
                 .focusRequester(focusRequester)
         )
 
-        // Los 6 recuadros visibles
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.fillMaxWidth()
@@ -202,7 +186,6 @@ fun AuthCodeInputFields(code: List<String>, codeLength: Int,onCodeChange: (Int, 
     LaunchedEffect(Unit) { focusRequester.requestFocus() }
 }
 
-// 👈 FUNCIÓN MODIFICADA: Llama al ViewModel para verificar
 @Composable
 fun SendAuthenticationButton(
     viewModel: RegisterViewModel,
@@ -211,7 +194,6 @@ fun SendAuthenticationButton(
 ) {
     Button(
         onClick = {
-            // Llama a la lógica de verificación del ViewModel
             viewModel.verifyCode(authcode)
         },
         modifier = Modifier
@@ -227,7 +209,6 @@ fun SendAuthenticationButton(
     }
 }
 
-// 👈 FUNCIÓN ADICIONAL: Manejador de estado de verificación (añadir al mismo archivo)
 @Composable
 fun RegisterAuthHandler(
     state: RegisterState,
@@ -259,6 +240,5 @@ fun RegisterAuthHandler(
 @Composable
 fun PreviewAuthenticationFirstScreen() {
     val navController = rememberNavController()
-    // Nota: El Preview ya no funcionará completamente sin un ViewModel real.
-    // AuthenticationScreen(navController = navController)
+
 }

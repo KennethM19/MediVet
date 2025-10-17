@@ -36,7 +36,6 @@ fun PasswordResetScreen(navController: NavHostController) {
             contentScale = ContentScale.Crop
         )
 
-        // Contenido encima del fondo
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -55,7 +54,6 @@ fun PasswordResetScreen(navController: NavHostController) {
     }
 }
 
-// Logo
 @Composable
 fun PasswordResetLogo() {
     Image(
@@ -67,7 +65,6 @@ fun PasswordResetLogo() {
     )
 }
 
-// Texto de instrucción
 @Composable
 fun InstructionText() {
     Text(
@@ -78,7 +75,6 @@ fun InstructionText() {
     )
 }
 
-// Input de correo
 @Composable
 fun PasswordResetEmailInput(value: String, onValueChange: (String) -> Unit) {
     OutlinedTextField(
@@ -94,7 +90,6 @@ fun PasswordResetEmailInput(value: String, onValueChange: (String) -> Unit) {
     )
 }
 
-// Botón de enviar enlace
 @Composable
 fun SendResetButton(navController: NavHostController, email: String) {
     Button(

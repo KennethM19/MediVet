@@ -70,24 +70,22 @@ fun RegisterFirstScreen(
                 RegisterLogo()
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // FILA DE DOCUMENTO (ENLACE DIRECTO AL VM)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     DocumentTypeDropdown(
                         selectedType = regData.docType,
-                        onTypeSelected = viewModel::setDocType, // 👈 ENLACE
+                        onTypeSelected = viewModel::setDocType,
                         modifier = Modifier.weight(1f)
                     )
                     InputFieldWithSubtitle(
                         subtitle = "N° documento",
                         value = regData.docNumber,
-                        onValueChange = viewModel::setDocNumber, // 👈 ENLACE
-                        keyboardType = KeyboardType.Number, // Asumo que el documento es numérico
+                        onValueChange = viewModel::setDocNumber,
+                        keyboardType = KeyboardType.Number,
                         modifier = Modifier.weight(1f)
                     )
                 }
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // FILA DE NOMBRE Y APELLIDO (ENLACE DIRECTO AL VM)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     InputFieldWithSubtitle(
                         subtitle = "Nombre",
@@ -104,12 +102,11 @@ fun RegisterFirstScreen(
                 }
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // FILA DE NACIMIENTO Y DIRECCIÓN (ENLACE DIRECTO AL VM)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     InputFieldWithSubtitle(
                         subtitle = "Nacimiento",
                         value = regData.birthDate,
-                        onValueChange = viewModel::setBirthDate, // 👈 ENLACE: Usuario debe usar YYYY-MM-DD
+                        onValueChange = viewModel::setBirthDate,
                         modifier = Modifier.weight(1f)
                     )
                     InputFieldWithSubtitle(
@@ -121,7 +118,6 @@ fun RegisterFirstScreen(
                 }
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // FILA DE NUMERO DE TELEFONO O CELULAR (ENLACE DIRECTO AL VM)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     InputFieldWithSubtitle(
                         subtitle = "Celular",
@@ -139,21 +135,14 @@ fun RegisterFirstScreen(
                     )
                 }
             }
-
-            // BOTÓN PARA CONTINUAR EL REGISTRO
             ContinueButton(
                 navController = navController,
-                regData = regData // Pasamos el estado para la validación
+                regData = regData
             )
         }
     }
 }
 
-// --------------------------------------------------
-// COMPONENTES AUXILIARES
-// --------------------------------------------------
-
-// Logo
 @Composable
 fun RegisterLogo() {
     Image(
@@ -165,7 +154,6 @@ fun RegisterLogo() {
     )
 }
 
-// Input normal con subtítulo arriba
 @Composable
 fun InputFieldWithSubtitle(
     subtitle: String,
@@ -191,16 +179,14 @@ fun InputFieldWithSubtitle(
     }
 }
 
-// FUNCIÓN MODIFICADA PARA GUARDAR DATOS EN EL VM (VALIDACIÓN)
 @Composable
 fun ContinueButton(
     navController: NavHostController,
-    regData: RegistrationData // Recibe el estado actual para la validación
+    regData: RegistrationData
 ) {
     val context = LocalContext.current
     Button(
         onClick = {
-            // 🛑 VALIDACIÓN FINAL: Usar el estado actual para validar obligatorios
             if (regData.docType.isBlank() || regData.docNumber.isBlank() || regData.firstName.isBlank() ||
                 regData.lastName.isBlank() || regData.address.isBlank() || regData.birthDate.isBlank()) {
 
@@ -208,7 +194,6 @@ fun ContinueButton(
                 return@Button
             }
 
-            // Si la validación pasa, navega (el ViewModel ya tiene los datos en su estado interno)
             navController.navigate(AppScreens.RegisterSecondScreen.route)
         },
         modifier = Modifier
@@ -270,6 +255,5 @@ fun DocumentTypeDropdown(
 @Composable
 fun PreviewRegisterFirstScreen() {
     val navController = rememberNavController()
-    // Nota: Necesitarías un VM mock para que el Preview no falle por la inyección
-    // RegisterFirstScreen(navController)
+
 }

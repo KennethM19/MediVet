@@ -37,33 +37,25 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.example.medivet.ui.login.LoginViewModelFactory
 
-// ---------------------------------------------------------------------
-// FUNCIÓN PRINCIPAL - LoginScreen
-// ---------------------------------------------------------------------
 @Composable
 fun LoginScreen(
     navController: NavHostController
 ) {
     val context = LocalContext.current
-    val auth = FirebaseAuth.getInstance() // Mantener para el Google Sign-In
+    val auth = FirebaseAuth.getInstance()
 
-    // ✅ Crear instancia de SessionManager
     val sessionManager = remember { SessionManager(context) }
 
-    // ✅ Inyectar el ViewModel usando la factory personalizada
     val viewModel: LoginViewModel = viewModel(
         factory = LoginViewModelFactory(sessionManager)
 
     )
 
-    // Variables de estado local para los inputs
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
-    // Observar el estado de autenticación del ViewModel
     val authState by viewModel.authState.collectAsState()
 
-    // Configuración de Google Sign-In
     val token = context.getString(R.string.default_web_client_id)
     val googleSignInClient = GoogleSignIn.getClient(
         context,
@@ -76,7 +68,6 @@ fun LoginScreen(
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
-        // Google Sign-In aún usa el AuthHandler de Firebase
         handleGoogleLoginResult(result, auth, navController, context)
     }
 
@@ -115,16 +106,11 @@ fun LoginScreen(
 
             RegisterText(navController, context)
 
-            // 👇 Reacciona al estado de autenticación
             AuthHandler(authState = authState, navController = navController, context = context)
         }
     }
 }
 
-
-// ---------------------------------------------------------------------
-// COMPONENTES EXISTENTES (SIN CAMBIOS)
-// ---------------------------------------------------------------------
 @Composable
 fun LogoSection() {
     Image(
@@ -179,25 +165,21 @@ fun ForgotPasswordText(navController: NavHostController, context: Context) {
     )
 }
 
-// ---------------------------------------------------------------------
-// FUNCIÓN MODIFICADA - LoginButton
-// ---------------------------------------------------------------------
 @Composable
 fun LoginButton(
     email: String,
     password: String,
-    viewModel: LoginViewModel, // viewmodel
-    isLoading: Boolean //estado de carga
+    viewModel: LoginViewModel,
+    isLoading: Boolean
 ) {
     Button(
         onClick = {
-            // Llama a la lógica centralizada (FastAPI -> Firebase)
             viewModel.signIn(email, password)
         },
         modifier = Modifier
             .fillMaxWidth()
             .height(50.dp),
-        enabled = !isLoading // Deshabilitar si está cargando
+        enabled = !isLoading
     ) {
         if (isLoading) {
             CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
@@ -207,9 +189,6 @@ fun LoginButton(
     }
 }
 
-// ---------------------------------------------------------------------
-// COMPONENTES EXISTENTES (SIN CAMBIOS)
-// ---------------------------------------------------------------------
 @Composable
 fun GoogleLoginButton(onClick: () -> Unit) {
     Button(
@@ -248,9 +227,6 @@ fun RegisterText(navController: NavHostController, context: Context) {
     }
 }
 
-// ---------------------------------------------------------------------
-// NUEVA FUNCIÓN - AuthHandler (Maneja la navegación basada en el VM)
-// ---------------------------------------------------------------------
 @Composable
 fun AuthHandler(
     authState: AuthState,
@@ -273,10 +249,6 @@ fun AuthHandler(
     }
 }
 
-
-// ---------------------------------------------------------------------
-// FUNCIÓN DE FIREBASE (Mantiene su implementación existente)
-// ---------------------------------------------------------------------
 private fun handleGoogleLoginResult(
     result: ActivityResult,
     auth: FirebaseAuth,

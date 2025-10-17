@@ -53,26 +53,20 @@ fun RegisterSecondScreen(
 ) {
     val context = LocalContext.current
 
-    // 1. Crear la instancia UNICA del SessionManager
     val sessionManager = remember { SessionManager(context) }
 
-    // 2. Crear la Factory, pasándole el SessionManager
     val factory = remember { RegisterViewModelFactory(sessionManager) }
 
-    // 3. Obtener el ViewModel usando la Factory (ESTE ES EL CAMBIO CLAVE)
     val navBackStackEntry = remember { navController.getBackStackEntry(AppScreens.RegisterFirstScreen.route) }
     val viewModel: RegisterViewModel = viewModel(
         factory = factory,
         viewModelStoreOwner = navBackStackEntry
     )
 
-
-    // Variables de estado locales
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
 
-    // 4. Observar el estado de registro
     val state by viewModel.registerState.collectAsState()
     val isLoading = state is RegisterState.Loading
 
@@ -97,7 +91,6 @@ fun RegisterSecondScreen(
             ) {
                 RegisterLogo()
                 Spacer(modifier = Modifier.height(8.dp))
-                // Correo electrónico
                 Row() {
                     InputFieldWithSubtitle(
                         subtitle = "Correo electrónico",
@@ -135,7 +128,6 @@ fun RegisterSecondScreen(
     }
 }
 
-// Input de contraseña con subtítulo
 @Composable
 fun PasswordFieldWithSubtitle(
     subtitle: String,
@@ -160,7 +152,6 @@ fun PasswordFieldWithSubtitle(
     }
 }
 
-//5. FUNCIÓN MODIFICADA DEL BOTÓN REGISTRARSE
 @Composable
 fun RegisterButton(
     viewModel: RegisterViewModel,
@@ -173,19 +164,14 @@ fun RegisterButton(
 
     Button(
         onClick = {
-            // 1. VALIDACIÓN DE COINCIDENCIA DE CONTRASEÑAS
             if (password != confirmPassword) {
                 Toast.makeText(context, "Las contraseñas no coinciden.", Toast.LENGTH_SHORT).show()
                 return@Button
             }
 
-            // 2. 🚨 GUARDAR EMAIL Y PASSWORD EN EL VIEWMODEL PRIMERO 🚨
-            // Usamos los setters para actualizar el estado interno del VM
             viewModel.setEmail(email.trim())
             viewModel.setPassword(password.trim())
 
-            // 3. VALIDACIÓN FINAL EN EL VM
-            // Llamar a la función de registro (que ahora lee el email/password directamente de su estado interno)
             viewModel.registerUser()
         },
         modifier = Modifier
@@ -201,7 +187,6 @@ fun RegisterButton(
     }
 }
 
-// 👈 6. FUNCIÓN MANEJADORA DE ESTADO
 @Composable
 fun RegisterAuthHandler(
     state: RegisterState,
@@ -213,9 +198,8 @@ fun RegisterAuthHandler(
         when (state) {
             is RegisterState.Success -> {
                 Toast.makeText(context, "Registro exitoso. Verifique su correo.", Toast.LENGTH_LONG).show()
-                // Navegar a la pantalla de Autenticación de código
                 navController.navigate(AppScreens.AuthenticationScreen.route)
-                viewModel.resetState() // Limpiar el estado después de navegar
+                viewModel.resetState()
             }
             is RegisterState.Error -> {
                 Toast.makeText(context, state.message, Toast.LENGTH_LONG).show()

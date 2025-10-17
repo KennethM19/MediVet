@@ -35,22 +35,16 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 fun SplashScreen(navController: NavHostController) {
     val context = LocalContext.current
 
-    // --- INYECCIÓN DE DEPENDENCIAS ---
-    // 1. Crear la instancia única del SessionManager
     val sessionManager = remember { SessionManager(context) }
 
-    // 2. Crear la Factory para el MainViewModel
     val factory = remember { MainViewModelFactory(sessionManager) }
 
-    // 3. Obtener el ViewModel usando la Factory
     val viewModel: MainViewModel = viewModel(factory = factory)
 
-    // 4. Observar el estado de la sesión
-    val isLoggedIn by viewModel.isUserLoggedIn.collectAsState() // True, False, o null (cargando)
+    val isLoggedIn by viewModel.isUserLoggedIn.collectAsState()
 
     var startAnimation by remember { mutableStateOf(false) }
 
-    // Animación de escala y opacidad (tu código existente)
     val scale by animateFloatAsState(
         targetValue = if (startAnimation) 1f else 0.7f,
         animationSpec = tween(durationMillis = 1500, easing = { OvershootInterpolator(2f).getInterpolation(it) }),
@@ -63,29 +57,21 @@ fun SplashScreen(navController: NavHostController) {
         label = "alphaAnim"
     )
 
-    // Lanzar animación
     LaunchedEffect(key1 = true) {
         startAnimation = true
     }
 
-    // 👈 LÓGICA DE REDIRECCIÓN CONDICIONAL
     LaunchedEffect(isLoggedIn) {
-        // Espera a que la animación termine (3 segundos) Y a que el ViewModel compruebe el token.
-        // Usamos un tiempo mínimo para que la animación se muestre.
         delay(2000)
 
         if (isLoggedIn != null) {
             val destination = if (isLoggedIn == true) {
-                // SESIÓN ACTIVA: Ir a la pantalla principal
                 AppScreens.MainScreen.route
             } else {
-                // NO HAY TOKEN: Ir a la pantalla de login
                 AppScreens.LoginScreen.route
             }
 
-            // Navegar y limpiar el historial para evitar volver al splash
             navController.navigate(destination) {
-                // Elimina todas las pantallas debajo del destino
                 popUpTo(0) { inclusive = true }
             }
         }
