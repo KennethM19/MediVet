@@ -1,4 +1,4 @@
-package com.example.medivet.ui.pets
+package com.example.medivet.ui.pets // 1. Corregido el nombre del paquete para seguir la convención
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

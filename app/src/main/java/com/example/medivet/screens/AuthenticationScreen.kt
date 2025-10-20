@@ -165,11 +165,9 @@ fun AuthCodeInputFields(code: List<String>, onCodeChange: (Int, String) -> Unit)
         }
     }
 
-    // Pedir foco al iniciar
     LaunchedEffect(Unit) { focusRequester.requestFocus() }
 }
 
-// Botón de enviar código
 @Composable
 fun SendAuthenticationButton(navController: NavHostController, authcode: String) {
     Button(

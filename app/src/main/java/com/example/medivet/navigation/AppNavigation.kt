@@ -1,20 +1,21 @@
 package com.example.medivet.navigation
 
-//import com.example.medivet.MainScreen
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.medivet.MainScreen
 import com.example.medivet.SplashScreen
-import com.example.medivet.presentation.main.MainScreen
-import com.example.medivet.screens.AuthenticationScreen
 import com.example.medivet.screens.LoginScreen
 import com.example.medivet.screens.PasswordResetScreen
 import com.example.medivet.screens.UpdatePasswordScreen
 import com.example.medivet.screens.register.RegisterFirstScreen
+import com.example.medivet.screens.AuthenticationScreen
 import com.example.medivet.screens.register.RegisterSecondScreen
 import com.example.medivet.ui.pets.CreatePetScreen
 import com.example.medivet.ui.pets.PetsScreen
+
+
 
 @Composable
 fun AppNavigation() {

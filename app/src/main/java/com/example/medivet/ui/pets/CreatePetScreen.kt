@@ -306,6 +306,7 @@ fun CreatePetScreen(
                                 } else {
 
                                     val pet = PetRequest(
+                                        //user_id = userId,
                                         num_doc = numDoc.ifBlank { null },
                                         name = name,
                                         photo = selectedImageUri?.toString(),

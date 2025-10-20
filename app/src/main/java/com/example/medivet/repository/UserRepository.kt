@@ -1,8 +1,8 @@
 package com.example.medivet.repository
 
+import com.example.medivet.model.User
 import com.example.medivet.model.AuthRequest
 import com.example.medivet.model.AuthResponse
-import com.example.medivet.model.User
 import com.example.medivet.services.AuthService
 import com.google.firebase.auth.FirebaseAuth
 import retrofit2.Response
@@ -43,6 +43,11 @@ class UserRepository(
         }
     }
 
+    // -------------------------------------------------------------------
+    //                       FUNCIONES EXISTENTES
+    // -------------------------------------------------------------------
+
+    // Tu función existente para obtener el usuario de Firebase
     fun getCurrentUser(): User? {
         val firebaseUser = auth.currentUser
         return firebaseUser?.let {
@@ -54,6 +59,7 @@ class UserRepository(
         }
     }
 
+    // Tu función existente para cerrar sesión
     fun signOut() {
         auth.signOut()
     }
