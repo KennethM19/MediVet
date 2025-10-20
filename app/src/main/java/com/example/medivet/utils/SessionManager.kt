@@ -1,13 +1,13 @@
 package com.example.medivet.utils
 
 import android.content.Context
+import android.util.Base64
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
-import android.util.Base64
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import org.json.JSONObject
 
 private val Context.dataStore by preferencesDataStore("user_session")
@@ -19,7 +19,6 @@ class SessionManager(private val context: Context) {
         private val METHOD_KEY = stringPreferencesKey("auth_method")
     }
 
-    // Guardar token + método
     suspend fun saveAuthData(token: String, method: String) {
         context.dataStore.edit { prefs ->
             prefs[TOKEN_KEY] = token
@@ -41,17 +40,14 @@ class SessionManager(private val context: Context) {
         }
     }
 
-    // Leer token
     val token: Flow<String?> = context.dataStore.data.map { prefs ->
         prefs[TOKEN_KEY]
     }
 
-    // Leer método de autenticación (FastAPI o Firebase)
     val method: Flow<String?> = context.dataStore.data.map { prefs ->
         prefs[METHOD_KEY]
     }
 
-    // Borrar sesión (logout)
     suspend fun clearSession() {
         context.dataStore.edit { prefs ->
             prefs.clear()

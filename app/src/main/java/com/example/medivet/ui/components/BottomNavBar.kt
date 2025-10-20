@@ -1,8 +1,14 @@
 package com.example.medivet.ui.components
 
-import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Chat
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.LocalHospital
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Pets
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -12,7 +18,7 @@ import com.example.medivet.navigation.AppScreens
 @Composable
 fun BottomNavBar(navController: NavHostController, modifier: Modifier = Modifier) {
     NavigationBar(
-        containerColor = Color(0xFF00BFA5), // Color turquesa
+        containerColor = Color(0xFF00BFA5),
         modifier = modifier
     ) {
         NavigationBarItem(

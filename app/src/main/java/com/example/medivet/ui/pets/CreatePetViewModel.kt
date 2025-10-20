@@ -6,9 +6,11 @@ import com.example.medivet.model.PetRequest
 import com.example.medivet.repository.PetRepository
 import com.example.medivet.utils.SessionManager
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 data class DropdownOption(val id: Int, val name: String)
 
@@ -63,19 +65,20 @@ class CreatePetViewModel(
                         DropdownOption(id, name)
                     } ?: emptyList()
                 } else {
-                    _creationState.value = PetCreationState.Error("Error al cargar opciones del servidor")
+                    _creationState.value =
+                        PetCreationState.Error("Error al cargar opciones del servidor")
                 }
 
             } catch (e: Exception) {
-                _creationState.value = PetCreationState.Error("Error cargando opciones: ${e.message}")
+                _creationState.value =
+                    PetCreationState.Error("Error cargando opciones: ${e.message}")
             }
         }
     }
 
-    // 🔹 Crear mascota
     fun createPet(pet: PetRequest) {
         viewModelScope.launch {
-            _creationState.value = PetCreationState.Loading // Poner el estado de carga primero
+            _creationState.value = PetCreationState.Loading
 
             val token = sessionManager.token.first() ?: run {
                 _creationState.value =
@@ -84,14 +87,13 @@ class CreatePetViewModel(
             }
 
             try {
-                // Asegúrate de que tu repositorio formatea el token como "Bearer [token]"
+
                 val response = repository.createPet(token, pet)
 
                 if (response.isSuccessful) {
                     _creationState.value = PetCreationState.Success
                 } else {
-                    // **MEJORA CRÍTICA AQUÍ**
-                    // Intentamos leer el cuerpo del error para obtener un mensaje detallado.
+
                     val errorBody = response.errorBody()?.string()
                     val detailedError = if (errorBody.isNullOrBlank()) {
                         "Error ${response.code()}: ${response.message()}"
@@ -101,8 +103,7 @@ class CreatePetViewModel(
                     _creationState.value = PetCreationState.Error(detailedError)
                 }
             } catch (e: Exception) {
-                // Captura de errores de red (sin conexión, timeout, etc.)
-                e.printStackTrace() // Esencial para ver el error completo en Logcat
+                e.printStackTrace()
                 _creationState.value = PetCreationState.Error("Error de conexión: ${e.message}")
             }
         }

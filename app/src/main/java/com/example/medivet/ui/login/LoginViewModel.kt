@@ -1,17 +1,16 @@
 package com.example.medivet.ui.login
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.medivet.repository.UserRepository
 import com.example.medivet.services.ApiClient
+import com.example.medivet.utils.SessionManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import android.util.Log
-import com.example.medivet.utils.SessionManager
 
-// Estados posibles de la UI
 sealed class AuthState {
     object Idle : AuthState()
     object Loading : AuthState()
@@ -36,23 +35,23 @@ class LoginViewModel(
         _authState.value = AuthState.Loading
         viewModelScope.launch {
             try {
-                // 🔹 PRIMER INTENTO: FastAPI
                 val response = repository.loginWithFastApi(email, password)
                 val token = response.access_token
                 val method = "FastAPI"
 
-                // Guardamos token en DataStore
                 sessionManager.saveAuthData(token, method)
 
                 _authState.value = AuthState.Success(token, method)
 
             } catch (fastApiError: Exception) {
-                Log.e("LoginVM", "FastAPI falló: ${fastApiError.message}. Intentando con Firebase...")
+                Log.e(
+                    "LoginVM",
+                    "FastAPI falló: ${fastApiError.message}. Intentando con Firebase..."
+                )
 
                 try {
-                    // 🔹 SEGUNDO INTENTO: Firebase
                     repository.loginWithFirebase(email, password)
-                    val token = "FIREBASE_TOKEN" // Aquí puedes recuperar el real si lo usas
+                    val token = "FIREBASE_TOKEN"
                     val method = "Firebase"
 
                     sessionManager.saveAuthData(token, method)

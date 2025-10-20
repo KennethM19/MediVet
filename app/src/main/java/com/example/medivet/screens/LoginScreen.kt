@@ -8,10 +8,33 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,47 +46,39 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.example.medivet.R
-import com.example.medivet.utils.SessionManager
 import com.example.medivet.navigation.AppScreens
-import com.example.medivet.ui.login.LoginViewModel
 import com.example.medivet.ui.login.AuthState
+import com.example.medivet.ui.login.LoginViewModel
+import com.example.medivet.ui.login.LoginViewModelFactory
+import com.example.medivet.utils.SessionManager
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
-import com.example.medivet.ui.login.LoginViewModelFactory
 
-// ---------------------------------------------------------------------
-// FUNCIÓN PRINCIPAL - LoginScreen
-// ---------------------------------------------------------------------
 @Composable
 fun LoginScreen(
     navController: NavHostController
 ) {
     val context = LocalContext.current
-    val auth = FirebaseAuth.getInstance() // Mantener para el Google Sign-In
+    val auth = FirebaseAuth.getInstance()
 
-    // ✅ Crear instancia de SessionManager
     val sessionManager = remember { SessionManager(context) }
 
-    // ✅ Inyectar el ViewModel usando la factory personalizada
     val viewModel: LoginViewModel = viewModel(
         factory = LoginViewModelFactory(sessionManager)
 
     )
 
-    // Variables de estado local para los inputs
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
-    // Observar el estado de autenticación del ViewModel
     val authState by viewModel.authState.collectAsState()
 
-    // Configuración de Google Sign-In
     val token = context.getString(R.string.default_web_client_id)
     val googleSignInClient = GoogleSignIn.getClient(
         context,
@@ -76,7 +91,6 @@ fun LoginScreen(
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
-        // Google Sign-In aún usa el AuthHandler de Firebase
         handleGoogleLoginResult(result, auth, navController, context)
     }
 
@@ -115,16 +129,11 @@ fun LoginScreen(
 
             RegisterText(navController, context)
 
-            // 👇 Reacciona al estado de autenticación
             AuthHandler(authState = authState, navController = navController, context = context)
         }
     }
 }
 
-
-// ---------------------------------------------------------------------
-// COMPONENTES EXISTENTES (SIN CAMBIOS)
-// ---------------------------------------------------------------------
 @Composable
 fun LogoSection() {
     Image(
@@ -179,25 +188,21 @@ fun ForgotPasswordText(navController: NavHostController, context: Context) {
     )
 }
 
-// ---------------------------------------------------------------------
-// FUNCIÓN MODIFICADA - LoginButton
-// ---------------------------------------------------------------------
 @Composable
 fun LoginButton(
     email: String,
     password: String,
-    viewModel: LoginViewModel, // viewmodel
-    isLoading: Boolean //estado de carga
+    viewModel: LoginViewModel,
+    isLoading: Boolean
 ) {
     Button(
         onClick = {
-            // Llama a la lógica centralizada (FastAPI -> Firebase)
             viewModel.signIn(email, password)
         },
         modifier = Modifier
             .fillMaxWidth()
             .height(50.dp),
-        enabled = !isLoading // Deshabilitar si está cargando
+        enabled = !isLoading
     ) {
         if (isLoading) {
             CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
@@ -207,9 +212,6 @@ fun LoginButton(
     }
 }
 
-// ---------------------------------------------------------------------
-// COMPONENTES EXISTENTES (SIN CAMBIOS)
-// ---------------------------------------------------------------------
 @Composable
 fun GoogleLoginButton(onClick: () -> Unit) {
     Button(
@@ -248,9 +250,6 @@ fun RegisterText(navController: NavHostController, context: Context) {
     }
 }
 
-// ---------------------------------------------------------------------
-// NUEVA FUNCIÓN - AuthHandler (Maneja la navegación basada en el VM)
-// ---------------------------------------------------------------------
 @Composable
 fun AuthHandler(
     authState: AuthState,
@@ -260,23 +259,25 @@ fun AuthHandler(
     LaunchedEffect(authState) {
         when (authState) {
             is AuthState.Success -> {
-                Toast.makeText(context, "Login con ${authState.method} exitoso.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context,
+                    "Login con ${authState.method} exitoso.",
+                    Toast.LENGTH_SHORT
+                ).show()
                 navController.navigate(AppScreens.MainScreen.route) {
                     popUpTo(AppScreens.LoginScreen.route) { inclusive = true }
                 }
             }
+
             is AuthState.Error -> {
                 Toast.makeText(context, authState.message, Toast.LENGTH_LONG).show()
             }
+
             else -> Unit
         }
     }
 }
 
-
-// ---------------------------------------------------------------------
-// FUNCIÓN DE FIREBASE (Mantiene su implementación existente)
-// ---------------------------------------------------------------------
 private fun handleGoogleLoginResult(
     result: ActivityResult,
     auth: FirebaseAuth,

@@ -53,18 +53,18 @@ fun RegisterSecondScreen(navController: NavHostController) {
 
         Column(
             modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
+                .fillMaxSize()
+                .padding(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween) {
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 RegisterLogo()
                 Spacer(modifier = Modifier.height(8.dp))
-                // Correo electrónico
-                Row() {
+                Row {
                     InputFieldWithSubtitle(
                         subtitle = "Correo electrónico",
                         value = email,
@@ -73,19 +73,19 @@ fun RegisterSecondScreen(navController: NavHostController) {
                     )
                 }
                 Spacer(modifier = Modifier.height(8.dp))
-                Row() {
+                Row {
                     PasswordFieldWithSubtitle(
                         subtitle = "Contraseña",
                         value = password,
-                        onValueChange = { password = it}
+                        onValueChange = { password = it }
                     )
                 }
                 Spacer(modifier = Modifier.height(8.dp))
-                Row() {
+                Row {
                     PasswordFieldWithSubtitle(
                         subtitle = "Confirmar Contraseña",
                         value = confirmPassword,
-                        onValueChange = { confirmPassword = it}
+                        onValueChange = { confirmPassword = it }
                     )
                 }
             }
@@ -94,7 +94,6 @@ fun RegisterSecondScreen(navController: NavHostController) {
     }
 }
 
-// Input de contraseña con subtítulo
 @Composable
 fun PasswordFieldWithSubtitle(
     subtitle: String,
@@ -123,7 +122,6 @@ fun PasswordFieldWithSubtitle(
 fun RegisterButton(navController: NavHostController) {
     Button(
         onClick = {
-            /* Funcionalidad se agregará después */
             navController.navigate(AppScreens.AuthenticationScreen.route)
         },
         modifier = Modifier

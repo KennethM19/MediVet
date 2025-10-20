@@ -2,8 +2,11 @@ package com.example.medivet.services
 
 import com.example.medivet.model.PetRequest
 import com.example.medivet.model.PetResponse
-import retrofit2.http.*
 import retrofit2.Response
+import retrofit2.http.Body
+import retrofit2.http.GET
+import retrofit2.http.Header
+import retrofit2.http.POST
 
 interface PetService {
 

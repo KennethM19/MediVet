@@ -6,17 +6,48 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.CameraAlt
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,10 +60,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
+import com.example.medivet.R
 import com.example.medivet.model.PetRequest
 import com.example.medivet.utils.SessionManager
-import kotlinx.coroutines.launch
-import com.example.medivet.R
 
 @Composable
 fun CreatePetScreen(
@@ -42,8 +72,8 @@ fun CreatePetScreen(
     )
 ) {
     val context = LocalContext.current
-    val sessionManager = SessionManager(context)
-    val scope = rememberCoroutineScope()
+    SessionManager(context)
+    rememberCoroutineScope()
 
     val sexOptions by viewModel.sexOptions.collectAsState()
     val speciesOptions by viewModel.speciesOptions.collectAsState()
@@ -63,14 +93,12 @@ fun CreatePetScreen(
 
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
 
-// Lanzador para abrir la galería
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         selectedImageUri = uri
     }
 
-// --- 👇 INICIO DE LA MODIFICACIÓN 1: MANEJO DE ESTADOS ---
     var showErrorDialog by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(creationState) {
@@ -78,17 +106,18 @@ fun CreatePetScreen(
             is PetCreationState.Success -> {
                 navController.popBackStack()
             }
+
             is PetCreationState.Error -> {
                 showErrorDialog = state.message
             }
-            else -> { /* No hacer nada */ }
+
+            else -> { /* No hacer nada */
+            }
         }
     }
-// --- FIN DE LA MODIFICACIÓN 1 ---
 
     LaunchedEffect(Unit) { viewModel.loadDropdownData() }
 
-// --- 👇 INICIO DE LA MODIFICACIÓN 2: DIÁLOGO DE ERROR ---
     if (showErrorDialog != null) {
         AlertDialog(
             onDismissRequest = { showErrorDialog = null },
@@ -101,8 +130,6 @@ fun CreatePetScreen(
             }
         )
     }
-// --- FIN DE LA MODIFICACIÓN 2 ---
-
     Column(modifier = Modifier.fillMaxSize()) {
         Box(
             modifier = Modifier
@@ -184,7 +211,11 @@ fun CreatePetScreen(
                     Spacer(Modifier.height(12.dp))
 
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("¿Está castrado?*", color = Color.Black, modifier = Modifier.weight(1f))
+                        Text(
+                            "¿Está castrado?*",
+                            color = Color.Black,
+                            modifier = Modifier.weight(1f)
+                        )
                         Switch(checked = isNeutered, onCheckedChange = { isNeutered = it })
                     }
                     Spacer(Modifier.height(12.dp))
@@ -251,7 +282,6 @@ fun CreatePetScreen(
 
                     Spacer(Modifier.height(24.dp))
 
-                    // --- 👇 INICIO DE LA MODIFICACIÓN 3: LÓGICA DEL BOTÓN ---
                     Row(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         modifier = Modifier.fillMaxWidth()
@@ -270,12 +300,12 @@ fun CreatePetScreen(
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00BFA5)),
                             enabled = creationState !is PetCreationState.Loading,
                             onClick = {
-                                    if (name.isBlank() || selectedSex == null || selectedSpecies == null || selectedBreed == null) {
-                                        showErrorDialog = "Por favor, completa todos los campos obligatorios (*)."
-                                    }else {
+                                if (name.isBlank() || selectedSex == null || selectedSpecies == null || selectedBreed == null) {
+                                    showErrorDialog =
+                                        "Por favor, completa todos los campos obligatorios (*)."
+                                } else {
 
                                     val pet = PetRequest(
-                                        //user_id = userId,
                                         num_doc = numDoc.ifBlank { null },
                                         name = name,
                                         photo = selectedImageUri?.toString(),
@@ -288,7 +318,7 @@ fun CreatePetScreen(
                                         breed_id = selectedBreed!!
                                     )
                                     viewModel.createPet(pet)
-                                    }
+                                }
                             },
                             modifier = Modifier.weight(1f)
                         ) {
@@ -303,14 +333,12 @@ fun CreatePetScreen(
                             }
                         }
                     }
-                    // --- FIN DE LA MODIFICACIÓN 3 ---
                 }
             }
         }
     }
 }
 
-// Dropdown estilizado
 @Composable
 fun DropdownSelector(
     label: String,
@@ -330,7 +358,11 @@ fun DropdownSelector(
                 modifier = Modifier.fillMaxWidth(),
                 trailingIcon = {
                     IconButton(onClick = { expanded = true }) {
-                        Icon(Icons.Default.ArrowDropDown, contentDescription = null, tint = Color.Black)
+                        Icon(
+                            Icons.Default.ArrowDropDown,
+                            contentDescription = null,
+                            tint = Color.Black
+                        )
                     }
                 }
             )

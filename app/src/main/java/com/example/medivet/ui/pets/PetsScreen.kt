@@ -1,12 +1,21 @@
 package com.example.medivet.ui.pets
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.*
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -17,10 +26,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.medivet.navigation.AppScreens
-import com.example.medivet.repository.PetRepository // <-- Importa el repositorio
+import com.example.medivet.repository.PetRepository
 import com.example.medivet.ui.components.BottomNavBar
 import com.example.medivet.ui.components.PetCard
-import com.example.medivet.utils.SessionManager // <-- Importa el SessionManager
+import com.example.medivet.utils.SessionManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -37,18 +46,17 @@ fun PetsScreen(
         sessionManager = sessionManager
     )
 
-    // 4. Pasa la fábrica a la función viewModel() para que pueda crear el ViewModel
     val viewModel: PetsViewModel = viewModel(factory = factory)
 
     val pets by viewModel.pets.collectAsState()
-    val error by viewModel.error.collectAsState() // Recoge los errores para mostrarlos
+    val error by viewModel.error.collectAsState()
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text("Mis mascotas") },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color(0xFF00BFA5), // color de tu app
+                    containerColor = Color(0xFF00BFA5),
                     titleContentColor = Color.White
                 )
             )

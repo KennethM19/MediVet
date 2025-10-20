@@ -1,11 +1,22 @@
 package com.example.medivet.ui.components
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,7 +29,7 @@ import com.example.medivet.model.PetResponse
 
 @Composable
 fun PetCard(
-    pet: PetResponse, // El parámetro correcto
+    pet: PetResponse,
     onEditClick: () -> Unit
 ) {
     Card(
@@ -29,10 +40,9 @@ fun PetCard(
         elevation = CardDefaults.cardElevation(6.dp)
     ) {
         Row(modifier = Modifier.padding(8.dp)) {
-            // --- CORRECCIONES AQUÍ ---
             Image(
-                painter = rememberAsyncImagePainter(pet.photo), // Usa 'pet'
-                contentDescription = pet.name, // Usa 'pet'
+                painter = rememberAsyncImagePainter(pet.photo),
+                contentDescription = pet.name,
                 modifier = Modifier
                     .size(100.dp)
                     .clip(RoundedCornerShape(12.dp)),
@@ -46,7 +56,7 @@ fun PetCard(
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = pet.name, // Usa 'pet'
+                        text = pet.name,
                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
@@ -54,11 +64,10 @@ fun PetCard(
                         Icon(Icons.Default.Edit, contentDescription = "Editar mascota")
                     }
                 }
-                // --- Y AQUÍ ---
-                Text("Sexo: ${pet.sex_id}", style = MaterialTheme.typography.bodySmall) // Usa 'pet'
-                Text("Peso: ${pet.weight}", style = MaterialTheme.typography.bodySmall) // Usa 'pet'
-                //Text("Edad: ${pet.}", style = MaterialTheme.typography.bodySmall) // Usa 'pet'
-                Text("Raza: ${pet.breed_id}", style = MaterialTheme.typography.bodySmall) // Usa 'pet'
+                Text("Sexo: ${pet.sex_id}", style = MaterialTheme.typography.bodySmall)
+                Text("Peso: ${pet.weight}", style = MaterialTheme.typography.bodySmall)
+                //Text("Edad: ${pet.}", style = MaterialTheme.typography.bodySmall)
+                Text("Raza: ${pet.breed_id}", style = MaterialTheme.typography.bodySmall)
             }
         }
     }

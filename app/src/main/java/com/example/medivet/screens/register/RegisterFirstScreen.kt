@@ -2,11 +2,32 @@ package com.example.medivet.screens.register
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,7 +57,7 @@ fun RegisterFirstScreen(navController: NavHostController) {
     var telephoneNum by remember { mutableStateOf("") }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // Fondo
+
         Image(
             painter = painterResource(id = R.drawable.background),
             contentDescription = null,
@@ -57,11 +78,10 @@ fun RegisterFirstScreen(navController: NavHostController) {
             ) {
                 RegisterLogo()
                 Spacer(modifier = Modifier.height(8.dp))
-                // FILA DE DOCUMENTO
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     DocumentTypeDropdown(
                         selectedType = docType,
-                        onTypeSelected = {docType = it},
+                        onTypeSelected = { docType = it },
                         modifier = Modifier.weight(1f)
                     )
                     InputFieldWithSubtitle(
@@ -72,7 +92,6 @@ fun RegisterFirstScreen(navController: NavHostController) {
                     )
                 }
                 Spacer(modifier = Modifier.height(8.dp))
-                // FILA DE NOMBRE Y APELLIDO
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     InputFieldWithSubtitle(
                         subtitle = "Nombre",
@@ -88,7 +107,6 @@ fun RegisterFirstScreen(navController: NavHostController) {
                     )
                 }
                 Spacer(modifier = Modifier.height(8.dp))
-                //FILA DE NACIMIENTO Y DIRECCIÓN
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     InputFieldWithSubtitle(
                         subtitle = "Nacimiento",
@@ -104,7 +122,6 @@ fun RegisterFirstScreen(navController: NavHostController) {
                     )
                 }
                 Spacer(modifier = Modifier.height(8.dp))
-                //FILA DE NUMERO DE TELEFONO O CELULAR
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     InputFieldWithSubtitle(
                         subtitle = "Celular",
@@ -120,13 +137,11 @@ fun RegisterFirstScreen(navController: NavHostController) {
                     )
                 }
             }
-            //BOTÓN PARA CONTINUAR EL REGISTRO
             ContinueButton(navController)
         }
     }
 }
 
-// Logo
 @Composable
 fun RegisterLogo() {
     Image(
@@ -138,7 +153,6 @@ fun RegisterLogo() {
     )
 }
 
-// Input normal con subtítulo arriba
 @Composable
 fun InputFieldWithSubtitle(
     subtitle: String,
@@ -164,7 +178,6 @@ fun InputFieldWithSubtitle(
     }
 }
 
-// Botón Continuar con el registro
 @Composable
 fun ContinueButton(navController: NavHostController) {
     Button(
@@ -195,14 +208,14 @@ fun DocumentTypeDropdown(
         Spacer(modifier = Modifier.height(4.dp))
         ExposedDropdownMenuBox(
             expanded = expanded,
-            onExpandedChange = { expanded = !expanded}
+            onExpandedChange = { expanded = !expanded }
         ) {
             OutlinedTextField(
                 value = selectedType,
                 onValueChange = {},
-                label = {Text("")},
+                label = { Text("") },
                 readOnly = true,
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)},
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                 modifier = Modifier
                     .menuAnchor()
                     .fillMaxWidth()
@@ -211,11 +224,11 @@ fun DocumentTypeDropdown(
 
             ExposedDropdownMenu(
                 expanded = expanded,
-                onDismissRequest = { expanded = false}
+                onDismissRequest = { expanded = false }
             ) {
                 types.forEach { type ->
                     DropdownMenuItem(
-                        text = { Text(type)},
+                        text = { Text(type) },
                         onClick = {
                             onTypeSelected(type)
                             expanded = false

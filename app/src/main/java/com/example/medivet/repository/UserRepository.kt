@@ -1,9 +1,9 @@
 package com.example.medivet.repository
 
-import com.example.medivet.model.User
 import com.example.medivet.model.AuthRequest
 import com.example.medivet.model.AuthResponse
-import com.example.medivet.services.AuthService // Tu interfaz Retrofit
+import com.example.medivet.model.User
+import com.example.medivet.services.AuthService
 import com.google.firebase.auth.FirebaseAuth
 import retrofit2.Response
 import kotlin.coroutines.resume
@@ -15,45 +15,34 @@ class UserRepository(
     private val authService: AuthService,
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
 ) {
-    // -------------------------------------------------------------------
-    //                       NUEVAS FUNCIONES DE LOGIN
-    // -------------------------------------------------------------------
 
-    // 1. Login con FastAPI (Llama a tu backend)
     suspend fun loginWithFastApi(email: String, password: String): AuthResponse {
         val request = AuthRequest(email, password)
-        // Llama al servicio API y espera la respuesta de Retrofit
         val response: Response<AuthResponse> = authService.loginUser(request)
 
         if (response.isSuccessful && response.body() != null) {
             return response.body()!!
         } else {
-            // Lanza una excepción en caso de error de credenciales o del servidor
             throw Exception("FastAPI: Credenciales incorrectas o error ${response.code()}")
         }
     }
 
-    // 2. Login con Firebase (Adaptado a Corrutinas)
     suspend fun loginWithFirebase(email: String, password: String): Boolean {
-        // Convierte la API asíncrona de Firebase a una función suspend
         return suspendCoroutine { continuation ->
             auth.signInWithEmailAndPassword(email.trim(), password.trim())
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        continuation.resume(true) // Éxito
+                        continuation.resume(true)
                     } else {
-                        // Pasa el error para que el ViewModel lo maneje
-                        continuation.resumeWithException(task.exception ?: Exception("Error desconocido de Firebase"))
+
+                        continuation.resumeWithException(
+                            task.exception ?: Exception("Error desconocido de Firebase")
+                        )
                     }
                 }
         }
     }
 
-    // -------------------------------------------------------------------
-    //                       FUNCIONES EXISTENTES
-    // -------------------------------------------------------------------
-
-    // Tu función existente para obtener el usuario de Firebase
     fun getCurrentUser(): User? {
         val firebaseUser = auth.currentUser
         return firebaseUser?.let {
@@ -65,7 +54,6 @@ class UserRepository(
         }
     }
 
-    // Tu función existente para cerrar sesión
     fun signOut() {
         auth.signOut()
     }
