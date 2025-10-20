@@ -2,6 +2,7 @@ package com.example.medivet.model.repository
 
 import com.example.medivet.model.model.AuthRequest
 import com.example.medivet.model.model.AuthResponse
+import com.example.medivet.model.model.RegisterRequest
 import com.example.medivet.model.model.User
 import com.example.medivet.model.services.AuthService
 import com.google.firebase.auth.FirebaseAuth
@@ -16,6 +17,15 @@ class UserRepository(
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
 ) {
 
+    suspend fun registerWithFastApi(request: RegisterRequest): AuthResponse {
+        val response = authService.registerUser(request)
+
+        if (response.isSuccessful && response.body() != null) {
+            return response.body()!!
+        } else {
+            throw Exception("Registro fallido. El email podría estar en uso, o error: ${response.code()}")
+        }
+    }
     suspend fun loginWithFastApi(email: String, password: String): AuthResponse {
         val request = AuthRequest(email, password)
         val response: Response<AuthResponse> = authService.loginUser(request)

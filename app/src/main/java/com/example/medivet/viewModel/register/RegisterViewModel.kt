@@ -3,7 +3,7 @@ package com.example.medivet.viewModel.register
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.medivet.model.VerifyCodeRequest
+import com.example.medivet.model.model.VerifyCodeRequest
 import com.example.medivet.model.model.RegisterRequest
 import com.example.medivet.model.repository.UserRepository
 import com.example.medivet.model.services.ApiClient
