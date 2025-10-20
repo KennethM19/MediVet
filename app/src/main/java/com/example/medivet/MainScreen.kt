@@ -1,4 +1,4 @@
-package com.example.medivet.presentation.main
+package com.example.medivet
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -46,9 +46,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.example.medivet.MainViewModel
-import com.example.medivet.R
-import com.example.medivet.navigation.AppScreens
+import com.example.medivet.view.navigation.AppScreens
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

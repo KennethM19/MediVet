@@ -13,7 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
-import com.example.medivet.navigation.AppScreens
+import com.example.medivet.view.navigation.AppScreens
 
 @Composable
 fun BottomNavBar(navController: NavHostController, modifier: Modifier = Modifier) {
