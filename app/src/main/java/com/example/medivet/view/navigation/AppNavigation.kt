@@ -1,11 +1,14 @@
 package com.example.medivet.view.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.medivet.MainScreen
 import com.example.medivet.SplashScreen
+import com.example.medivet.utils.SessionManager
 import com.example.medivet.view.screens.AuthenticationScreen
 import com.example.medivet.view.screens.LoginScreen
 import com.example.medivet.view.screens.PasswordResetScreen
@@ -18,14 +21,19 @@ import com.example.medivet.view.screens.register.RegisterSecondScreen
 
 @Composable
 fun AppNavigation() {
+    val context = LocalContext.current
     val navController = rememberNavController()
+    val sessionManager = remember { SessionManager(context) }
 
-    NavHost(navController = navController, startDestination = AppScreens.SplashScreen.route) {
+    NavHost(
+        navController = navController,
+        startDestination = AppScreens.LoginScreen.route
+    ) {
         composable(AppScreens.SplashScreen.route) {
             SplashScreen(navController)
         }
         composable(AppScreens.MainScreen.route) {
-            MainScreen(navController)
+            MainScreen(navController = navController, sessionManager = sessionManager)
         }
         composable(AppScreens.PetsScreen.route) {
             PetsScreen(navController)
