@@ -57,9 +57,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.medivet.R
 import com.example.medivet.model.model.PetRequest
@@ -171,12 +173,15 @@ fun CreatePetScreen(
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
 
-                    DropdownSelector(
-                        label = "Especie*",
-                        options = speciesOptions.map { it.name },
-                        selectedIndex = speciesOptions.indexOfFirst { it.id == selectedSpecies },
-                        onOptionSelected = { selectedSpecies = speciesOptions[it].id }
-                    )
+                    Box() {
+                        Text("Especie*")
+                        DropdownSelector(
+                            label = "Especie*",
+                            options = speciesOptions.map { it.name },
+                            selectedIndex = speciesOptions.indexOfFirst { it.id == selectedSpecies },
+                            onOptionSelected = { selectedSpecies = speciesOptions[it].id }
+                        )
+                    }
                     Spacer(Modifier.height(12.dp))
 
                     OutlinedTextField(
@@ -353,7 +358,7 @@ fun DropdownSelector(
 ) {
     var expanded by remember { mutableStateOf(false) }
     Column {
-        Text(label, color = Color.White)
+        Text(label, color = Color.Black)
         Box {
             OutlinedTextField(
                 value = options.getOrNull(selectedIndex) ?: "",
@@ -377,7 +382,7 @@ fun DropdownSelector(
             ) {
                 options.forEachIndexed { index, option ->
                     DropdownMenuItem(
-                        text = { Text(option, color = Color.White) },
+                        text = { Text(option, color = Color.Black) },
                         onClick = {
                             onOptionSelected(index)
                             expanded = false
@@ -387,5 +392,12 @@ fun DropdownSelector(
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun PreviewCreatePetScreen() {
+    val navController = rememberNavController()
+    CreatePetScreen(navController)
 }
 
