@@ -28,7 +28,7 @@ fun BottomNavBar(navController: NavHostController, modifier: Modifier = Modifier
         )
         NavigationBarItem(
             selected = false,
-            onClick = { navController.navigate(AppScreens.PetsScreen.route) },
+            onClick = { navController.navigate(AppScreens.ListPetsScreen.route) },
             icon = { Icon(Icons.Default.Pets, contentDescription = "Mascotas") }
         )
         NavigationBarItem(

@@ -11,7 +11,8 @@ sealed class AppScreens(val route: String) {
     object UpdatePasswordScreen : AppScreens("update_password_screen")
     object AuthenticationScreen : AppScreens("authentication_screen")
 
-    object PetsScreen : AppScreens("pets_screen")
+    object ListPetsScreen : AppScreens("list_pets")
+    object PetScreen : AppScreens("pets_screen")
     object CreatePetScreen : AppScreens("create_pet_screen")
     object EditPetScreen : AppScreens("edit_pet_screen")
     object ProfileScreen : AppScreens("profile_screen")

@@ -37,7 +37,7 @@ import com.example.medivet.viewModel.pet.PetsViewModelFactory
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PetsScreen(
+fun ListPetsScreen(
     navController: NavHostController
 ) {
     val context = LocalContext.current
@@ -109,7 +109,7 @@ fun PetsScreen(
 
 @Preview
 @Composable
-fun PreviewPetScreen() {
+fun PreviewListPetScreen() {
     val navController = rememberNavController()
-    PetsScreen(navController)
+    ListPetsScreen(navController)
 }

@@ -128,7 +128,7 @@ fun MainScreen(
                 ) {
                     Column {
                         MenuItem("Mascotas", Icons.Default.Pets) {
-                            navController.navigate("pets_screen")
+                            navController.navigate("list_pets")
                         }
                         MenuItem("Veterinarias", Icons.Default.LocalHospital) { /* Navegar */ }
                         MenuItem("Consulta", Icons.Default.Chat) { /* Navegar */ }
