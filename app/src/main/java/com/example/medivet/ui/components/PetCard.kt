@@ -11,27 +11,37 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.example.medivet.model.model.PetResponse
+import com.example.medivet.view.navigation.AppScreens
 
 @Composable
 fun PetCard(
     pet: PetResponse,
-    onEditClick: () -> Unit
+    navController: NavHostController
 ) {
+    var expanded by remember { mutableStateOf(false) }
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -54,21 +64,42 @@ fun PetCard(
                     .weight(1f)
                     .align(Alignment.CenterVertically)
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = pet.name,
-                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    IconButton(onClick = onEditClick) {
-                        Icon(Icons.Default.Edit, contentDescription = "Editar mascota")
-                    }
-                }
+                Text(
+                    text = pet.name,
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                )
                 Text("Sexo: ${pet.sex_id}", style = MaterialTheme.typography.bodySmall)
                 Text("Peso: ${pet.weight}", style = MaterialTheme.typography.bodySmall)
                 //Text("Edad: ${pet.}", style = MaterialTheme.typography.bodySmall)
                 Text("Raza: ${pet.breed_id}", style = MaterialTheme.typography.bodySmall)
             }
+            Column {
+                IconButton(onClick = { expanded = true}) {
+                    Icon(Icons.Default.MoreVert,
+                        contentDescription = "Más opciones")
+                }
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest =  {expanded = false}
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("Ver mascota") },
+                        onClick = { }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Editar") },
+                        onClick = {
+                            expanded = false
+                            navController.navigate(AppScreens.EditPetScreen.route)
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Eliminar") },
+                        onClick = {}
+                    )
+                }
+            }
         }
+
     }
 }

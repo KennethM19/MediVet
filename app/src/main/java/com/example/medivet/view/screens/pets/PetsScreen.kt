@@ -99,9 +99,7 @@ fun PetsScreen(
                 items(pets) { pet ->
                     PetCard(
                         pet = pet,
-                        onEditClick = {
-                            // Lógica para editar
-                        }
+                        navController = navController
                     )
                 }
             }

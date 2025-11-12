@@ -14,6 +14,7 @@ import com.example.medivet.view.screens.LoginScreen
 import com.example.medivet.view.screens.PasswordResetScreen
 import com.example.medivet.view.screens.UpdatePasswordScreen
 import com.example.medivet.view.screens.pets.CreatePetScreen
+import com.example.medivet.view.screens.pets.EditPetScreen
 import com.example.medivet.view.screens.pets.PetsScreen
 import com.example.medivet.view.screens.register.RegisterFirstScreen
 import com.example.medivet.view.screens.register.RegisterSecondScreen
@@ -40,6 +41,9 @@ fun AppNavigation() {
         }
         composable(AppScreens.CreatePetScreen.route) {
             CreatePetScreen(navController)
+        }
+        composable (AppScreens.EditPetScreen.route ) {
+            EditPetScreen(navController)
         }
         composable(AppScreens.LoginScreen.route) {
             LoginScreen(navController)
