@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("com.google.gms.google-services")
+    id("org.jetbrains.kotlin.plugin.serialization")
 }
 
 android {
@@ -85,6 +86,9 @@ dependencies {
 
     // Conversor JSON (Gson)
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    // Serialización JSON
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
 
     // Corrutinas de Kotlin (necesarias para las funciones 'suspend')
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1")

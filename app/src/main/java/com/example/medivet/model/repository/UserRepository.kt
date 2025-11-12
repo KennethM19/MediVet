@@ -1,9 +1,10 @@
 package com.example.medivet.model.repository
 
+import android.util.Log
+import com.example.medivet.model.model.User
 import com.example.medivet.model.model.AuthRequest
 import com.example.medivet.model.model.AuthResponse
 import com.example.medivet.model.model.RegisterRequest
-import com.example.medivet.model.model.User
 import com.example.medivet.model.services.AuthService
 import com.google.firebase.auth.FirebaseAuth
 import retrofit2.Response
@@ -53,14 +54,18 @@ class UserRepository(
         }
     }
 
-    fun getCurrentUser(): User? {
-        val firebaseUser = auth.currentUser
-        return firebaseUser?.let {
-            User(
-                name = it.displayName ?: "[Nombre]",
-                email = it.email ?: "example@example.com",
-                profileImageUrl = it.photoUrl?.toString()
-            )
+    suspend fun getCurrentUser(): User? {
+        return try {
+            val response = authService.getCurrentUser()
+            if (response.isSuccessful && response.body() != null) {
+                response.body()?.firstOrNull()
+            } else {
+                Log.e("UserRepository", "Error: ${response.code()}")
+                null
+            }
+        } catch (e: Exception) {
+            Log.e("UserRepository", "Excepción: ${e.message}")
+            null
         }
     }
 
