@@ -22,9 +22,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.medivet.model.repository.PetRepository
 import com.example.medivet.ui.components.BottomNavBar
 import com.example.medivet.ui.components.PetCard
@@ -105,4 +107,11 @@ fun PetsScreen(
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun PreviewPetScreen() {
+    val navController = rememberNavController()
+    PetsScreen(navController)
 }
