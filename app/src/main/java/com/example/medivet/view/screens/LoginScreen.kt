@@ -56,21 +56,19 @@ import com.example.medivet.view.navigation.AppScreens
 import com.example.medivet.viewModel.login.AuthState
 import com.example.medivet.viewModel.login.LoginViewModel
 import com.example.medivet.viewModel.login.LoginViewModelFactory
-// --- 👇 IMPORTS AÑADIDOS 👇 ---
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
-// --- 👆 IMPORTS AÑADIDOS 👆 ---
 
 @Composable
 fun LoginScreen(
     navController: NavHostController
 ) {
     val context = LocalContext.current
-    val auth = FirebaseAuth.getInstance() // <-- AÑADIDO (necesario para el handler)
+    val auth = FirebaseAuth.getInstance()
 
     val sessionManager = remember { SessionManager(context) }
 
@@ -84,7 +82,6 @@ fun LoginScreen(
 
     val authState by viewModel.authState.collectAsState()
 
-    // --- 👇 LÓGICA DE GOOGLE AÑADIDA 👇 ---
     val token = context.getString(R.string.default_web_client_id)
     val googleSignInClient = GoogleSignIn.getClient(
         context,
@@ -94,14 +91,11 @@ fun LoginScreen(
             .build()
     )
 
-    // 2. Launcher que recibe el resultado de Google
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
-        // 3. Llama al handler para procesar el resultado
         handleGoogleLoginResult(result, auth, viewModel)
     }
-    // --- 👆 FIN DE LÓGICA AÑADIDA 👆 ---
 
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
@@ -134,16 +128,13 @@ fun LoginScreen(
             LoginButton(email, password, viewModel, isLoading)
             Spacer(modifier = Modifier.height(12.dp))
 
-            // --- 👇 CAMBIO EN EL BOTÓN DE GOOGLE 👇 ---
-            // 4. Conecta el onClick al launcher
+
             GoogleLoginButton { launcher.launch(googleSignInClient.signInIntent) }
-            // --- 👆 FIN DEL CAMBIO 👆 ---
 
             Spacer(modifier = Modifier.height(16.dp))
 
             RegisterText(navController, context)
 
-            // 5. Este AuthHandler ahora funciona para FastAPI y Google
             AuthHandler(authState = authState, navController = navController, context = context)
         }
     }
@@ -151,7 +142,6 @@ fun LoginScreen(
 
 @Composable
 fun LogoSection() {
-    // (Tu código existente - sin cambios)
     Image(
         painter = painterResource(id = R.drawable.logo_titulo),
         contentDescription = "Logo",
@@ -163,7 +153,6 @@ fun LogoSection() {
 
 @Composable
 fun EmailInput(value: String, onValueChange: (String) -> Unit) {
-    // (Tu código existente - sin cambios)
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
@@ -179,7 +168,6 @@ fun EmailInput(value: String, onValueChange: (String) -> Unit) {
 
 @Composable
 fun PasswordInput(value: String, onValueChange: (String) -> Unit) {
-    // (Tu código existente - sin cambios)
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
@@ -195,7 +183,6 @@ fun PasswordInput(value: String, onValueChange: (String) -> Unit) {
 
 @Composable
 fun ForgotPasswordText(navController: NavHostController, context: Context) {
-    // (Tu código existente - sin cambios)
     Text(
         "¿Olvidaste tu contraseña?",
         fontSize = 14.sp,
@@ -214,7 +201,6 @@ fun LoginButton(
     viewModel: LoginViewModel,
     isLoading: Boolean
 ) {
-    // (Tu código existente - sin cambios)
     Button(
         onClick = {
             viewModel.signIn(email, password)
@@ -234,7 +220,6 @@ fun LoginButton(
 
 @Composable
 fun GoogleLoginButton(onClick: () -> Unit) {
-    // (Tu código existente - sin cambios)
     Button(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
@@ -254,7 +239,6 @@ fun GoogleLoginButton(onClick: () -> Unit) {
 
 @Composable
 fun RegisterText(navController: NavHostController, context: Context) {
-    // (Tu código existente - sin cambios)
     Row(
         horizontalArrangement = Arrangement.Center,
         modifier = Modifier.fillMaxWidth()
@@ -278,8 +262,7 @@ fun AuthHandler(
     navController: NavHostController,
     context: Context
 ) {
-    // (Tu código existente - sin cambios)
-    // (Este handler ahora también recibirá el AuthState.Success de Google)
+
     LaunchedEffect(authState) {
         when (authState) {
             is AuthState.Success -> {
@@ -302,8 +285,6 @@ fun AuthHandler(
     }
 }
 
-// --- 👇 FUNCIÓN NUEVA AÑADIDA 👇 ---
-// (Maneja el resultado del launcher y lo pasa al ViewModel)
 private fun handleGoogleLoginResult(
     result: ActivityResult,
     auth: FirebaseAuth,
@@ -311,15 +292,13 @@ private fun handleGoogleLoginResult(
 ) {
     val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
     try {
-        // 1. Obtiene la credencial de Google
+
         val account = task.getResult(ApiException::class.java)
         val credential = GoogleAuthProvider.getCredential(account.idToken, null)
 
-        // 2. Llama al ViewModel para que maneje el login (en lugar de hacerlo aquí)
         viewModel.signInWithGoogle(credential)
 
     } catch (e: ApiException) {
-        // 3. Si Google falla, notifica al ViewModel para mostrar un error
         viewModel.setGoogleApiError(e.message ?: "Error desconocido de Google")
     }
 }

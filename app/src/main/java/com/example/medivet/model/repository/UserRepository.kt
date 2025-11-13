@@ -60,9 +60,8 @@ class UserRepository(
             auth.signInWithCredential(credential)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        continuation.resume(true) // Éxito
+                        continuation.resume(true)
                     } else {
-                        // Pasa el error para que el ViewModel lo maneje
                         continuation.resumeWithException(
                             task.exception ?: Exception("Error desconocido de Google Auth")
                         )

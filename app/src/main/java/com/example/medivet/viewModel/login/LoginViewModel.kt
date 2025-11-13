@@ -70,19 +70,16 @@ class LoginViewModel(
         _authState.value = AuthState.Loading
         viewModelScope.launch {
             try {
-                // 1. Llama al repositorio (solo Firebase)
                 repository.loginWithGoogleCredential(credential)
 
-                // 2. Guarda la sesión de Google en DataStore
-                val token = "FIREBASE_GOOGLE_TOKEN" // Token de placeholder (separado de FastAPI)
+                val token = "FIREBASE_GOOGLE_TOKEN"
                 val method = "Google" // Método separado
                 sessionManager.saveAuthData(token, method)
 
-                // 3. Notifica a la UI que el login (de Google) fue exitoso
+
                 _authState.value = AuthState.Success(token, method)
 
             } catch (googleError: Exception) {
-                // Si Firebase falla, notifica el error
                 _authState.value = AuthState.Error(googleError.message ?: "Error de login con Google")
             }
         }
