@@ -15,6 +15,7 @@ data class User(
     val num_telephone: String? = null,
     val email: String = "",
     val role_id: Int = 0,
+    val photo: String? = null,
     val type_document: TypeDocument? = null,
     val role: Role? = null
 )

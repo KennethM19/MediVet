@@ -13,6 +13,7 @@ import com.example.medivet.view.screens.AuthenticationScreen
 import com.example.medivet.view.screens.LoginScreen
 import com.example.medivet.view.screens.PasswordResetScreen
 import com.example.medivet.view.screens.UpdatePasswordScreen
+import com.example.medivet.view.screens.perfil.PerfilScreen
 import com.example.medivet.view.screens.pets.CreatePetScreen
 import com.example.medivet.view.screens.pets.EditPetScreen
 import com.example.medivet.view.screens.pets.ListPetsScreen
@@ -66,6 +67,9 @@ fun AppNavigation() {
         }
         composable(AppScreens.AuthenticationScreen.route) {
             AuthenticationScreen(navController)
+        }
+        composable(AppScreens.ProfileScreen.route) {
+            PerfilScreen(navController)
         }
     }
 }

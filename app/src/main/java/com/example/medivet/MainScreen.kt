@@ -35,6 +35,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -43,11 +44,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.medivet.utils.SessionManager
 import com.example.medivet.view.navigation.AppScreens
 
@@ -57,10 +61,15 @@ fun MainScreen(
     navController: NavHostController,
     sessionManager: SessionManager
 ) {
-    val factory = remember { MainViewModelFactory(sessionManager) }
+    val context = LocalContext.current
+    val factory = remember { MainViewModelFactory(sessionManager, context) }
     val viewModel: MainViewModel = viewModel(factory = factory)
 
     val user by viewModel.user.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.refreshUser()
+    }
 
     Scaffold(
         topBar = {
@@ -103,8 +112,39 @@ fun MainScreen(
                             modifier = Modifier
                                 .size(80.dp)
                                 .clip(CircleShape)
-                                .background(Color.LightGray)
-                        )
+                                .clickable {
+                                    navController.navigate("profile_screen")
+                                },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            if (!user?.photo.isNullOrEmpty()) {
+                                // ✅ Mostrar foto con Coil
+                                AsyncImage(
+                                    model = ImageRequest.Builder(context)
+                                        .data(user?.photo)
+                                        .crossfade(true)
+                                        .build(),
+                                    contentDescription = "Foto de perfil",
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop
+                                )
+                            } else {
+                                // Placeholder cuando no hay foto
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(Color.LightGray),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Person,
+                                        contentDescription = "Sin foto",
+                                        modifier = Modifier.size(40.dp),
+                                        tint = Color.Gray
+                                    )
+                                }
+                            }
+                        }
 
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
@@ -132,7 +172,9 @@ fun MainScreen(
                         }
                         MenuItem("Veterinarias", Icons.Default.LocalHospital) { /* Navegar */ }
                         MenuItem("Consulta", Icons.Default.Chat) { /* Navegar */ }
-                        MenuItem("Perfil", Icons.Default.Person) { /* Navegar */ }
+                        MenuItem("Perfil", Icons.Default.Person) {
+                            navController.navigate("profile_screen")
+                        }
                         MenuItem("Información", Icons.Default.Info) { /* Navegar */ }
                     }
                 }
