@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "662872493037-p4bm86fcrn5m5tdnj8cu9op1hf30mftd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.medivet",
+            "certificate_hash": "9042a3f2250a78376718480bcbb9492ed252827f"
+          }
+        },
+        {
           "client_id": "662872493037-i4doi9m424h49cr247scuoaikpmc008l.apps.googleusercontent.com",
           "client_type": 3
         }
