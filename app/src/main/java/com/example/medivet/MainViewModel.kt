@@ -1,75 +1,90 @@
 package com.example.medivet
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.medivet.model.model.User
-import com.example.medivet.model.repository.UserRepository
+import com.example.medivet.model.repository.ProfileRepository
 import com.example.medivet.model.services.ApiClient
+import com.example.medivet.model.services.FirebaseStorageService
 import com.example.medivet.utils.SessionManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
 
 class MainViewModel(
-    private val userRepository: UserRepository = UserRepository(ApiClient.apiService),
-    private val sessionManager: SessionManager
+    private val sessionManager: SessionManager,
+    context: Context
 ) : ViewModel() {
 
+    private val profileRepository = ProfileRepository(
+        authService = ApiClient.apiService,
+        context = context,
+        firebaseStorageService = FirebaseStorageService(context)
+    )
+
     private val _user = MutableStateFlow<User?>(null)
-    val user: StateFlow<User?> = _user
+    val user: StateFlow<User?> = _user.asStateFlow()
+
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
     init {
         loadUser()
     }
 
+    /**
+     * Carga los datos del usuario desde el ProfileRepository.
+     * Usa el endpoint getUserByEmail para obtener datos actualizados.
+     */
     private fun loadUser() {
         viewModelScope.launch {
-            Log.d("MainViewModel", "Iniciando carga de usuario...")
             try {
-                val endpoint = "https://medivet-backend.onrender.com/users/"
-                val response = sessionManager.fetchUserData(endpoint)
+                _isLoading.value = true
+                Log.d("MainViewModel", "🔄 Cargando usuario desde ProfileRepository...")
 
-                if (response != null) {
-                    Log.d("MainViewModel", "Respuesta recibida")
+                val userData = profileRepository.getCurrentUserData()
 
-                    // Deserializar como array de usuarios
-                    val usersList: List<User> = Json.decodeFromString(response)
-                    Log.d("MainViewModel", "Array de usuarios desserializado: ${usersList.size} usuarios")
-
-                    // Obtener el email del usuario logueado desde el token
-                    val emailLogueado = sessionManager.getEmailFromToken()
-                    Log.d("MainViewModel", "Email logueado: $emailLogueado")
-
-                    // Buscar al usuario logueado en la lista
-                    val usuarioActual = usersList.firstOrNull { it.email == emailLogueado }
-
-                    if (usuarioActual != null) {
-                        _user.value = usuarioActual
-                        Log.d("MainViewModel", "Usuario cargado: ${_user.value}")
-                    } else {
-                        Log.e("MainViewModel", "Usuario no encontrado en la lista. Email buscado: $emailLogueado")
-                        if (usersList.isNotEmpty()) {
-                            _user.value = usersList[0]
-                            Log.d("MainViewModel", "Usando primer usuario como fallback: ${_user.value}")
-                        }
-                    }
+                if (userData != null) {
+                    _user.value = userData
+                    Log.d("MainViewModel", "✅ Usuario cargado en MainScreen")
+                    Log.d("MainViewModel", "👤 Nombre: ${userData.name} ${userData.lastname}")
+                    Log.d("MainViewModel", "📧 Email: ${userData.email}")
+                    Log.d("MainViewModel", "📸 Foto: ${userData.photo ?: "Sin foto"}")
                 } else {
-                    Log.e("MainViewModel", "Respuesta nula del servidor")
+                    Log.e("MainViewModel", "❌ No se pudo cargar el usuario")
                 }
             } catch (e: Exception) {
-                Log.e("MainViewModel", "Error al cargar usuario: ${e.message}")
-                e.printStackTrace()
+                Log.e("MainViewModel", "❌ Error al cargar usuario: ${e.message}", e)
+            } finally {
+                _isLoading.value = false
             }
         }
     }
 
+    /**
+     * Refresca los datos del usuario.
+     * Llamar cuando se vuelve a MainScreen desde otra pantalla.
+     */
+    fun refreshUser() {
+        Log.d("MainViewModel", "🔄 Refrescando datos del usuario...")
+        loadUser()
+    }
+
+    /**
+     * Cierra la sesión del usuario.
+     */
     fun signOut() {
         viewModelScope.launch {
-            sessionManager.clearSession()
-            userRepository.signOut()
+            try {
+                sessionManager.clearSession()
+                _user.value = null
+                Log.d("MainViewModel", "🚪 Sesión cerrada")
+            } catch (e: Exception) {
+                Log.e("MainViewModel", "❌ Error al cerrar sesión: ${e.message}", e)
+            }
         }
     }
 }
