@@ -1,41 +1,41 @@
 {
   "project_info": {
-    "project_number": "499242235274",
-    "project_id": "medivet-firebase",
-    "storage_bucket": "medivet-firebase.firebasestorage.app"
+    "project_number": "662872493037",
+    "project_id": "medivet-71192",
+    "storage_bucket": "medivet-71192.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:499242235274:android:51f2208a84225f8b9f4473",
+        "mobilesdk_app_id": "1:662872493037:android:c9850cb8308b43d8a2b5e4",
         "android_client_info": {
           "package_name": "com.example.medivet"
         }
       },
       "oauth_client": [
         {
-          "client_id": "499242235274-cjqbvb0iv0erkklt1qg88agu3meafrr6.apps.googleusercontent.com",
+          "client_id": "662872493037-p4bm86fcrn5m5tdnj8cu9op1hf30mftd.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.medivet",
-            "certificate_hash": "d49bc3f92512f15cc920a97321e54290d1e0f19d"
+            "certificate_hash": "9042a3f2250a78376718480bcbb9492ed252827f"
           }
         },
         {
-          "client_id": "499242235274-49v8tocaseda7uncifcj38o52ajhlk70.apps.googleusercontent.com",
+          "client_id": "662872493037-i4doi9m424h49cr247scuoaikpmc008l.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDTfS7aaypHnwWCE373oEkEAxp1t91Wrtw"
+          "current_key": "AIzaSyAOCv3MnlCdAFbYQ87HpzX0ECmiO7uj14w"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "499242235274-49v8tocaseda7uncifcj38o52ajhlk70.apps.googleusercontent.com",
+              "client_id": "662872493037-i4doi9m424h49cr247scuoaikpmc008l.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

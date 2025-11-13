@@ -1,5 +1,7 @@
 package com.example.medivet.view.screens
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -18,12 +20,14 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,6 +39,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
@@ -47,12 +52,33 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.medivet.R
 import com.example.medivet.view.navigation.AppScreens
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.medivet.utils.SessionManager
+import com.example.medivet.viewModel.register.RegisterState
+import com.example.medivet.viewModel.register.RegisterViewModel
+import com.example.medivet.viewModel.register.RegisterViewModelFactory
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AuthenticationScreen(navController: NavHostController) {
-    val codeLength = 6
+    val context = LocalContext.current
+    val codeLength = 5
     var code by remember { mutableStateOf(List(codeLength) { "" }) }
+
+    val sessionManager = remember { SessionManager(context) }
+    val factory = remember { RegisterViewModelFactory(sessionManager) }
+
+    val navBackStackEntry = remember { navController.getBackStackEntry(AppScreens.RegisterFirstScreen.route) }
+    val viewModel: RegisterViewModel = viewModel(
+        factory = factory,
+        viewModelStoreOwner = navBackStackEntry
+    )
+
+    val state by viewModel.registerState.collectAsState()
+    val regData by viewModel.registrationData.collectAsState()
+
+    val emailText = regData.email.ifBlank { "tu correo" }
+    val isLoading = state is RegisterState.Loading
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -73,16 +99,26 @@ fun AuthenticationScreen(navController: NavHostController) {
         ) {
             AuthenticationLogo()
             Spacer(modifier = Modifier.height(60.dp))
-            AuthInstructionText()
+
+            AuthInstructionText(emailText)
+
             Spacer(modifier = Modifier.height(16.dp))
+
             AuthCodeInputFields(code) { index, value ->
                 code = code.toMutableList().also { it[index] = value }
             }
             Spacer(modifier = Modifier.height(24.dp))
-            SendAuthenticationButton(navController, code.joinToString(""))
+
+            SendAuthenticationButton(
+                viewModel = viewModel,
+                authcode = code.joinToString(""),
+                isLoading = isLoading
+            )
         }
+        RegisterAuthHandler(state, navController, context, viewModel)
     }
 }
+
 
 @Composable
 fun AuthenticationLogo() {
@@ -96,9 +132,9 @@ fun AuthenticationLogo() {
 }
 
 @Composable
-fun AuthInstructionText() {
+fun AuthInstructionText(email: String) {
     Text(
-        "Se envió un código a example@example.com",
+        "Se envió un código a $email",
         color = Color.Black,
         fontSize = 14.sp,
         textAlign = TextAlign.Center,
@@ -115,12 +151,12 @@ fun AuthCodeInputFields(code: List<String>, onCodeChange: (Int, String) -> Unit)
         BasicTextField(
             value = code.joinToString(""),
             onValueChange = { input ->
-                val digits = input.filter { it.isDigit() }.take(6)
-                digits.forEachIndexed { i, c -> onCodeChange(i, c.toString()) }
-                for (i in digits.length until 6) onCodeChange(i, "")
+                val chars = input.filter { it.isLetterOrDigit() }.take(5)
+                chars.forEachIndexed { i, c -> onCodeChange(i, c.toString()) }
+                for (i in chars.length until 5) onCodeChange(i, "")
             },
             keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number,
+                keyboardType = KeyboardType.Text,
                 imeAction = ImeAction.Done
             ),
             keyboardActions = KeyboardActions(
@@ -164,16 +200,50 @@ fun AuthCodeInputFields(code: List<String>, onCodeChange: (Int, String) -> Unit)
 }
 
 @Composable
-fun SendAuthenticationButton(navController: NavHostController, authcode: String) {
+fun SendAuthenticationButton(
+    viewModel: RegisterViewModel,
+    authcode: String,
+    isLoading: Boolean
+) {
     Button(
         onClick = {
-            navController.navigate(AppScreens.MainScreen.route)
+            viewModel.verifyCode(authcode)
         },
         modifier = Modifier
             .fillMaxWidth()
-            .height(50.dp)
+            .height(50.dp),
+        enabled = !isLoading
     ) {
-        Text("Registrarte")
+        if (isLoading) {
+            CircularProgressIndicator(Modifier.size(24.dp))
+        } else {
+            Text("Verificar")
+        }
+    }
+}
+@Composable
+fun RegisterAuthHandler(
+    state: RegisterState,
+    navController: NavHostController,
+    context: Context,
+    viewModel: RegisterViewModel
+) {
+    LaunchedEffect(state) {
+        when (state) {
+            is RegisterState.Success -> {
+                Toast.makeText(context, "Verificación exitosa. ¡Bienvenido!", Toast.LENGTH_LONG).show()
+                // Navega al MainScreen y limpia el historial de registro
+                navController.navigate(AppScreens.MainScreen.route) {
+                    popUpTo(AppScreens.LoginScreen.route) { inclusive = true }
+                }
+                viewModel.resetState()
+            }
+            is RegisterState.Error -> {
+                Toast.makeText(context, state.message, Toast.LENGTH_LONG).show()
+                viewModel.resetState()
+            }
+            else -> Unit
+        }
     }
 }
 
@@ -181,6 +251,5 @@ fun SendAuthenticationButton(navController: NavHostController, authcode: String)
 @Composable
 fun PreviewAuthenticationFirstScreen() {
     val navController = rememberNavController()
-
     AuthenticationScreen(navController = navController)
 }

@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.medivet.model.repository.UserRepository
 import com.example.medivet.model.services.ApiClient
 import com.example.medivet.utils.SessionManager
+import com.google.firebase.auth.AuthCredential
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -64,4 +65,28 @@ class LoginViewModel(
             }
         }
     }
+
+    fun signInWithGoogle(credential: AuthCredential) {
+        _authState.value = AuthState.Loading
+        viewModelScope.launch {
+            try {
+                repository.loginWithGoogleCredential(credential)
+
+                val token = "FIREBASE_GOOGLE_TOKEN"
+                val method = "Google" // Método separado
+                sessionManager.saveAuthData(token, method)
+
+
+                _authState.value = AuthState.Success(token, method)
+
+            } catch (googleError: Exception) {
+                _authState.value = AuthState.Error(googleError.message ?: "Error de login con Google")
+            }
+        }
+    }
+
+    fun setGoogleApiError(message: String) {
+        _authState.value = AuthState.Error(message)
+    }
+
 }

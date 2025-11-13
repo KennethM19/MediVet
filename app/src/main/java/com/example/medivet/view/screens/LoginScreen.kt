@@ -2,9 +2,11 @@ package com.example.medivet.view.screens
 
 import android.content.Context
 import android.widget.Toast
+// --- 👇 IMPORTS AÑADIDOS 👇 ---
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+// --- 👆 IMPORTS AÑADIDOS 👆 ---
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -57,6 +59,7 @@ import com.example.medivet.viewModel.login.LoginViewModelFactory
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 
@@ -91,7 +94,7 @@ fun LoginScreen(
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
-        handleGoogleLoginResult(result, auth, navController, context)
+        handleGoogleLoginResult(result, auth, viewModel)
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -124,7 +127,10 @@ fun LoginScreen(
 
             LoginButton(email, password, viewModel, isLoading)
             Spacer(modifier = Modifier.height(12.dp))
+
+
             GoogleLoginButton { launcher.launch(googleSignInClient.signInIntent) }
+
             Spacer(modifier = Modifier.height(16.dp))
 
             RegisterText(navController, context)
@@ -256,6 +262,7 @@ fun AuthHandler(
     navController: NavHostController,
     context: Context
 ) {
+
     LaunchedEffect(authState) {
         when (authState) {
             is AuthState.Success -> {
@@ -281,25 +288,18 @@ fun AuthHandler(
 private fun handleGoogleLoginResult(
     result: ActivityResult,
     auth: FirebaseAuth,
-    navController: NavHostController,
-    context: Context
+    viewModel: LoginViewModel
 ) {
     val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
     try {
+
         val account = task.getResult(ApiException::class.java)
         val credential = GoogleAuthProvider.getCredential(account.idToken, null)
 
-        auth.signInWithCredential(credential).addOnCompleteListener { authResult ->
-            if (authResult.isSuccessful) {
-                Toast.makeText(context, "Login con Google exitoso", Toast.LENGTH_SHORT).show()
-                navController.navigate(AppScreens.MainScreen.route) {
-                    popUpTo(AppScreens.LoginScreen.route) { inclusive = true }
-                }
-            } else {
-                Toast.makeText(context, "Error en login con Google", Toast.LENGTH_SHORT).show()
-            }
-        }
+        viewModel.signInWithGoogle(credential)
+
     } catch (e: ApiException) {
-        Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+        viewModel.setGoogleApiError(e.message ?: "Error desconocido de Google")
     }
 }
+// --- 👆 FIN DE LA FUNCIÓN AÑADIDA 👆 ---

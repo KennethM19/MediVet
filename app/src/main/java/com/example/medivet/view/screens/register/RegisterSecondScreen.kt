@@ -1,5 +1,7 @@
 package com.example.medivet.view.screens.register
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -11,13 +13,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,13 +42,32 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.medivet.R
 import com.example.medivet.view.navigation.AppScreens
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.medivet.utils.SessionManager
+import com.example.medivet.viewModel.register.RegisterState
+import com.example.medivet.viewModel.register.RegisterViewModel
+import com.example.medivet.viewModel.register.RegisterViewModelFactory
 
 @Composable
 fun RegisterSecondScreen(navController: NavHostController) {
-    LocalContext.current
+    val context = LocalContext.current
+
+    val sessionManager = remember { SessionManager(context) }
+    val factory = remember { RegisterViewModelFactory(sessionManager) }
+
+    val navBackStackEntry = remember { navController.getBackStackEntry(AppScreens.RegisterFirstScreen.route) }
+    val viewModel: RegisterViewModel = viewModel(
+        factory = factory,
+        viewModelStoreOwner = navBackStackEntry
+    )
+
+    val state by viewModel.registerState.collectAsState()
+    val isLoading = state is RegisterState.Loading
+
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
+
     Box(modifier = Modifier.fillMaxWidth()) {
         Image(
             painter = painterResource(id = R.drawable.background),
@@ -89,8 +114,16 @@ fun RegisterSecondScreen(navController: NavHostController) {
                     )
                 }
             }
-            RegisterButton(navController)
+            RegisterButton(
+                navController = navController,
+                viewModel = viewModel,
+                email = email,
+                password = password,
+                confirmPassword = confirmPassword,
+                isLoading = isLoading
+            )
         }
+        RegisterAuthHandler(state, navController, context, viewModel)
     }
 }
 
@@ -119,16 +152,63 @@ fun PasswordFieldWithSubtitle(
 }
 
 @Composable
-fun RegisterButton(navController: NavHostController) {
+fun RegisterButton(
+    navController: NavHostController,
+    viewModel: RegisterViewModel,
+    email: String,
+    password: String,
+    confirmPassword: String,
+    isLoading: Boolean
+) {
+    val context = LocalContext.current
+
     Button(
         onClick = {
-            navController.navigate(AppScreens.AuthenticationScreen.route)
+            if (password != confirmPassword) {
+                Toast.makeText(context, "Las contraseñas no coinciden.", Toast.LENGTH_SHORT).show()
+                return@Button
+            }
+
+            viewModel.setEmail(email.trim())
+            viewModel.setPassword(password.trim())
+
+            viewModel.registerUser()
         },
         modifier = Modifier
             .fillMaxWidth()
             .height(50.dp),
+        enabled = !isLoading
     ) {
-        Text("Registrarse")
+        if (isLoading) {
+            CircularProgressIndicator(Modifier.size(24.dp))
+        } else {
+            Text("Registrarse")
+        }
+    }
+}
+
+@Composable
+fun RegisterAuthHandler(
+    state: RegisterState,
+    navController: NavHostController,
+    context: Context,
+    viewModel: RegisterViewModel
+) {
+    LaunchedEffect(state) {
+        when (state) {
+            is RegisterState.Success -> {
+                Toast.makeText(context, "Registro exitoso. Verifique su correo.", Toast.LENGTH_LONG).show()
+                navController.navigate(AppScreens.AuthenticationScreen.route)
+                viewModel.resetState()
+            }
+            is RegisterState.Error -> {
+                // Error: Notificar
+                Toast.makeText(context, state.message, Toast.LENGTH_LONG).show()
+                viewModel.resetState()
+            }
+            else -> {
+            }
+        }
     }
 }
 

@@ -6,6 +6,7 @@ import com.example.medivet.model.model.AuthRequest
 import com.example.medivet.model.model.AuthResponse
 import com.example.medivet.model.model.RegisterRequest
 import com.example.medivet.model.services.AuthService
+import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.FirebaseAuth
 import retrofit2.Response
 import kotlin.coroutines.resume
@@ -48,6 +49,21 @@ class UserRepository(
 
                         continuation.resumeWithException(
                             task.exception ?: Exception("Error desconocido de Firebase")
+                        )
+                    }
+                }
+        }
+    }
+
+    suspend fun loginWithGoogleCredential(credential: AuthCredential): Boolean {
+        return suspendCoroutine { continuation ->
+            auth.signInWithCredential(credential)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        continuation.resume(true)
+                    } else {
+                        continuation.resumeWithException(
+                            task.exception ?: Exception("Error desconocido de Google Auth")
                         )
                     }
                 }

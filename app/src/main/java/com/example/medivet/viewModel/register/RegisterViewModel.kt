@@ -1,17 +1,17 @@
 package com.example.medivet.viewModel.register
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.medivet.model.model.VerifyCodeRequest
-import com.example.medivet.model.model.RegisterRequest
 import com.example.medivet.model.repository.UserRepository
 import com.example.medivet.model.services.ApiClient
+import com.example.medivet.model.model.RegisterRequest
+import com.example.medivet.model.model.VerifyCodeRequest
 import com.example.medivet.utils.SessionManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import android.util.Log
 
 private fun mapDocTypeToId(docType: String): Int {
     return when (docType) {
@@ -42,6 +42,7 @@ data class RegistrationData(
     val cellphoneNum: String = "",
     val telephoneNum: String = "",
     val email: String = "",
+    val photo: String = "",
     val password: String = ""
 )
 
@@ -59,39 +60,30 @@ class RegisterViewModel(
     fun setDocType(value: String) {
         _registrationData.value = _registrationData.value.copy(docType = value)
     }
-
     fun setDocNumber(value: String) {
         _registrationData.value = _registrationData.value.copy(docNumber = value)
     }
-
     fun setFirstName(value: String) {
         _registrationData.value = _registrationData.value.copy(firstName = value)
     }
-
     fun setLastName(value: String) {
         _registrationData.value = _registrationData.value.copy(lastName = value)
     }
-
     fun setAddress(value: String) {
         _registrationData.value = _registrationData.value.copy(address = value)
     }
-
     fun setBirthDate(value: String) {
         _registrationData.value = _registrationData.value.copy(birthDate = value)
     }
-
     fun setCellphoneNum(value: String) {
         _registrationData.value = _registrationData.value.copy(cellphoneNum = value)
     }
-
     fun setTelephoneNum(value: String) {
         _registrationData.value = _registrationData.value.copy(telephoneNum = value)
     }
-
     fun setEmail(value: String) {
         _registrationData.value = _registrationData.value.copy(email = value)
     }
-
     fun setPassword(value: String) {
         _registrationData.value = _registrationData.value.copy(password = value)
     }
@@ -107,17 +99,15 @@ class RegisterViewModel(
         val request = RegisterRequest(
             type_document_id = mapDocTypeToId(finalData.docType),
             role_id = 1,
-
             name = finalData.firstName.trim(),
             lastname = finalData.lastName.trim(),
             num_document = finalData.docNumber.trim(),
             address = finalData.address.trim(),
             birth_date = finalData.birthDate.trim(),
-
             num_cellphone = finalData.cellphoneNum.toNullIfBlank(),
             num_telephone = finalData.telephoneNum.toNullIfBlank(),
-
             email = finalData.email.trim(),
+            photo = finalData.photo.toNullIfBlank(),
             password = finalData.password
         )
 
@@ -125,17 +115,14 @@ class RegisterViewModel(
         viewModelScope.launch {
             try {
                 repository.registerWithFastApi(request)
-
                 sessionManager.saveAuthData(request.email, "FastAPI")
                 _registerState.value = RegisterState.Success("REGISTRO_COMPLETADO")
             } catch (e: Exception) {
                 Log.e("RegisterVM", "Error de registro: ${e.message}")
-                _registerState.value =
-                    RegisterState.Error(e.message ?: "Error desconocido al registrar.")
+                _registerState.value = RegisterState.Error(e.message ?: "Error desconocido al registrar.")
             }
         }
     }
-
 
     fun resetState() {
         _registerState.value = RegisterState.Idle
@@ -167,6 +154,4 @@ class RegisterViewModel(
             }
         }
     }
-
-
 }
