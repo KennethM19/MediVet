@@ -1,6 +1,7 @@
 package com.example.medivet.view.screens.register
 
 import android.app.DatePickerDialog
+import android.widget.Toast // <-- AÑADIDO
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -49,12 +50,22 @@ import com.example.medivet.view.navigation.AppScreens
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.medivet.utils.SessionManager
+import com.example.medivet.viewModel.register.RegisterViewModel
+import com.example.medivet.viewModel.register.RegisterViewModelFactory
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterFirstScreen(navController: NavHostController) {
-    LocalContext.current
+    val context = LocalContext.current
+
+    val sessionManager = remember { SessionManager(context) }
+    val factory = remember { RegisterViewModelFactory(sessionManager) }
+
+    val viewModel: RegisterViewModel = viewModel(factory = factory)
+
     var docType by remember { mutableStateOf("") }
     var docNumber by remember { mutableStateOf("") }
     var firstName by remember { mutableStateOf("") }
@@ -146,7 +157,18 @@ fun RegisterFirstScreen(navController: NavHostController) {
                     )
                 }
             }
-            ContinueButton(navController)
+            ContinueButton(
+                navController = navController,
+                viewModel = viewModel,
+                docType = docType,
+                docNumber = docNumber,
+                firstName = firstName,
+                lastName = lastName,
+                address = address,
+                birthDate = birthDate,
+                cellphoneNum = cellphoneNum,
+                telephoneNum = telephoneNum
+            )
         }
     }
 }
@@ -187,10 +209,37 @@ fun InputFieldWithSubtitle(
 }
 
 @Composable
-fun ContinueButton(navController: NavHostController) {
+fun ContinueButton(
+    navController: NavHostController,
+    viewModel: RegisterViewModel,
+    docType: String,
+    docNumber: String,
+    firstName: String,
+    lastName: String,
+    address: String,
+    birthDate: String,
+    cellphoneNum: String,
+    telephoneNum: String
+) {
+    val context = LocalContext.current
+
     Button(
         onClick = {
-            /* Funcionalidad se agregará después */
+            if (docType.isBlank() || docNumber.isBlank() || firstName.isBlank() ||
+                lastName.isBlank() || address.isBlank() || birthDate.isBlank()) {
+                Toast.makeText(context, "Por favor, complete todos los campos.", Toast.LENGTH_LONG).show()
+                return@Button
+            }
+
+            viewModel.setDocType(docType)
+            viewModel.setDocNumber(docNumber)
+            viewModel.setFirstName(firstName)
+            viewModel.setLastName(lastName)
+            viewModel.setAddress(address)
+            viewModel.setBirthDate(birthDate)
+            viewModel.setCellphoneNum(cellphoneNum)
+            viewModel.setTelephoneNum(telephoneNum)
+
             navController.navigate(AppScreens.RegisterSecondScreen.route)
         },
         modifier = Modifier
@@ -300,4 +349,3 @@ fun PreviewRegisterFirstScreen() {
     val navController = rememberNavController()
     RegisterFirstScreen(navController)
 }
-
