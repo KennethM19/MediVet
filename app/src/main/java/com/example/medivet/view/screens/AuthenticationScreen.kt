@@ -95,7 +95,6 @@ fun AuthenticationLogo() {
     )
 }
 
-// Texto de instrucción
 @Composable
 fun AuthInstructionText() {
     Text(
@@ -107,14 +106,12 @@ fun AuthInstructionText() {
     )
 }
 
-// Input de código en recuadros individuales
 @Composable
 fun AuthCodeInputFields(code: List<String>, onCodeChange: (Int, String) -> Unit) {
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
 
     Box {
-        // Campo invisible para capturar todo el input
         BasicTextField(
             value = code.joinToString(""),
             onValueChange = { input ->
@@ -131,15 +128,13 @@ fun AuthCodeInputFields(code: List<String>, onCodeChange: (Int, String) -> Unit)
             ),
             singleLine = true,
             textStyle = LocalTextStyle.current.copy(color = Color.Transparent),
-            cursorBrush = SolidColor(Color.Transparent), // <- Oculta el cursor
+            cursorBrush = SolidColor(Color.Transparent),
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp)
                 .focusRequester(focusRequester)
         )
 
-
-        // Los 6 recuadros visibles
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.fillMaxWidth()

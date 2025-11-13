@@ -22,9 +22,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.medivet.model.repository.PetRepository
 import com.example.medivet.ui.components.BottomNavBar
 import com.example.medivet.ui.components.PetCard
@@ -35,7 +37,7 @@ import com.example.medivet.viewModel.pet.PetsViewModelFactory
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PetsScreen(
+fun ListPetsScreen(
     navController: NavHostController
 ) {
     val context = LocalContext.current
@@ -97,12 +99,17 @@ fun PetsScreen(
                 items(pets) { pet ->
                     PetCard(
                         pet = pet,
-                        onEditClick = {
-                            // Lógica para editar
-                        }
+                        navController = navController
                     )
                 }
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun PreviewListPetScreen() {
+    val navController = rememberNavController()
+    ListPetsScreen(navController)
 }

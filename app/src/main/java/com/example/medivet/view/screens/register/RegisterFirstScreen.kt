@@ -1,5 +1,6 @@
 package com.example.medivet.view.screens.register
 
+import android.app.DatePickerDialog
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -14,11 +15,15 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -41,6 +46,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.medivet.R
 import com.example.medivet.view.navigation.AppScreens
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -108,11 +116,12 @@ fun RegisterFirstScreen(navController: NavHostController) {
                 }
                 Spacer(modifier = Modifier.height(8.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    InputFieldWithSubtitle(
-                        subtitle = "Nacimiento",
-                        value = birthDate,
-                        onValueChange = { birthDate = it },
-                        modifier = Modifier.weight(1f)
+                    DateInputField(
+                        subtitle = "Fecha de nacimiento",
+                        birthDate = birthDate,
+                        onDateChange = { birthDate = it },
+                        modifier = Modifier
+                            .weight(1f)
                     )
                     InputFieldWithSubtitle(
                         subtitle = "Dirección",
@@ -167,7 +176,6 @@ fun InputFieldWithSubtitle(
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
-            label = { Text(subtitle) },
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
             textStyle = LocalTextStyle.current.copy(color = Color.Black),
@@ -237,6 +245,52 @@ fun DocumentTypeDropdown(
                 }
             }
         }
+    }
+}
+
+@Composable
+fun DateInputField(
+    birthDate: String,
+    onDateChange: (String) -> Unit,
+    modifier: Modifier,
+    subtitle: String,
+) {
+    val context = LocalContext.current
+    val calendar = Calendar.getInstance()
+
+    val year = calendar.get(Calendar.YEAR)
+    val month = calendar.get(Calendar.MONTH)
+    val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+    val datePickerDialog = DatePickerDialog(
+        context,
+        { _, selectedYear, selectedMonth, selectedDay ->
+            val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            val selectedCalendar = Calendar.getInstance().apply {
+                set(selectedYear, selectedMonth, selectedDay)
+            }
+            val formattedDate = formatter.format(selectedCalendar.time)
+            onDateChange(formattedDate)
+        },
+        year,
+        month,
+        day
+    )
+
+    Column(modifier = modifier) {
+        Text(text = subtitle, color = Color.Black)
+        Spacer(modifier = Modifier.height(4.dp))
+        OutlinedTextField(
+            value = birthDate,
+            onValueChange = {},
+            readOnly = true,
+            trailingIcon = {
+                IconButton(onClick = { datePickerDialog.show() }) {
+                    Icon(Icons.Default.DateRange, contentDescription = "Seleccionar fecha")
+                }
+            },
+            modifier = Modifier.background(Color.White.copy(alpha = 0.85f), shape = MaterialTheme.shapes.small)
+        )
     }
 }
 
