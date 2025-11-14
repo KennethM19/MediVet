@@ -64,8 +64,9 @@ import com.example.medivet.viewModel.pet.PetsViewModelFactory
 @Composable
 fun EditPetScreen(navController: NavHostController, petId: Int?) {
     val context = LocalContext.current
-    SessionManager(context)
-    rememberCoroutineScope()
+    val sessionManager = remember { SessionManager(context) }
+    val factory = PetsViewModelFactory(sessionManager)
+    val petViewModel: PetsViewModel = viewModel(factory = factory)
 
     var isNeutered by remember { mutableStateOf(false) }
     var weight by remember { mutableStateOf("") }
@@ -180,7 +181,13 @@ fun EditPetScreen(navController: NavHostController, petId: Int?) {
                         Spacer(Modifier.width(16.dp))
 
                         Button(
-                            onClick = {},
+                            onClick = {
+                                petId?.let {
+                                    val photoUrl = selectedImageUri?.toString()
+                                    petViewModel.updatePet(it, weight, isNeutered, photoUrl)
+                                    navController.popBackStack()
+                                }
+                            },
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00BFA5)),
                             modifier = Modifier.weight(1f)
                         ) {

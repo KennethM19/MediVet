@@ -42,3 +42,9 @@ data class SexResponse(
     val id: Int,
     val name: String
 )
+
+data class PetUpdate(
+    val weight: Double?,
+    val neutered: Boolean?,
+    val photo: String?
+)

@@ -2,6 +2,7 @@ package com.example.medivet.model.repository
 
 import com.example.medivet.model.model.PetRequest
 import com.example.medivet.model.model.PetResponse
+import com.example.medivet.model.model.PetUpdate
 import com.example.medivet.model.services.ApiClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -30,6 +31,10 @@ class PetRepository {
         return withContext(Dispatchers.IO) {
             service.getPets(userId)
         }
+    }
+
+    suspend fun updatePet(petId: Int, update: PetUpdate, token: String): PetResponse {
+        return service.updatePet(petId, update, "Bearer $token")
     }
 
 }

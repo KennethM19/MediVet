@@ -2,11 +2,14 @@ package com.example.medivet.model.services
 
 import com.example.medivet.model.model.PetRequest
 import com.example.medivet.model.model.PetResponse
+import com.example.medivet.model.model.PetUpdate
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
+import retrofit2.http.PUT
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface PetService {
@@ -32,4 +35,11 @@ interface PetService {
 
     @GET("/pets/user")
     suspend fun getPets(@Query("user_id") userId: Int): Response<List<PetResponse>>
+
+    @PUT("/pets")
+    suspend fun updatePet(
+        @Query("pet_id") petId: Int,
+        @Body petUpdate: PetUpdate,
+        @Header("Authorization") token: String
+    ): PetResponse
 }

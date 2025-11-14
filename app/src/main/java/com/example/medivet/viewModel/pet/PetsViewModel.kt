@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.medivet.model.model.PetRequest
 import com.example.medivet.model.model.PetResponse
+import com.example.medivet.model.model.PetUpdate
 import com.example.medivet.model.repository.PetRepository
 import com.example.medivet.model.repository.UserRepository
 import com.example.medivet.model.services.ApiClient.petService
@@ -101,4 +102,23 @@ class PetsViewModel(
             }
         }
     }
+
+    fun updatePet(petId: Int, weight: String, neutered: Boolean, photoUrl: String?) {
+        viewModelScope.launch {
+            try {
+                val token = sessionManager.getToken() ?: return@launch
+                val update = PetUpdate(
+                    weight = weight.toDoubleOrNull(),
+                    neutered = neutered,
+                    photo = photoUrl
+                )
+                val response = repository.updatePet(petId, update, token)
+                Log.d("PetsViewModel", "Mascota actualizada: $response")
+            } catch (e: Exception) {
+                Log.e("PetsViewModel", "Error actualizando mascota", e)
+            }
+        }
+    }
+
+
 }
