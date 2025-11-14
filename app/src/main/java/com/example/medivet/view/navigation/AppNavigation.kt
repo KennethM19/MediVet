@@ -16,6 +16,7 @@ import com.example.medivet.view.screens.LoginScreen
 import com.example.medivet.view.screens.PasswordResetScreen
 import com.example.medivet.view.screens.UpdatePasswordScreen
 import com.example.medivet.view.screens.chat.ChatScreen
+import com.example.medivet.view.screens.dashboard.DashboardScreen
 import com.example.medivet.view.screens.perfil.PerfilScreen
 import com.example.medivet.view.screens.pets.CreatePetScreen
 import com.example.medivet.view.screens.pets.EditPetScreen
@@ -84,5 +85,9 @@ fun AppNavigation() {
 
             ChatScreen(navController, chatViewModel)
         }
+        composable(AppScreens.DashboardScreen.route){
+            DashboardScreen(navController)
+        }
+
     }
 }

@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     id("com.google.gms.google-services")
     id("org.jetbrains.kotlin.plugin.serialization")
+    id("com.google.devtools.ksp") version "2.0.21-1.0.25"
 }
 
 android {
@@ -76,6 +77,8 @@ dependencies {
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-analytics")
 
+    // Gson para serialización
+    implementation("com.google.code.gson:gson:2.10.1")
 
     // Google Play Services
 
@@ -86,6 +89,9 @@ dependencies {
 
     // Coil - cargar imagenes desde URLs
     implementation("io.coil-kt:coil-compose:2.4.0")
+
+    // Accompanist para SwipeRefresh
+    implementation("com.google.accompanist:accompanist-swiperefresh:0.32.0")
 
     // Permisiones
     implementation("com.google.accompanist:accompanist-permissions:0.32.0")
@@ -111,6 +117,22 @@ dependencies {
     implementation("com.google.firebase:firebase-auth:23.0.0")
     implementation("com.google.firebase:firebase-analytics:22.1.0")
     implementation("com.google.firebase:firebase-storage:21.0.0")
+
+    // Room para caché local
+    val room_version = "2.6.1"
+    implementation("androidx.room:room-runtime:$room_version")
+    implementation("androidx.room:room-ktx:$room_version")
+    ksp("androidx.room:room-compiler:$room_version")
+
+    // Vico Charts
+    implementation("com.patrykandpatrick.vico:compose:1.13.1")
+    implementation("com.patrykandpatrick.vico:compose-m3:1.13.1")
+    implementation("com.patrykandpatrick.vico:core:1.13.1")
+
+    // Lifecycle
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
+
 
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
     implementation(libs.androidx.compose.runtime.livedata)

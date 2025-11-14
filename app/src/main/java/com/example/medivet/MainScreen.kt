@@ -177,7 +177,9 @@ fun MainScreen(
                         MenuItem("Perfil", Icons.Default.Person) {
                             navController.navigate("profile_screen")
                         }
-                        MenuItem("Información", Icons.Default.Info) { /* Navegar */ }
+                        MenuItem("Dashboard", Icons.Default.Info) {
+                            navController.navigate("dashboard_screen")
+                        }
                     }
                 }
 
