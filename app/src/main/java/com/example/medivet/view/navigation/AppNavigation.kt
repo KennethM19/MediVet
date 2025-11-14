@@ -4,9 +4,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.medivet.MainScreen
 import com.example.medivet.SplashScreen
 import com.example.medivet.model.repository.ChatRepository
@@ -50,8 +52,12 @@ fun AppNavigation() {
         composable(AppScreens.CreatePetScreen.route) {
             CreatePetScreen(navController)
         }
-        composable (AppScreens.EditPetScreen.route ) {
-            EditPetScreen(navController)
+        composable(
+            route = AppScreens.EditPetScreen.route + "/{pet_Id}",
+            arguments = listOf(navArgument("pet_Id") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val petId = backStackEntry.arguments?.getInt("pet_Id")
+            EditPetScreen(navController, petId)
         }
         composable(AppScreens.LoginScreen.route) {
             LoginScreen(navController)
@@ -59,8 +65,12 @@ fun AppNavigation() {
         composable(AppScreens.PasswordResetScreen.route) {
             PasswordResetScreen(navController)
         }
-        composable(AppScreens.PetScreen.route) {
-            PetScreen(navController)
+        composable(
+            route = AppScreens.PetScreen.route + "/{pet_Id}",
+            arguments = listOf(navArgument("pet_Id") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val petId = backStackEntry.arguments?.getInt("pet_Id")
+            PetScreen(navController, petId)
         }
         composable(AppScreens.UpdatePasswordScreen.route) {
             UpdatePasswordScreen(navController)

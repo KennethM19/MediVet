@@ -11,23 +11,25 @@ import retrofit2.http.Query
 
 interface PetService {
 
-    @GET("utils/sex")
+    @GET("/utils/sex")
     suspend fun getSexOptions(): Response<List<Map<String, Any>>>
 
-    @GET("utils/species")
+    @GET("/utils/species")
     suspend fun getSpeciesOptions(): Response<List<Map<String, Any>>>
 
-    @GET("utils/breed")
+    @GET("/utils/breed")
     suspend fun getBreedOptions(): Response<List<Map<String, Any>>>
 
-    @POST("pets")
+    @POST("/pets")
     suspend fun createPet(
         @Header("Authorization") token: String,
         @Body pet: PetRequest
     ): Response<PetResponse>
 
+    @GET("/pets")
+    suspend fun getPet(@Query("pet_id") petId: Int, @Header("Authorization") token: String): List<PetResponse>
 
 
-    @GET("pets/user")
+    @GET("/pets/user")
     suspend fun getPets(@Query("user_id") userId: Int): Response<List<PetResponse>>
 }

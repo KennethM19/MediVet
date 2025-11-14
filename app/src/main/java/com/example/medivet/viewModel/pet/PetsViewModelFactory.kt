@@ -11,7 +11,6 @@ import com.example.medivet.model.services.ApiClient
 import com.example.medivet.utils.SessionManager
 
 class PetsViewModelFactory(
-    private val context: Context,
     private val sessionManager: SessionManager
 ) : ViewModelProvider.Factory {
 

@@ -7,6 +7,7 @@ import com.example.medivet.model.model.PetRequest
 import com.example.medivet.model.model.PetResponse
 import com.example.medivet.model.repository.PetRepository
 import com.example.medivet.model.repository.UserRepository
+import com.example.medivet.model.services.ApiClient.petService
 import com.example.medivet.utils.SessionManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,6 +23,9 @@ class PetsViewModel(
 
     private val _pets = MutableStateFlow<List<PetResponse>>(emptyList())
     val pets: StateFlow<List<PetResponse>> = _pets.asStateFlow()
+
+    private val _pet = MutableStateFlow<PetResponse?>(null)
+    val pet: StateFlow<PetResponse?> = _pet
 
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
@@ -60,6 +64,21 @@ class PetsViewModel(
             } catch (e: Exception) {
                 _error.value = "Error de red: ${e.message}"
                 Log.e("PetsViewModel", "Excepción en loadPets", e)
+            }
+        }
+    }
+
+    fun loadPet(petId: Int) {
+        viewModelScope.launch {
+            try {
+                val token = sessionManager.getToken() ?: return@launch
+                Log.d("PetsViewModel", "Cargando mascota con id=$petId y token=$token")
+
+                val response = repository.getPet(petId, token)
+                Log.d("PetsViewModel", "Respuesta del backend: $response")
+                _pet.value = response
+            } catch (e: Exception) {
+                println("Error cargando mascota: ${e.message}")
             }
         }
     }

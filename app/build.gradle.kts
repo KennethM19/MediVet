@@ -27,7 +27,7 @@ android {
 
     buildTypes {
         debug {
-            buildConfigField("String", "BASE_URL", "\"https://medivet-backend.onrender.com/\"")
+            buildConfigField("String", "BASE_URL", "\"https://medivet-backend.onrender.com\"")
         }
         release {
             isMinifyEnabled = false
@@ -35,7 +35,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            buildConfigField("String", "BASE_URL", "\"https://medivet-backend.onrender.com/\"")
+            buildConfigField("String", "BASE_URL", "\"https://medivet-backend.onrender.com\"")
         }
     }
 

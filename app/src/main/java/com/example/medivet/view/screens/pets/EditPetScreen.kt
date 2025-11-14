@@ -62,7 +62,7 @@ import com.example.medivet.viewModel.pet.PetsViewModelFactory
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditPetScreen(navController: NavHostController) {
+fun EditPetScreen(navController: NavHostController, petId: Int?) {
     val context = LocalContext.current
     SessionManager(context)
     rememberCoroutineScope()
@@ -197,5 +197,6 @@ fun EditPetScreen(navController: NavHostController) {
 @Composable
 fun PreviewEditPetScreen() {
     val navController = rememberNavController()
-    EditPetScreen(navController)
+    val petId = 1
+    EditPetScreen(navController, petId)
 }

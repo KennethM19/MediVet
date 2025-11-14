@@ -21,6 +21,10 @@ class PetRepository {
         }
     }
 
+    suspend fun getPet(petId: Int, token: String): PetResponse? {
+        val pets = ApiClient.petService.getPet(petId, "Bearer $token")
+        return pets.firstOrNull()
+    }
 
     suspend fun getPets(userId: Int): Response<List<PetResponse>> {
         return withContext(Dispatchers.IO) {
