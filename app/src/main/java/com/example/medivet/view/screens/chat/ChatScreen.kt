@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,25 +31,26 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.medivet.model.model.Message
+import com.example.medivet.model.repository.ChatRepository
+import com.example.medivet.viewModel.chat.ChatViewModel
+import okhttp3.OkHttpClient
 
 @Composable
 fun ChatScreen(
     navController: NavController,
+    chatViewModel: ChatViewModel
 ) {
     var message by remember { mutableStateOf("") }
-    val messages = remember { mutableStateListOf<Message>() }
+    val messages by chatViewModel.messages.observeAsState(emptyList())
     val listState = rememberLazyListState()
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         LazyColumn(
-            modifier = Modifier
-                .weight(1f)
-                .padding(8.dp),
-            reverseLayout = true
+            modifier = Modifier.weight(1f).padding(8.dp),
+            reverseLayout = true,
+            state = listState
         ) {
-            items(messages) {
-                msg ->
-
+            items(messages) { msg ->
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = if (msg.isUser) Arrangement.End else Arrangement.Start
@@ -63,21 +65,16 @@ fun ChatScreen(
                             .padding(8.dp)
                     )
                 }
-
             }
         }
 
         LaunchedEffect(messages.size) {
             if (messages.isNotEmpty()) {
-                listState.animateScrollToItem(0);
+                listState.animateScrollToItem(0)
             }
         }
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-        ) {
+        Row(modifier = Modifier.fillMaxWidth().padding(8.dp)) {
             OutlinedTextField(
                 value = message,
                 onValueChange = { message = it },
@@ -87,13 +84,7 @@ fun ChatScreen(
             Button(
                 onClick = {
                     if (message.isNotBlank()) {
-                        // Mensaje del usuario
-                        messages.add(0, Message(message, true))
-
-                        // Respuesta del bot (simulada)
-                        val botReply = getBotResponse(message)
-                        messages.add(0, Message(botReply, false))
-
+                        chatViewModel.sendMessage(message)
                         message = ""
                     }
                 },
@@ -103,19 +94,4 @@ fun ChatScreen(
             }
         }
     }
-}
-
-fun getBotResponse(userMessage: String): String {
-    return when {
-        userMessage.contains("hola", ignoreCase = true) -> "¡Hola! ¿Cómo estás?"
-        userMessage.contains("perro", ignoreCase = true) -> "Me encantan los perros 🐶"
-        else -> "Interesante... cuéntame más."
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewChatScreen() {
-    val navController = rememberNavController()
-    ChatScreen(navController)
 }

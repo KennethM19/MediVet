@@ -113,6 +113,7 @@ dependencies {
     implementation("com.google.firebase:firebase-storage:21.0.0")
 
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+    implementation(libs.androidx.compose.runtime.livedata)
 
     // Testing
     testImplementation(libs.junit)
