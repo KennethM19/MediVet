@@ -36,4 +36,3 @@ object ApiClient {
     val apiService: AuthService by lazy { retrofit.create(AuthService::class.java) }
     val petService: PetService by lazy { retrofit.create(PetService::class.java) }
 }
-

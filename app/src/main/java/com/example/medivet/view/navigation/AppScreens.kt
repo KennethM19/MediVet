@@ -16,7 +16,7 @@ sealed class AppScreens(val route: String) {
     object CreatePetScreen : AppScreens("create_pet_screen")
     object EditPetScreen : AppScreens("edit_pet_screen")
     object ProfileScreen : AppScreens("profile_screen")
-    object InfoScreen : AppScreens("info_screen")
+    object DashboardScreen : AppScreens("dashboard_screen")
     object ConsultScreen : AppScreens("consult_screen")
     object VetsScreen : AppScreens("vets_screen")
     object ChatScreen : AppScreens("chat_screen")
