@@ -33,11 +33,9 @@ interface AuthService {
     suspend fun getCurrentUser(): Response<List<User>>
 
     @GET("users/email")
-    suspend fun getUserByEmail(
-        @Query("user_email") email: String
-    ): Response<User>
+    suspend fun getUserByEmail(@Query("user_email") email: String): Response<User>
 
-    // Este endpoint sube la foto Y actualiza el usuario automáticamente
+
     @Multipart
     @POST("users/upload-photo")
     suspend fun uploadProfilePhoto(

@@ -1,6 +1,7 @@
 package com.example.medivet.ui.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable // <-- AÑADIDO
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -27,37 +28,51 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color // <-- AÑADIDO
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource // <-- AÑADIDO
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
+// import androidx.navigation.NavHostController // <-- ELIMINADO
 import coil.compose.rememberAsyncImagePainter
+import com.example.medivet.R // <-- AÑADIDO
 import com.example.medivet.model.model.PetResponse
-import com.example.medivet.view.navigation.AppScreens
 
 @Composable
 fun PetCard(
     pet: PetResponse,
-    navController: NavHostController
+
+
+    onClick: () -> Unit,
+    onEditClick: () -> Unit = {},
+    onDeleteClick: () -> Unit = {}
+
 ) {
     var expanded by remember { mutableStateOf(false) }
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .padding(vertical = 8.dp)
+            .clickable { onClick() },
         shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(6.dp)
+        elevation = CardDefaults.cardElevation(6.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
-        Row(modifier = Modifier.padding(8.dp)) {
+        Row(modifier = Modifier.padding(16.dp)) {
             Image(
-                painter = rememberAsyncImagePainter(pet.photo),
+                // Usa un placeholder si la foto es nula
+                painter = if (pet.photo.isNullOrBlank()) {
+                    painterResource(id = R.drawable.logo_titulo)
+                } else {
+                    rememberAsyncImagePainter(pet.photo)
+                },
                 contentDescription = pet.name,
                 modifier = Modifier
                     .size(100.dp)
                     .clip(RoundedCornerShape(12.dp)),
                 contentScale = ContentScale.Crop
             )
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(16.dp))
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -65,12 +80,15 @@ fun PetCard(
             ) {
                 Text(
                     text = pet.name,
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold
                 )
-                Text("Sexo: ${pet.sex_id}", style = MaterialTheme.typography.bodySmall)
-                Text("Peso: ${pet.weight}", style = MaterialTheme.typography.bodySmall)
-                //Text("Edad: ${pet.}", style = MaterialTheme.typography.bodySmall)
-                Text("Raza: ${pet.breed_id}", style = MaterialTheme.typography.bodySmall)
+
+                Text("Sexo ID: ${pet.sex_id}", style = MaterialTheme.typography.bodyMedium)
+                Text("Raza ID: ${pet.breed_id}", style = MaterialTheme.typography.bodyMedium)
+                pet.weight?.let { // Muestra el peso solo si no es nulo
+                    Text("Peso: $it kg", style = MaterialTheme.typography.bodyMedium)
+                }
             }
             Column {
                 IconButton(onClick = { expanded = true}) {
@@ -85,19 +103,22 @@ fun PetCard(
                         text = { Text("Ver mascota") },
                         onClick = {
                             expanded = false
-                            navController.navigate(AppScreens.PetScreen.route)
+                            onClick()
                         }
                     )
                     DropdownMenuItem(
                         text = { Text("Editar") },
                         onClick = {
                             expanded = false
-                            navController.navigate(AppScreens.EditPetScreen.route)
+                            onEditClick()
                         }
                     )
                     DropdownMenuItem(
                         text = { Text("Eliminar") },
-                        onClick = {}
+                        onClick = {
+                            expanded = false
+                            onDeleteClick()
+                        }
                     )
                 }
             }

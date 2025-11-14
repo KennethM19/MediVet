@@ -118,4 +118,40 @@ class SessionManager(private val context: Context) {
             prefs.clear()
         }
     }
+
+    suspend fun getUserIdFromToken(): Int? {
+        return try {
+            val token = token.first() ?: run {
+                Log.e("SessionManager", "Token es nulo, no se puede extraer user_id")
+                return null
+            }
+
+            val parts = token.split(".")
+            if (parts.size != 3) {
+                Log.e("SessionManager", "Token JWT inválido, no tiene 3 partes")
+                return null
+            }
+
+            val payload = String(Base64.decode(parts[1], Base64.DEFAULT))
+            val jsonObject = JSONObject(payload)
+
+            if (jsonObject.has("user_id")) {
+                val userId = jsonObject.optInt("user_id", -1)
+                if (userId == -1) {
+                    Log.e("SessionManager", "user_id está presente pero no es un Int válido")
+                    null
+                } else {
+                    Log.d("SessionManager", "ID de usuario extraído: $userId")
+                    userId
+                }
+            } else {
+                Log.e("SessionManager", "El token no contiene 'user_id'")
+                null
+            }
+        } catch (e: Exception) {
+            Log.e("SessionManager", "Error al decodificar token: ${e.message}")
+            null
+        }
+    }
+
 }

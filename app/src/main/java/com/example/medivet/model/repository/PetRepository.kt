@@ -21,9 +21,10 @@ class PetRepository {
         }
     }
 
-    suspend fun getPets(token: String): Response<List<PetResponse>> {
+
+    suspend fun getPets(userId: Int): Response<List<PetResponse>> {
         return withContext(Dispatchers.IO) {
-            service.getPets("Bearer $token")
+            service.getPets(userId)
         }
     }
 
