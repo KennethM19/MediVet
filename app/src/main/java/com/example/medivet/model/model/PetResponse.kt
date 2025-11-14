@@ -2,15 +2,49 @@ package com.example.medivet.model.model
 
 data class PetResponse(
     val id: Int,
-    val user_id: Int,
-    val num_doc: String?,
     val name: String,
+    val year_birth: Int,
+    val month_birth: Int,
+    val weight: Double,
     val photo: String?,
-    val sex_id: Int,
-    val specie_id: Int,
-    val year_birth: Int?,
-    val month_birth: Int?,
-    val weight: Double?,
     val neutered: Boolean,
-    val breed_id: Int
+    val age: AgeResponse,
+    val user: UserResponse,
+    val breed: BreedResponse?,
+    val species: SpeciesResponse?,
+    val sex: SexResponse?
+)
+
+data class AgeResponse(
+    val years: Int,
+    val months: Int
+)
+
+data class UserResponse(
+    val id: Int,
+    val name: String,
+    val lastname: String,
+    val email: String,
+    val photo: String?
+)
+
+data class BreedResponse(
+    val id: Int,
+    val name: String
+)
+
+data class SpeciesResponse(
+    val id: Int,
+    val name: String
+)
+
+data class SexResponse(
+    val id: Int,
+    val name: String
+)
+
+data class PetUpdate(
+    val weight: Double?,
+    val neutered: Boolean?,
+    val photo: String?
 )

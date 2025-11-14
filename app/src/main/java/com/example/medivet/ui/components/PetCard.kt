@@ -84,11 +84,6 @@ fun PetCard(
                     fontWeight = FontWeight.Bold
                 )
 
-                Text("Sexo ID: ${pet.sex_id}", style = MaterialTheme.typography.bodyMedium)
-                Text("Raza ID: ${pet.breed_id}", style = MaterialTheme.typography.bodyMedium)
-                pet.weight?.let { // Muestra el peso solo si no es nulo
-                    Text("Peso: $it kg", style = MaterialTheme.typography.bodyMedium)
-                }
             }
             Column {
                 IconButton(onClick = { expanded = true}) {

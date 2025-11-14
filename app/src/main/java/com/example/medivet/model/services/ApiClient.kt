@@ -10,49 +10,29 @@ import java.util.concurrent.TimeUnit
 
 object ApiClient {
 
-    private lateinit var context: Context
+    private lateinit var retrofit: Retrofit
 
-    // Método para inicializar desde Application
     fun init(appContext: Context) {
-        context = appContext.applicationContext
-    }
-
-    private val okHttpClient: OkHttpClient by lazy {
-        // Interceptor para logs (solo en modo debug)
         val loggingInterceptor = HttpLoggingInterceptor().apply {
-            level = if (BuildConfig.DEBUG) {
-                HttpLoggingInterceptor.Level.BODY
-            } else {
-                HttpLoggingInterceptor.Level.NONE
-            }
+            level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY
+            else HttpLoggingInterceptor.Level.NONE
         }
 
-        OkHttpClient.Builder()
-            .addInterceptor(AuthInterceptor(context)) // Agrega el token automáticamente
+        val okHttpClient = OkHttpClient.Builder()
+            .addInterceptor(AuthInterceptor(appContext.applicationContext)) // ✅ seguro
             .addInterceptor(loggingInterceptor)
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)
             .build()
-    }
 
-    private val retrofit: Retrofit by lazy {
-        Retrofit.Builder()
+        retrofit = Retrofit.Builder()
             .baseUrl(BuildConfig.BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
 
-    val apiService: AuthService by lazy {
-        retrofit.create(AuthService::class.java)
-    }
-
-    val petService: PetService by lazy {
-        retrofit.create(PetService::class.java)
-    }
-
-    val dashboardService: DashboardApiService by lazy {
-        retrofit.create(DashboardApiService::class.java)
-    }
+    val apiService: AuthService by lazy { retrofit.create(AuthService::class.java) }
+    val petService: PetService by lazy { retrofit.create(PetService::class.java) }
 }

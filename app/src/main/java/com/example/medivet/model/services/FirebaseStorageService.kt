@@ -3,6 +3,7 @@ package com.example.medivet.model.services
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import com.example.medivet.BuildConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
@@ -11,7 +12,6 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
-import java.io.FileOutputStream
 import java.util.concurrent.TimeUnit
 
 class FirebaseStorageService(private val context: Context) {
@@ -22,7 +22,7 @@ class FirebaseStorageService(private val context: Context) {
         .writeTimeout(30, TimeUnit.SECONDS)
         .build()
 
-    private val baseUrl = "https://medivet-backend.onrender.com"
+    private val baseUrl = BuildConfig.BASE_URL
 
     suspend fun uploadUserProfilePhoto(
         uri: Uri,

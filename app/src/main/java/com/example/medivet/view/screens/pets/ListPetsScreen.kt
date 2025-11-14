@@ -22,7 +22,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-// import com.example.medivet.model.repository.PetRepository // <-- Ya no se usa aquí
 import com.example.medivet.ui.components.BottomNavBar
 import com.example.medivet.ui.components.PetCard
 import com.example.medivet.utils.SessionManager
@@ -39,7 +38,6 @@ fun ListPetsScreen(
     val sessionManager = SessionManager(context)
 
     val factory = PetsViewModelFactory(
-        context = context.applicationContext,
         sessionManager = sessionManager
     )
 
