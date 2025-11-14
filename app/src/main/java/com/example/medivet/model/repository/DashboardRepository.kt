@@ -107,24 +107,22 @@ class DashboardRepository(context: Context) {
      * Agrupa por specie_id y cuenta las mascotas.
      */
     private fun processSpeciesData(pets: List<PetResponse>): List<PetsBySpeciesEntity> {
-        // Mapeo de IDs a nombres de especies (ajustar según tu BD)
         val speciesMap = mapOf(
             1 to "Perro",
             2 to "Gato"
         )
 
         return pets
-            .groupBy { it.specie_id }
+            .groupBy { it.species?.id }
             .map { (specieId, petsList) ->
                 PetsBySpeciesEntity(
-                    especie = speciesMap[specieId] ?: "Especie $specieId",
+                    especie = speciesMap[specieId] ?: petsList.firstOrNull()?.species?.name ?: "Desconocido",
                     cantidad = petsList.size,
                     lastUpdated = System.currentTimeMillis()
                 )
             }
             .sortedByDescending { it.cantidad }
     }
-
     /**
      * Procesa los datos de mascotas para crear estadísticas por castración.
      * Agrupa por estado de castración.
