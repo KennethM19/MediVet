@@ -85,6 +85,11 @@ class UserRepository(
         }
     }
 
+
+    suspend fun getUserByEmail(email: String): Response<User> {
+        return authService.getUserByEmail(email)
+    }
+
     fun signOut() {
         auth.signOut()
     }

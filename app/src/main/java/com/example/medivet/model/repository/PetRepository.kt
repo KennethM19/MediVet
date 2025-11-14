@@ -2,6 +2,7 @@ package com.example.medivet.model.repository
 
 import com.example.medivet.model.model.PetRequest
 import com.example.medivet.model.model.PetResponse
+import com.example.medivet.model.model.PetUpdate
 import com.example.medivet.model.services.ApiClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -21,10 +22,19 @@ class PetRepository {
         }
     }
 
-    suspend fun getPets(token: String): Response<List<PetResponse>> {
+    suspend fun getPet(petId: Int, token: String): PetResponse? {
+        val pets = ApiClient.petService.getPet(petId, "Bearer $token")
+        return pets.firstOrNull()
+    }
+
+    suspend fun getPets(userId: Int): Response<List<PetResponse>> {
         return withContext(Dispatchers.IO) {
-            service.getPets("Bearer $token")
+            service.getPets(userId)
         }
+    }
+
+    suspend fun updatePet(petId: Int, update: PetUpdate, token: String): PetResponse {
+        return service.updatePet(petId, update, "Bearer $token")
     }
 
 }

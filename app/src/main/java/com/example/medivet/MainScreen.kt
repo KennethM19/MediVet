@@ -171,7 +171,9 @@ fun MainScreen(
                             navController.navigate("list_pets")
                         }
                         MenuItem("Veterinarias", Icons.Default.LocalHospital) { /* Navegar */ }
-                        MenuItem("Consulta", Icons.Default.Chat) { /* Navegar */ }
+                        MenuItem("Consulta", Icons.Default.Chat) {
+                            navController.navigate("chat_screen")
+                        }
                         MenuItem("Perfil", Icons.Default.Person) {
                             navController.navigate("profile_screen")
                         }

@@ -27,7 +27,7 @@ android {
 
     buildTypes {
         debug {
-            buildConfigField("String", "BASE_URL", "\"https://medivet-backend.onrender.com/\"")
+            buildConfigField("String", "BASE_URL", "\"https://medivet-backend.onrender.com\"")
         }
         release {
             isMinifyEnabled = false
@@ -35,7 +35,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            buildConfigField("String", "BASE_URL", "\"https://medivet-backend.onrender.com/\"")
+            buildConfigField("String", "BASE_URL", "\"https://medivet-backend.onrender.com\"")
         }
     }
 
@@ -113,6 +113,7 @@ dependencies {
     implementation("com.google.firebase:firebase-storage:21.0.0")
 
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+    implementation(libs.androidx.compose.runtime.livedata)
 
     // Testing
     testImplementation(libs.junit)
