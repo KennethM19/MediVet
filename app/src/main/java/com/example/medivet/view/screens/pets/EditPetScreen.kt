@@ -1,6 +1,7 @@
 package com.example.medivet.view.screens.pets
 
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -182,28 +183,27 @@ fun EditPetScreen(navController: NavHostController, petId: Int?) {
 
                         Button(
                             onClick = {
-                                petId?.let {
-                                    val photoUrl = selectedImageUri?.toString()
-                                    petViewModel.updatePet(it, weight, isNeutered, photoUrl)
-                                    navController.popBackStack()
+                                petId?.let { id ->
+                                    selectedImageUri?.let { uri ->
+                                        petViewModel.updatePetPhoto(id, uri, context) { url ->
+                                            if (url != null) {
+                                                Toast.makeText(context, "Foto actualizada", Toast.LENGTH_SHORT).show()
+                                                navController.popBackStack()
+                                            } else {
+                                                navController.popBackStack()
+                                            }
+                                        }
+                                    }
                                 }
                             },
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00BFA5)),
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray),
                         ) {
-                            Text("Guardar", color = Color.White)
+                            Text("Guardar")
                         }
                     }
                 }
             }
         }
     }
-}
-
-@Preview
-@Composable
-fun PreviewEditPetScreen() {
-    val navController = rememberNavController()
-    val petId = 1
-    EditPetScreen(navController, petId)
 }
