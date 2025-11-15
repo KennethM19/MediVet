@@ -100,21 +100,6 @@ class PetsViewModel(
         }
     }
 
-    fun updatePetPhoto(petId: Int, uri: Uri, context: Context, onResult: (String?) -> Unit) {
-        viewModelScope.launch {
-            try {
-                val token = sessionManager.getToken() ?: return@launch
-                val response = repository.updatePetPhoto(petId, uri, token, context)
-                _pets.value = _pets.value.map { pet ->
-                    if (pet.id == petId) pet.copy(photo = response.url) else pet
-                }
-                onResult(response.url)
-            } catch (e: Exception) {
-                onResult(null)
-            }
-        }
-    }
-
     fun createPet(pet: PetRequest) {
         viewModelScope.launch {
             try {
@@ -148,6 +133,7 @@ class PetsViewModel(
                     neutered = neutered
                 )
                 val response = repository.updatePet(petId, update, token)
+                _pet.value = response
                 onResult(true)
             } catch (e: Exception) {
                 Log.e("PetsViewModel", "Error actualizando mascota", e)

@@ -187,7 +187,7 @@ fun EditPetScreen(navController: NavHostController, petId: Int?) {
                                     petViewModel.updatePet(id, weight, isNeutered) { success ->
                                         if (success) {
                                             if (selectedImageUri != null) {
-                                                petViewModel.updatePetPhoto(id, selectedImageUri!!, context) { url ->
+                                                petViewModel.updatePetPhoto(selectedImageUri!!, id, context) { url ->
                                                     if (url != null) {
                                                         Toast.makeText(context, "Mascota actualizada", Toast.LENGTH_SHORT).show()
                                                     } else {
