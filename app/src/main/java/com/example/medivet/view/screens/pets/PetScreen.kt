@@ -55,11 +55,11 @@ import com.example.medivet.viewModel.pet.PetsViewModelFactory
 @Composable
 fun PetScreen( navController: NavHostController, petId: Int?) {
     val context = LocalContext.current
-    val sessionManager = remember { SessionManager(context) }
+    val sessionManager = SessionManager(context)
     val factory = PetsViewModelFactory(sessionManager)
     val petViewModel: PetsViewModel = viewModel(factory = factory)
 
-    val pet by petViewModel.pet.collectAsState(initial = null)
+    val pet by petViewModel.pet.collectAsState()
 
     LaunchedEffect(petId) {
         petId?.let { petViewModel.loadPet(it) }
@@ -107,15 +107,16 @@ fun PetScreen( navController: NavHostController, petId: Int?) {
                     ) {
                         //IMAGEN DE LA MASCOTA
                         Image(
-                            // Usa un placeholder si la foto es nula
                             painter = if (pet?.photo.isNullOrBlank()) {
                                 painterResource(id = R.drawable.logo_titulo)
                             } else {
-                                rememberAsyncImagePainter(pet?.photo)
+                                rememberAsyncImagePainter(
+                                    model = pet?.photo
+                                )
                             },
                             contentDescription = pet?.name,
                             modifier = Modifier
-                                .size(100.dp)
+                                .size(120.dp)
                                 .clip(RoundedCornerShape(12.dp)),
                             contentScale = ContentScale.Crop
                         )

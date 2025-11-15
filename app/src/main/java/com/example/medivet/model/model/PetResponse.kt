@@ -46,5 +46,10 @@ data class SexResponse(
 data class PetUpdate(
     val weight: Double?,
     val neutered: Boolean?,
-    val photo: String?
+)
+
+data class UploadPhotoResponse(
+    val message: String,
+    val url: String
+
 )

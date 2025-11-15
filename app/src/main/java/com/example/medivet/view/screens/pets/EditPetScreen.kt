@@ -1,6 +1,7 @@
 package com.example.medivet.view.screens.pets
 
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -182,28 +183,35 @@ fun EditPetScreen(navController: NavHostController, petId: Int?) {
 
                         Button(
                             onClick = {
-                                petId?.let {
-                                    val photoUrl = selectedImageUri?.toString()
-                                    petViewModel.updatePet(it, weight, isNeutered, photoUrl)
-                                    navController.popBackStack()
+                                petId?.let { id ->
+                                    petViewModel.updatePet(id, weight, isNeutered) { success ->
+                                        if (success) {
+                                            if (selectedImageUri != null) {
+                                                petViewModel.updatePetPhoto(selectedImageUri!!, id, context) { url ->
+                                                    if (url != null) {
+                                                        Toast.makeText(context, "Mascota actualizada", Toast.LENGTH_SHORT).show()
+                                                    } else {
+                                                        Toast.makeText(context, "Mascota actualizada", Toast.LENGTH_SHORT).show()
+                                                    }
+                                                    navController.popBackStack()
+                                                }
+                                            } else {
+                                                Toast.makeText(context, "Mascota actualizada", Toast.LENGTH_SHORT).show()
+                                                navController.popBackStack()
+                                            }
+                                        } else {
+                                            Toast.makeText(context, "Error al actualizar mascota", Toast.LENGTH_SHORT).show()
+                                        }
+                                    }
                                 }
                             },
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00BFA5)),
                             modifier = Modifier.weight(1f)
                         ) {
-                            Text("Guardar", color = Color.White)
+                            Text("Guardar")
                         }
                     }
                 }
             }
         }
     }
-}
-
-@Preview
-@Composable
-fun PreviewEditPetScreen() {
-    val navController = rememberNavController()
-    val petId = 1
-    EditPetScreen(navController, petId)
 }

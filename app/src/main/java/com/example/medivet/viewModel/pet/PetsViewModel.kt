@@ -1,5 +1,7 @@
 package com.example.medivet.viewModel.pet
 
+import android.content.Context
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -52,7 +54,6 @@ class PetsViewModel(
                 }
 
                 val currentUserId = userResponse.body()!!.id
-                Log.d("PetsViewModel", "ID de usuario obtenido: $currentUserId")
 
                 val response = repository.getPets(currentUserId)
 
@@ -84,6 +85,22 @@ class PetsViewModel(
         }
     }
 
+    fun deletePet(petId: Int, onResult: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val token = sessionManager.getToken() ?: return@launch
+                val success = repository.deletePet(petId, token)
+                if (success) {
+                    _pets.value = _pets.value.filter { it.id != petId }
+                }
+                onResult(success)
+            } catch (e: Exception) {
+                Log.e("PetsViewModel", "Error eliminando mascota", e)
+                onResult(false)
+            }
+        }
+    }
+
     fun createPet(pet: PetRequest) {
         viewModelScope.launch {
             try {
@@ -103,22 +120,47 @@ class PetsViewModel(
         }
     }
 
-    fun updatePet(petId: Int, weight: String, neutered: Boolean, photoUrl: String?) {
+    fun updatePet(
+        petId: Int,
+        weight: String,
+        neutered: Boolean,
+        onResult: (Boolean) -> Unit
+    ) {
         viewModelScope.launch {
             try {
                 val token = sessionManager.getToken() ?: return@launch
                 val update = PetUpdate(
                     weight = weight.toDoubleOrNull(),
-                    neutered = neutered,
-                    photo = photoUrl
+                    neutered = neutered
                 )
                 val response = repository.updatePet(petId, update, token)
-                Log.d("PetsViewModel", "Mascota actualizada: $response")
+                _pet.value = response
+                onResult(true)
             } catch (e: Exception) {
                 Log.e("PetsViewModel", "Error actualizando mascota", e)
+                onResult(false)
             }
         }
     }
+
+    fun updatePetPhoto(
+        uri: Uri,
+        petId: Int,
+        context: Context,
+        onResult: (String?) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+                val token = sessionManager.getToken() ?: return@launch
+                val response = repository.updatePetPhoto(petId, uri, token, context)
+                onResult(response.url)
+            } catch (e: Exception) {
+                Log.e("PetsViewModel", "Error actualizando foto", e)
+                onResult(null)
+            }
+        }
+    }
+
 
 
 }
