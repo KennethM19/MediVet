@@ -184,20 +184,28 @@ fun EditPetScreen(navController: NavHostController, petId: Int?) {
                         Button(
                             onClick = {
                                 petId?.let { id ->
-                                    selectedImageUri?.let { uri ->
-                                        petViewModel.updatePetPhoto(id, uri, context) { url ->
-                                            if (url != null) {
-                                                Toast.makeText(context, "Foto actualizada", Toast.LENGTH_SHORT).show()
-                                                navController.popBackStack()
+                                    petViewModel.updatePet(id, weight, isNeutered) { success ->
+                                        if (success) {
+                                            if (selectedImageUri != null) {
+                                                petViewModel.updatePetPhoto(id, selectedImageUri!!, context) { url ->
+                                                    if (url != null) {
+                                                        Toast.makeText(context, "Mascota actualizada", Toast.LENGTH_SHORT).show()
+                                                    } else {
+                                                        Toast.makeText(context, "Mascota actualizada", Toast.LENGTH_SHORT).show()
+                                                    }
+                                                    navController.popBackStack()
+                                                }
                                             } else {
+                                                Toast.makeText(context, "Mascota actualizada", Toast.LENGTH_SHORT).show()
                                                 navController.popBackStack()
                                             }
+                                        } else {
+                                            Toast.makeText(context, "Error al actualizar mascota", Toast.LENGTH_SHORT).show()
                                         }
                                     }
                                 }
                             },
-                            modifier = Modifier.weight(1f),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray),
+                            modifier = Modifier.weight(1f)
                         ) {
                             Text("Guardar")
                         }
