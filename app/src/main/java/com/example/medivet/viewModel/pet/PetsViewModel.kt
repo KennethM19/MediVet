@@ -103,25 +103,6 @@ class PetsViewModel(
         }
     }
 
-    fun createPet(pet: PetRequest) {
-        viewModelScope.launch {
-            try {
-                val token = sessionManager.token.first() ?: run {
-                    _error.value = "Usuario no autenticado."
-                    return@launch
-                }
-                val response = repository.createPet(token, pet)
-                if (response.isSuccessful) {
-                    loadPets()
-                } else {
-                    _error.value = "Error al crear mascota: ${response.code()}"
-                }
-            } catch (e: Exception) {
-                _error.value = "Error de red: ${e.message}"
-            }
-        }
-    }
-
     fun updatePet(
         petId: Int,
         weight: String,
