@@ -95,7 +95,7 @@ fun AppNavigation() {
 
             ChatScreen(navController, chatViewModel)
         }
-        composable(AppScreens.DashboardScreen.route){
+        composable(AppScreens.DashboardScreen.route) {
             DashboardScreen(navController)
         }
 

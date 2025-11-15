@@ -6,11 +6,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.medivet.model.model.Message
 import com.example.medivet.model.repository.ChatRepository
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
-class ChatViewModel(private val repository: ChatRepository): ViewModel() {
+class ChatViewModel(private val repository: ChatRepository) : ViewModel() {
 
     private val _messages = MutableLiveData<List<Message>>(emptyList())
     val messages: LiveData<List<Message>> = _messages

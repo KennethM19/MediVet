@@ -173,7 +173,7 @@ fun CreatePetScreen(
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
 
-                    Box() {
+                    Box {
                         Text("Especie*")
                         DropdownSelector(
                             label = "Especie*",

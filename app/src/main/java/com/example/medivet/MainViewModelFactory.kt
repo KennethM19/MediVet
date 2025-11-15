@@ -4,8 +4,6 @@ package com.example.medivet
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.medivet.model.repository.UserRepository
-import com.example.medivet.model.services.ApiClient
 import com.example.medivet.utils.SessionManager
 
 class MainViewModelFactory(

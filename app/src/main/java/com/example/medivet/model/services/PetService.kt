@@ -14,7 +14,6 @@ import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Part
-import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface PetService {
@@ -35,7 +34,11 @@ interface PetService {
     ): Response<PetResponse>
 
     @GET("/pets")
-    suspend fun getPet(@Query("pet_id") petId: Int, @Header("Authorization") token: String): List<PetResponse>
+    suspend fun getPet(
+        @Query("pet_id") petId: Int,
+        @Header("Authorization") token: String
+    ): List<PetResponse>
+
     @DELETE("/pets")
     suspend fun deletePet(
         @Query("pet_id") petId: Int,
