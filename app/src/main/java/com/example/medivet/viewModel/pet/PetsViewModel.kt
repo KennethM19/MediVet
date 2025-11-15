@@ -1,5 +1,7 @@
 package com.example.medivet.viewModel.pet
 
+import android.content.Context
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -52,13 +54,11 @@ class PetsViewModel(
                 }
 
                 val currentUserId = userResponse.body()!!.id
-                Log.d("PetsViewModel", "ID de usuario obtenido: $currentUserId")
 
                 val response = repository.getPets(currentUserId)
 
                 if (response.isSuccessful) {
                     _pets.value = response.body() ?: emptyList()
-                    Log.d("PetsViewModel", "Mascotas recibidas (filtradas por API): ${_pets.value.size}")
                 } else {
                     _error.value = "Error al cargar mascotas: ${response.code()}"
                 }
@@ -80,6 +80,37 @@ class PetsViewModel(
                 _pet.value = response
             } catch (e: Exception) {
                 println("Error cargando mascota: ${e.message}")
+            }
+        }
+    }
+
+    fun deletePet(petId: Int, onResult: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val token = sessionManager.getToken() ?: return@launch
+                val success = repository.deletePet(petId, token)
+                if (success) {
+                    _pets.value = _pets.value.filter { it.id != petId }
+                }
+                onResult(success)
+            } catch (e: Exception) {
+                Log.e("PetsViewModel", "Error eliminando mascota", e)
+                onResult(false)
+            }
+        }
+    }
+
+    fun updatePetPhoto(petId: Int, uri: Uri, context: Context, onResult: (String?) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val token = sessionManager.getToken() ?: return@launch
+                val response = repository.updatePetPhoto(petId, uri, token, context)
+                _pets.value = _pets.value.map { pet ->
+                    if (pet.id == petId) pet.copy(photo = response.url) else pet
+                }
+                onResult(response.url)
+            } catch (e: Exception) {
+                onResult(null)
             }
         }
     }

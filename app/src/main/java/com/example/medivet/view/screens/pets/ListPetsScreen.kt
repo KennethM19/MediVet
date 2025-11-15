@@ -1,5 +1,6 @@
 package com.example.medivet.view.screens.pets
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -41,10 +42,10 @@ fun ListPetsScreen(
         sessionManager = sessionManager
     )
 
-    val viewModel: PetsViewModel = viewModel(factory = factory)
+    val petViewModel: PetsViewModel = viewModel(factory = factory)
 
-    val pets by viewModel.pets.collectAsState()
-    val error by viewModel.error.collectAsState()
+    val pets by petViewModel.pets.collectAsState()
+    val error by petViewModel.error.collectAsState()
 
     Scaffold(
         topBar = {
@@ -120,6 +121,13 @@ fun ListPetsScreen(
                                 navController.navigate(AppScreens.EditPetScreen.route + "/${pet.id}")
                             },
                             onDeleteClick = {
+                                petViewModel.deletePet(pet.id) { success ->
+                                    if (success) {
+                                        Toast.makeText(context, "Mascota eliminada", Toast.LENGTH_SHORT).show()
+                                    } else {
+                                        Toast.makeText(context, "Error eliminando mascota", Toast.LENGTH_SHORT).show()
+                                    }
+                                }
                             }
                         )
                     }

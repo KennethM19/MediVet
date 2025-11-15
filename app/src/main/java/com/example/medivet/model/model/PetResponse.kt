@@ -48,3 +48,8 @@ data class PetUpdate(
     val neutered: Boolean?,
     val photo: String?
 )
+
+data class UploadPhotoResponse(
+    val message: String,
+    val url: String
+)
