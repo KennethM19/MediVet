@@ -134,22 +134,46 @@ class PetsViewModel(
         }
     }
 
-    fun updatePet(petId: Int, weight: String, neutered: Boolean, photoUrl: String?) {
+    fun updatePet(
+        petId: Int,
+        weight: String,
+        neutered: Boolean,
+        onResult: (Boolean) -> Unit
+    ) {
         viewModelScope.launch {
             try {
                 val token = sessionManager.getToken() ?: return@launch
                 val update = PetUpdate(
                     weight = weight.toDoubleOrNull(),
-                    neutered = neutered,
-                    photo = photoUrl
+                    neutered = neutered
                 )
                 val response = repository.updatePet(petId, update, token)
-                Log.d("PetsViewModel", "Mascota actualizada: $response")
+                onResult(true)
             } catch (e: Exception) {
                 Log.e("PetsViewModel", "Error actualizando mascota", e)
+                onResult(false)
             }
         }
     }
+
+    fun updatePetPhoto(
+        uri: Uri,
+        petId: Int,
+        context: Context,
+        onResult: (String?) -> Unit
+    ) {
+        viewModelScope.launch {
+            try {
+                val token = sessionManager.getToken() ?: return@launch
+                val response = repository.updatePetPhoto(petId, uri, token, context)
+                onResult(response.url)
+            } catch (e: Exception) {
+                Log.e("PetsViewModel", "Error actualizando foto", e)
+                onResult(null)
+            }
+        }
+    }
+
 
 
 }
