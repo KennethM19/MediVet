@@ -51,4 +51,5 @@ data class PetUpdate(
 data class UploadPhotoResponse(
     val message: String,
     val url: String
+
 )

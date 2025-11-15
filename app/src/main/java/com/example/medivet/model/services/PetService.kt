@@ -36,7 +36,7 @@ interface PetService {
 
     @GET("/pets")
     suspend fun getPet(@Query("pet_id") petId: Int, @Header("Authorization") token: String): List<PetResponse>
-
+  
     @DELETE("/pets")
     suspend fun deletePet(
         @Query("pet_id") petId: Int,

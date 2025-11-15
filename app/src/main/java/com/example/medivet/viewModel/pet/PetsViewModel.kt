@@ -59,6 +59,7 @@ class PetsViewModel(
 
                 if (response.isSuccessful) {
                     _pets.value = response.body() ?: emptyList()
+                    Log.d("PetsViewModel", "Mascotas recibidas (filtradas por API): ${_pets.value.size}")
                 } else {
                     _error.value = "Error al cargar mascotas: ${response.code()}"
                 }
