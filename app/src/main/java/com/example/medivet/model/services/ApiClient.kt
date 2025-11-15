@@ -35,7 +35,6 @@ object ApiClient {
 
     val apiService: AuthService by lazy { retrofit.create(AuthService::class.java) }
     val petService: PetService by lazy { retrofit.create(PetService::class.java) }
-
     val dashboardService: DashboardApiService by lazy {
         retrofit.create(DashboardApiService::class.java)
     }
