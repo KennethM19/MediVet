@@ -91,6 +91,7 @@ fun ChatScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(6.dp)
+                .padding(bottom = 30.dp)
         ) {
             OutlinedTextField(
                 value = message,
