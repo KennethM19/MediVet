@@ -36,7 +36,7 @@ class PetsViewModel(
         loadPets()
     }
 
-    private fun loadPets() {
+    fun loadPets() {
         viewModelScope.launch {
             try {
 
