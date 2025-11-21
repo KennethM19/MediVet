@@ -23,6 +23,8 @@ import com.example.medivet.viewModel.dashboard.DashboardViewModel
 import com.example.medivet.viewModel.dashboard.DashboardViewModelFactory
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import com.example.medivet.ui.components.HorizontalBarChartCard
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -111,6 +113,22 @@ fun DashboardScreen(
                         PieChartCard(
                             title = "Estado de Castración",
                             data = state.neuteredData
+                        )
+
+                        // Ranking de vacunas para perros
+                        HorizontalBarChartCard(
+                            title = "Vacunas más Aplicadas",
+                            subtitle = "Ranking para Perros",
+                            data = state.dogVaccineData,
+                            color = Color(0xFF2196F3)  // Azul
+                        )
+
+                        // Ranking de vacunas para gatos
+                        HorizontalBarChartCard(
+                            title = "Vacunas más Aplicadas",
+                            subtitle = "Ranking para Gatos",
+                            data = state.catVaccineData,
+                            color = Color(0xFFFF9800)  // Naranja
                         )
 
                         Spacer(modifier = Modifier.height(16.dp))

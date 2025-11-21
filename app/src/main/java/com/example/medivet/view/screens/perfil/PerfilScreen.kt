@@ -59,7 +59,6 @@ import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDuration
 import coil.request.CachePolicy
 import androidx.compose.runtime.key
-import android.util.Log
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -68,14 +67,23 @@ fun PerfilScreen(
     onNavigate: (String) -> Unit = {}
 ) {
     val context = LocalContext.current
+    // SessionManager: obtiene datos del usuario (token y email)
     val sessionManager = remember { SessionManager(context) }
+
+    // ViewModelFactory → Inyección de dependencias manual
+    // (DI) Este patrón permite crear ViewModels que necesitan parámetros.
     val factory = remember { PerfilViewModelFactory(context, sessionManager) }
+    // Obtención del ViewModel usando la fábrica
     val viewModel: PerfilViewModel = viewModel(factory = factory)
 
+    // Estados expuestos por el ViewModel (StateFlow)
+    //Compose los observa y redibuja la UI automáticamente.
     val user by viewModel.user.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
     val uploadSuccess by viewModel.uploadSuccess.collectAsState()
+
+
     val snackbarHostState = remember { SnackbarHostState() }
 
     // Launcher para seleccionar foto de la galería
@@ -83,6 +91,7 @@ fun PerfilScreen(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         if (uri != null) {
+            // Llamada al ViewModel → activa corrutina para subir imagen
             viewModel.uploadProfilePhoto(uri)
         }
     }
@@ -91,14 +100,14 @@ fun PerfilScreen(
     LaunchedEffect(uploadSuccess) {
         if (uploadSuccess) {
             snackbarHostState.showSnackbar(
-                message = "✅ Foto de perfil actualizada exitosamente",
+                message = "Foto de perfil actualizada exitosamente",
                 duration = SnackbarDuration.Short
             )
             viewModel.clearUploadSuccess()
         }
     }
 
-    // Mostrar Snackbar cuando hay un error
+    //Corrutina Compose: reacciona a errores emitidos por el ViewModel
     LaunchedEffect(errorMessage) {
         errorMessage?.let { message ->
             snackbarHostState.showSnackbar(
@@ -109,6 +118,7 @@ fun PerfilScreen(
         }
     }
 
+    // Estructura principal de Material 3
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -175,18 +185,18 @@ fun PerfilScreen(
                         .padding(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // Box con foto de perfil y botón de cámara
+                    //Contenedor de la foto y botón de cámara
                     Box(
                         modifier = Modifier.size(120.dp),
                         contentAlignment = Alignment.BottomEnd
                     ) {
-                        // Foto de perfil con caché y animación
+                        //Coil (AsyncImage) biblioteca de carga de imágenes con caché
                         if (!user?.photo.isNullOrEmpty()) {
-                            Log.d("PerfilScreen", "📸 Intentando cargar foto: ${user?.photo}")
+                            // key() fuerza recomposición cuando cambia la URL de la imagen
                             key(user?.photo) {
                                 AsyncImage(
                                     model = ImageRequest.Builder(context)
-                                        .data(user?.photo)
+                                        .data(user?.photo)                  // URL desde backend y Firebase Storage
                                         .crossfade(true)
                                         .memoryCachePolicy(CachePolicy.DISABLED)  // Deshabilitar caché de memoria
                                         .diskCachePolicy(CachePolicy.DISABLED)     // Deshabilitar caché de disco
@@ -201,7 +211,6 @@ fun PerfilScreen(
                             }
                         } else {
                             // Placeholder cuando no hay foto
-                            Log.d("PerfilScreen", "⚠️ No hay foto de perfil para mostrar")
                             Box(
                                 modifier = Modifier
                                     .size(120.dp)
@@ -218,7 +227,7 @@ fun PerfilScreen(
                             }
                         }
 
-                        // Botón flotante de cámara o loading
+                        // Botón flotante de cámara para abrir galería
                         if (!isLoading) {
                             Box(
                                 modifier = Modifier
@@ -236,6 +245,7 @@ fun PerfilScreen(
                                 )
                             }
                         } else {
+                            //Indicador de carga cuando se sube la foto
                             Box(
                                 modifier = Modifier
                                     .size(40.dp)

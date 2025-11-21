@@ -32,17 +32,22 @@ interface AuthService {
     @GET("users/")
     suspend fun getCurrentUser(): Response<List<User>>
 
+    // Se usa en PerfilViewModel para obtener al usuario logueado
+    // a partir del email extraído del token en SessionManager.
     @GET("users/email")
     suspend fun getUserByEmail(@Query("user_email") email: String): Response<User>
 
-
+    // Endpoint usado directamente en la implementación de subir foto.
+    // @Multipart permite enviar un archivo (imagen) como parte de la solicitud.
+    // MultipartBody.Part contiene la imagen capturada o elegida por el usuario.
     @Multipart
     @POST("users/upload-photo")
     suspend fun uploadProfilePhoto(
-        @Part photo: MultipartBody.Part
+        @Part photo: MultipartBody.Part     // Imagen enviada al backend
     ): Response<PhotoUploadResponse>
 }
 
+// Respuesta que devuelve el backend después de subir una foto.
 data class PhotoUploadResponse(
     val photo_url: String? = null,
     val url: String? = null,
