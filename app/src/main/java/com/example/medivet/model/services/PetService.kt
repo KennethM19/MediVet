@@ -42,7 +42,7 @@ interface PetService {
         @Header("Authorization") token: String
     ): Response<Unit>
 
-    @GET("/pets/user")
+    @GET("/pets")
     suspend fun getPets(@Query("user_id") userId: Int): Response<List<PetResponse>>
 
     @PUT("/pets")
