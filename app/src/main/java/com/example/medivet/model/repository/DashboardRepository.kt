@@ -12,7 +12,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import com.example.medivet.model.model.PetResponse
 import com.example.medivet.model.local.entities.VaccineRankingEntity
 import com.example.medivet.model.model.PetVaccineResponse
 import com.example.medivet.model.model.VaccineChartData
