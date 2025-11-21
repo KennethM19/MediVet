@@ -38,4 +38,8 @@ object ApiClient {
     val dashboardService: DashboardApiService by lazy {
         retrofit.create(DashboardApiService::class.java)
     }
+
+    val chatService: ChatService by lazy {
+        retrofit.create(ChatService::class.java)
+    }
 }
