@@ -6,6 +6,7 @@ import com.example.medivet.model.local.database.AppDatabase
 import com.example.medivet.model.local.entities.PetsByNeuteredEntity
 import com.example.medivet.model.local.entities.PetsBySpeciesEntity
 import com.example.medivet.model.model.ChartData
+import com.example.medivet.model.model.PetResponse
 import com.example.medivet.model.services.ApiClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -118,13 +119,15 @@ class DashboardRepository(context: Context) {
             .groupBy { it.species?.id }
             .map { (specieId, petsList) ->
                 PetsBySpeciesEntity(
-                    especie = speciesMap[specieId] ?: petsList.firstOrNull()?.species?.name ?: "Desconocido",
+                    especie = speciesMap[specieId] ?: petsList.firstOrNull()?.species?.name
+                    ?: "Desconocido",
                     cantidad = petsList.size,
                     lastUpdated = System.currentTimeMillis()
                 )
             }
             .sortedByDescending { it.cantidad }
     }
+
     /**
      * Procesa los datos de mascotas para crear estadísticas por castración.
      * Agrupa por estado de castración.

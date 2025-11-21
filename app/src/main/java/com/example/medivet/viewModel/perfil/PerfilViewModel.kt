@@ -11,9 +11,8 @@ import com.example.medivet.model.services.FirebaseStorageService
 import com.example.medivet.utils.SessionManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.asStateFlow
-import java.lang.Exception
+import kotlinx.coroutines.launch
 
 
 class PerfilViewModel(

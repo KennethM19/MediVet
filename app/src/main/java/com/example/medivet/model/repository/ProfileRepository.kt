@@ -72,7 +72,7 @@ class ProfileRepository(
             // El interceptor agrega automáticamente: Authorization: Bearer <token>
             val response = authService.getUserByEmail(userEmail)
 
-            Log.d("ProfileRepository", "📡 Respuesta getUserByEmail - Código: ${response.code()}")
+            Log.d("ProfileRepository", "Respuesta getUserByEmail - Código: ${response.code()}")
 
             if (response.isSuccessful) {
                 // Si la respuesta HTTP es 200

@@ -1,12 +1,12 @@
 package com.example.medivet.view.screens
 
+// --- 👇 IMPORTS AÑADIDOS 👇 ---
+// --- 👆 IMPORTS AÑADIDOS 👆 ---
 import android.content.Context
 import android.widget.Toast
-// --- 👇 IMPORTS AÑADIDOS 👇 ---
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-// --- 👆 IMPORTS AÑADIDOS 👆 ---
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -59,7 +59,6 @@ import com.example.medivet.viewModel.login.LoginViewModelFactory
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
-import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 

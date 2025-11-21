@@ -15,7 +15,8 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun InfoPetRow(label: String, value: String) {
-    Row(verticalAlignment = Alignment.CenterVertically,
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier.fillMaxSize()
     ) {

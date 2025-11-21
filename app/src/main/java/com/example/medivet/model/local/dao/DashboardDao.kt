@@ -1,6 +1,10 @@
 package com.example.medivet.model.local.dao
 
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Transaction
 import com.example.medivet.model.local.entities.PetsByNeuteredEntity
 import com.example.medivet.model.local.entities.PetsBySpeciesEntity
 import com.example.medivet.model.local.entities.VaccineRankingEntity

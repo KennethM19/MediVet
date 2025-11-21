@@ -93,7 +93,10 @@ class SessionManager(private val context: Context) {
                     null
                 }
             } catch (e: Exception) {
-                Log.e("SessionManager", "Excepción en fetchUserData: ${e.javaClass.simpleName} - ${e.message}")
+                Log.e(
+                    "SessionManager",
+                    "Excepción en fetchUserData: ${e.javaClass.simpleName} - ${e.message}"
+                )
                 e.printStackTrace()
                 null
             }

@@ -10,7 +10,6 @@ import com.example.medivet.model.model.PetResponse
 import com.example.medivet.model.model.PetUpdate
 import com.example.medivet.model.repository.PetRepository
 import com.example.medivet.model.repository.UserRepository
-import com.example.medivet.model.services.ApiClient.petService
 import com.example.medivet.utils.SessionManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -37,7 +36,7 @@ class PetsViewModel(
         loadPets()
     }
 
-    private fun loadPets() {
+    fun loadPets() {
         viewModelScope.launch {
             try {
 
@@ -59,7 +58,10 @@ class PetsViewModel(
 
                 if (response.isSuccessful) {
                     _pets.value = response.body() ?: emptyList()
-                    Log.d("PetsViewModel", "Mascotas recibidas (filtradas por API): ${_pets.value.size}")
+                    Log.d(
+                        "PetsViewModel",
+                        "Mascotas recibidas (filtradas por API): ${_pets.value.size}"
+                    )
                 } else {
                     _error.value = "Error al cargar mascotas: ${response.code()}"
                 }
@@ -97,25 +99,6 @@ class PetsViewModel(
             } catch (e: Exception) {
                 Log.e("PetsViewModel", "Error eliminando mascota", e)
                 onResult(false)
-            }
-        }
-    }
-
-    fun createPet(pet: PetRequest) {
-        viewModelScope.launch {
-            try {
-                val token = sessionManager.token.first() ?: run {
-                    _error.value = "Usuario no autenticado."
-                    return@launch
-                }
-                val response = repository.createPet(token, pet)
-                if (response.isSuccessful) {
-                    loadPets()
-                } else {
-                    _error.value = "Error al crear mascota: ${response.code()}"
-                }
-            } catch (e: Exception) {
-                _error.value = "Error de red: ${e.message}"
             }
         }
     }
@@ -160,7 +143,6 @@ class PetsViewModel(
             }
         }
     }
-
 
 
 }
