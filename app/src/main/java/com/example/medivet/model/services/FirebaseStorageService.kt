@@ -47,7 +47,10 @@ class FirebaseStorageService(private val context: Context) {
             // Construye la petición POST hacia /users/upload-photo
             val request = Request.Builder()
                 .url("$baseUrl/users/upload-photo")
-                .addHeader("Authorization", "Bearer $token")    // Token necesario para validar usuario
+                .addHeader(
+                    "Authorization",
+                    "Bearer $token"
+                )    // Token necesario para validar usuario
                 .post(multipartBody)
                 .build()
 

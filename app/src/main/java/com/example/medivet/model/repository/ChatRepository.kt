@@ -8,7 +8,7 @@ class ChatRepository {
 
     val service = ApiClient.chatService
 
-    suspend fun sendMessage(message: ChatRequest, token: String) : ChatResponse {
+    suspend fun sendMessage(message: ChatRequest, token: String): ChatResponse {
         return service.sendMessage(message, token)
     }
 

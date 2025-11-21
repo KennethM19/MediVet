@@ -17,7 +17,8 @@ class ProfileRepository(
     private val firebaseStorageService: FirebaseStorageService? = null  // Servicio para Firebase Storage (inyectable)
 ) {
 
-    private val sessionManager = SessionManager(context) // Maneja token y datos de sesión del usuario
+    private val sessionManager =
+        SessionManager(context) // Maneja token y datos de sesión del usuario
 
     /**
      * Sube la foto de perfil del usuario autenticado.
@@ -88,7 +89,7 @@ class ProfileRepository(
                 }
             } else {
                 // Manejo del error si la respuesta no es exitosa
-                val errorBody = response.errorBody()?.string()
+                response.errorBody()?.string()
                 null
             }
         } catch (e: Exception) {

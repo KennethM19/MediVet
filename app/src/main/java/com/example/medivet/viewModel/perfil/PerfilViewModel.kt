@@ -80,7 +80,8 @@ class PerfilViewModel(
                 _isLoading.value = true
                 _uploadSuccess.value = false
 
-                val token = sessionManager.getToken()       // Preferences DataStore: recuperación del token
+                val token =
+                    sessionManager.getToken()       // Preferences DataStore: recuperación del token
 
                 if (token.isNullOrEmpty()) {
                     _errorMessage.value = "Sesión expirada. Por favor, inicia sesión nuevamente"
@@ -106,13 +107,13 @@ class PerfilViewModel(
         }
     }
 
-     //Refresca los datos del usuario desde el backend (API REST).
+    //Refresca los datos del usuario desde el backend (API REST).
     //Útil para actualizar la UI después de cambios externos.
     fun refreshUserData() {
         loadUserData()
     }
 
-     //Limpiar el mensaje de error.
+    //Limpiar el mensaje de error.
     fun clearErrorMessage() {
         _errorMessage.value = null
     }

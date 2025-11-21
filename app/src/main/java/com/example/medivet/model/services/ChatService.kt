@@ -8,5 +8,8 @@ import retrofit2.http.POST
 
 interface ChatService {
     @POST("chat")
-    suspend fun sendMessage(@Body request: ChatRequest, @Header("Authorization") token: String): ChatResponse
+    suspend fun sendMessage(
+        @Body request: ChatRequest,
+        @Header("Authorization") token: String
+    ): ChatResponse
 }

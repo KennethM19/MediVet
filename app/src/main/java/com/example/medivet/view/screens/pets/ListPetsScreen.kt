@@ -92,8 +92,7 @@ fun ListPetsScreen(
                 Icon(Icons.Default.Add, contentDescription = "Agregar Mascota", tint = Color.White)
             }
         }
-    ) {
-        padding ->
+    ) { padding ->
         DisposableEffect(lifecycleOwner) {
             val observer = LifecycleEventObserver { _, event ->
                 if (event == Lifecycle.Event.ON_RESUME) {

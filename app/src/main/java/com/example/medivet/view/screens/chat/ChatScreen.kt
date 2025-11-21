@@ -40,7 +40,6 @@ import androidx.navigation.NavController
 import com.example.medivet.utils.SessionManager
 import com.example.medivet.viewModel.chat.ChatViewModel
 import com.example.medivet.viewModel.chat.ChatViewModelFactory
-import com.example.medivet.viewModel.pet.PetsViewModelFactory
 
 @Composable
 fun ChatScreen(

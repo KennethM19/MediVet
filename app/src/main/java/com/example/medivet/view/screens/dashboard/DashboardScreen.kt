@@ -40,13 +40,13 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.medivet.ui.components.BarChartCard
+import com.example.medivet.ui.components.HorizontalBarChartCard
 import com.example.medivet.ui.components.PieChartCard
 import com.example.medivet.viewModel.dashboard.DashboardUiState
 import com.example.medivet.viewModel.dashboard.DashboardViewModel
 import com.example.medivet.viewModel.dashboard.DashboardViewModelFactory
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
-import com.example.medivet.ui.components.HorizontalBarChartCard
 
 
 @OptIn(ExperimentalMaterial3Api::class)

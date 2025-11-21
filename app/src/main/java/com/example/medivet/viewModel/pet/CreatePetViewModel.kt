@@ -13,9 +13,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.MultipartBody
-import okhttp3.RequestBody
 
 data class DropdownOption(val id: Int, val name: String)
 
@@ -86,7 +83,8 @@ class CreatePetViewModel(
             _creationState.value = PetCreationState.Loading
 
             val token = sessionManager.token.first() ?: run {
-                _creationState.value = PetCreationState.Error("Token no disponible. Inicia sesión de nuevo.")
+                _creationState.value =
+                    PetCreationState.Error("Token no disponible. Inicia sesión de nuevo.")
                 return@launch
             }
 
@@ -97,7 +95,7 @@ class CreatePetViewModel(
                     val createdPet = response.body()
 
                     if (createdPet != null && selectedImageUri != null) {
-                        val uploadResponse = repository.updatePetPhoto(
+                        repository.updatePetPhoto(
                             petId = createdPet.id,
                             uri = selectedImageUri,
                             token = token,
@@ -109,7 +107,8 @@ class CreatePetViewModel(
                         _creationState.value = PetCreationState.Success
                     }
                 } else {
-                    _creationState.value = PetCreationState.Error("Error ${response.code()}: ${response.message()}")
+                    _creationState.value =
+                        PetCreationState.Error("Error ${response.code()}: ${response.message()}")
                 }
             } catch (e: Exception) {
                 _creationState.value = PetCreationState.Error("Error de conexión: ${e.message}")

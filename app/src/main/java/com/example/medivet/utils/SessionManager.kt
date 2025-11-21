@@ -89,7 +89,7 @@ class SessionManager(private val context: Context) {
                     val responseBody = response.body?.string()
                     responseBody
                 } else {
-                    val errorBody = response.body?.string()
+                    response.body?.string()
                     null
                 }
             } catch (e: Exception) {

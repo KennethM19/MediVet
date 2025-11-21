@@ -310,7 +310,8 @@ fun CreatePetScreen(
                             enabled = creationState !is PetCreationState.Loading,
                             onClick = {
                                 if (name.isBlank() || selectedSex == null || selectedSpecies == null || selectedBreed == null) {
-                                    showErrorDialog = "Por favor, completa todos los campos obligatorios (*)."
+                                    showErrorDialog =
+                                        "Por favor, completa todos los campos obligatorios (*)."
                                 } else {
                                     val pet = PetRequest(
                                         num_doc = numDoc.ifBlank { null },
