@@ -80,7 +80,8 @@ class LoginViewModel(
                 _authState.value = AuthState.Success(token, method)
 
             } catch (googleError: Exception) {
-                _authState.value = AuthState.Error(googleError.message ?: "Error de login con Google")
+                _authState.value =
+                    AuthState.Error(googleError.message ?: "Error de login con Google")
             }
         }
     }

@@ -3,7 +3,6 @@ package com.example.medivet.view.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -11,7 +10,6 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.medivet.MainScreen
 import com.example.medivet.SplashScreen
-import com.example.medivet.model.repository.ChatRepository
 import com.example.medivet.utils.SessionManager
 import com.example.medivet.view.screens.AuthenticationScreen
 import com.example.medivet.view.screens.LoginScreen
@@ -26,9 +24,6 @@ import com.example.medivet.view.screens.pets.ListPetsScreen
 import com.example.medivet.view.screens.pets.PetScreen
 import com.example.medivet.view.screens.register.RegisterFirstScreen
 import com.example.medivet.view.screens.register.RegisterSecondScreen
-import com.example.medivet.viewModel.chat.ChatViewModel
-import com.example.medivet.viewModel.chat.ChatViewModelFactory
-import okhttp3.OkHttpClient
 
 
 @Composable
@@ -89,13 +84,9 @@ fun AppNavigation() {
             PerfilScreen(navController)
         }
         composable(AppScreens.ChatScreen.route) {
-            val repository = ChatRepository(OkHttpClient())
-            val factory = ChatViewModelFactory(repository)
-            val chatViewModel: ChatViewModel = viewModel(factory = factory)
-
-            ChatScreen(navController, chatViewModel)
+            ChatScreen(navController)
         }
-        composable(AppScreens.DashboardScreen.route){
+        composable(AppScreens.DashboardScreen.route) {
             DashboardScreen(navController)
         }
 

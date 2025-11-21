@@ -1,8 +1,13 @@
 package com.example.medivet.model.local.dao
 
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
+import androidx.room.Transaction
 import com.example.medivet.model.local.entities.PetsByNeuteredEntity
 import com.example.medivet.model.local.entities.PetsBySpeciesEntity
+import com.example.medivet.model.local.entities.VaccineRankingEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -41,6 +46,42 @@ interface DashboardDao {
         clearPetsByNeutered()
         insertPetsByNeutered(data)
     }
+
+    // ========== Vacunas por especie ==========
+
+    /**
+     * Obtiene el ranking de vacunas para una especie específica.
+     * @param speciesId 1 = Perro, 2 = Gato
+     */
+    @Query("SELECT * FROM vaccine_ranking_cache WHERE speciesId = :speciesId ORDER BY ranking ASC")
+    fun getVaccineRankingBySpecies(speciesId: Int): Flow<List<VaccineRankingEntity>>
+
+    /**
+     * Inserta o actualiza el ranking de vacunas.
+     */
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertVaccineRanking(data: List<VaccineRankingEntity>)
+
+    /**
+     * Elimina el ranking de una especie específica.
+     */
+    @Query("DELETE FROM vaccine_ranking_cache WHERE speciesId = :speciesId")
+    suspend fun clearVaccineRankingBySpecies(speciesId: Int)
+
+    /**
+     * Reemplaza todo el ranking de una especie (transacción atómica).
+     */
+    @Transaction
+    suspend fun replaceVaccineRankingBySpecies(speciesId: Int, data: List<VaccineRankingEntity>) {
+        clearVaccineRankingBySpecies(speciesId)
+        insertVaccineRanking(data)
+    }
+
+    /**
+     * Obtiene la última actualización del ranking de vacunas.
+     */
+    @Query("SELECT lastUpdated FROM vaccine_ranking_cache WHERE speciesId = :speciesId LIMIT 1")
+    suspend fun getVaccineRankingLastUpdate(speciesId: Int): Long?
 
     //  Utilidades
 

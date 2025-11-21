@@ -48,7 +48,12 @@ class PetRepository {
         return response.isSuccessful
     }
 
-    suspend fun updatePetPhoto(petId: Int, uri: Uri, token: String, context: Context): UploadPhotoResponse {
+    suspend fun updatePetPhoto(
+        petId: Int,
+        uri: Uri,
+        token: String,
+        context: Context
+    ): UploadPhotoResponse {
         val stream = context.contentResolver.openInputStream(uri)!!
         val bytes = stream.readBytes()
         val requestFile = bytes.toRequestBody("image/*".toMediaType())

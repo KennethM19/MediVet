@@ -1,5 +1,7 @@
 package com.example.medivet.viewModel.pet
 
+import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.medivet.model.model.PetRequest
@@ -76,7 +78,7 @@ class CreatePetViewModel(
         }
     }
 
-    fun createPet(pet: PetRequest) {
+    fun createPet(pet: PetRequest, selectedImageUri: Uri?, context: Context) {
         viewModelScope.launch {
             _creationState.value = PetCreationState.Loading
 
@@ -87,25 +89,32 @@ class CreatePetViewModel(
             }
 
             try {
-
                 val response = repository.createPet(token, pet)
 
                 if (response.isSuccessful) {
-                    _creationState.value = PetCreationState.Success
-                } else {
+                    val createdPet = response.body()
 
-                    val errorBody = response.errorBody()?.string()
-                    val detailedError = if (errorBody.isNullOrBlank()) {
-                        "Error ${response.code()}: ${response.message()}"
+                    if (createdPet != null && selectedImageUri != null) {
+                        repository.updatePetPhoto(
+                            petId = createdPet.id,
+                            uri = selectedImageUri,
+                            token = token,
+                            context = context
+                        )
+
+                        _creationState.value = PetCreationState.Success
                     } else {
-                        "Error ${response.code()}: $errorBody"
+                        _creationState.value = PetCreationState.Success
                     }
-                    _creationState.value = PetCreationState.Error(detailedError)
+                } else {
+                    _creationState.value =
+                        PetCreationState.Error("Error ${response.code()}: ${response.message()}")
                 }
             } catch (e: Exception) {
-                e.printStackTrace()
                 _creationState.value = PetCreationState.Error("Error de conexión: ${e.message}")
             }
         }
     }
+
+
 }

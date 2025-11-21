@@ -16,11 +16,13 @@ import okhttp3.Request
 import org.json.JSONObject
 import java.util.concurrent.TimeUnit
 
+// DataStore donde se guardan el token y método de autenticación
 private val Context.dataStore by preferencesDataStore("user_session")
 
 class SessionManager(private val context: Context) {
 
     companion object {
+        // Clave para guardar el token JWT
         private val TOKEN_KEY = stringPreferencesKey("access_token")
         private val METHOD_KEY = stringPreferencesKey("auth_method")
     }
@@ -32,6 +34,7 @@ class SessionManager(private val context: Context) {
         .build()
 
     suspend fun saveAuthData(token: String, method: String) {
+        // Guarda el token en DataStore después del login
         context.dataStore.edit { prefs ->
             prefs[TOKEN_KEY] = token
             prefs[METHOD_KEY] = method
@@ -39,12 +42,14 @@ class SessionManager(private val context: Context) {
     }
 
     suspend fun getToken(): String? {
+        // Devuelve el token para enviarlo al backend o al repositorio
         return context.dataStore.data
             .map { prefs -> prefs[TOKEN_KEY] }
             .first()
     }
 
     suspend fun getEmailFromToken(): String? {
+        // Extrae el email del payload del token (se usa en ProfileRepository)
         return try {
             val token = getToken() ?: return null
             val parts = token.split(".")
@@ -52,7 +57,7 @@ class SessionManager(private val context: Context) {
 
             val payload = String(Base64.decode(parts[1], Base64.DEFAULT))
             val jsonObject = JSONObject(payload)
-            val email = jsonObject.optString("sub", null)
+            val email = jsonObject.optString("sub", null)   // "sub" = email del usuario
 
             Log.d("SessionManager", "Email extraído del token: $email")
             return email
@@ -71,9 +76,6 @@ class SessionManager(private val context: Context) {
                     return@withContext null
                 }
 
-                Log.d("SessionManager", "URL: $endpoint")
-                Log.d("SessionManager", "Token: $token")
-
                 val request = Request.Builder()
                     .url(endpoint)
                     .addHeader("Authorization", "Bearer $token")
@@ -81,24 +83,20 @@ class SessionManager(private val context: Context) {
                     .get()
                     .build()
 
-                Log.d("SessionManager", "Request: ${request.url}")
-
                 val response = client.newCall(request).execute()
-
-                Log.d("SessionManager", "Response Code: ${response.code}")
-                Log.d("SessionManager", "Response Message: ${response.message}")
 
                 if (response.isSuccessful) {
                     val responseBody = response.body?.string()
-                    Log.d("SessionManager", "Respuesta exitosa: $responseBody")
                     responseBody
                 } else {
-                    val errorBody = response.body?.string()
-                    Log.e("SessionManager", "Error del servidor - Código: ${response.code}, Mensaje: ${response.message}, Cuerpo: $errorBody")
+                    response.body?.string()
                     null
                 }
             } catch (e: Exception) {
-                Log.e("SessionManager", "Excepción en fetchUserData: ${e.javaClass.simpleName} - ${e.message}")
+                Log.e(
+                    "SessionManager",
+                    "Excepción en fetchUserData: ${e.javaClass.simpleName} - ${e.message}"
+                )
                 e.printStackTrace()
                 null
             }
@@ -122,13 +120,11 @@ class SessionManager(private val context: Context) {
     suspend fun getUserIdFromToken(): Int? {
         return try {
             val token = token.first() ?: run {
-                Log.e("SessionManager", "Token es nulo, no se puede extraer user_id")
                 return null
             }
 
             val parts = token.split(".")
             if (parts.size != 3) {
-                Log.e("SessionManager", "Token JWT inválido, no tiene 3 partes")
                 return null
             }
 
@@ -138,18 +134,14 @@ class SessionManager(private val context: Context) {
             if (jsonObject.has("user_id")) {
                 val userId = jsonObject.optInt("user_id", -1)
                 if (userId == -1) {
-                    Log.e("SessionManager", "user_id está presente pero no es un Int válido")
                     null
                 } else {
-                    Log.d("SessionManager", "ID de usuario extraído: $userId")
                     userId
                 }
             } else {
-                Log.e("SessionManager", "El token no contiene 'user_id'")
                 null
             }
         } catch (e: Exception) {
-            Log.e("SessionManager", "Error al decodificar token: ${e.message}")
             null
         }
     }

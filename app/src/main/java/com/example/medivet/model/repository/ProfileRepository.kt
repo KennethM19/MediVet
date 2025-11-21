@@ -10,15 +10,15 @@ import com.example.medivet.utils.SessionManager
 
 /**
  * Repositorio para manejar las operaciones relacionadas con el perfil del usuario.
- * Implementa el patrón Repository de Clean Architecture/MVVM.
  */
 class ProfileRepository(
-    private val authService: AuthService,
-    private val context: Context,
-    private val firebaseStorageService: FirebaseStorageService? = null
+    private val authService: AuthService,   // Servicio que hace las llamadas al backend
+    private val context: Context,           // Contexto para acceder a recursos locales
+    private val firebaseStorageService: FirebaseStorageService? = null  // Servicio para Firebase Storage (inyectable)
 ) {
 
-    private val sessionManager = SessionManager(context)
+    private val sessionManager =
+        SessionManager(context) // Maneja token y datos de sesión del usuario
 
     /**
      * Sube la foto de perfil del usuario autenticado.
@@ -34,25 +34,21 @@ class ProfileRepository(
      */
     suspend fun uploadAndUpdateProfilePhoto(uri: Uri, token: String): User? {
         return try {
-            Log.d("ProfileRepository", "🚀 Iniciando carga de foto de perfil...")
-
-            // Paso 1: Subir foto al storage
+            // Paso 1: Crear y usar el servicio de Firebase
             val storageService = firebaseStorageService ?: FirebaseStorageService(context)
+            // Subir la foto y obtener la URL pública
             val photoUrl = storageService.uploadUserProfilePhoto(uri, token)
 
             if (photoUrl.isNullOrEmpty()) {
-                Log.e("ProfileRepository", "❌ La URL de la foto es nula después de la carga")
+                // Si no se obtuvo URL, significa que falló la subida a Firebase
                 return null
             }
 
-            Log.d("ProfileRepository", "✅ Foto subida exitosamente: $photoUrl")
-
-            // Paso 2: Obtener los datos actualizados del usuario autenticado
-            Log.d("ProfileRepository", "🔄 Obteniendo datos actualizados del usuario...")
-            return fetchAuthenticatedUser()  // ✅ AGREGAR 'return' AQUÍ
+            // Paso 2: Obtener actualizados los datos del usuario desde backend
+            return fetchAuthenticatedUser()     // Se retorna el usuario actualizado
 
         } catch (e: Exception) {
-            Log.e("ProfileRepository", "❌ Error al subir foto: ${e.message}", e)
+            Log.e("ProfileRepository", " Error al subir foto: ${e.message}", e)
             e.printStackTrace()
             null
         }
@@ -60,53 +56,45 @@ class ProfileRepository(
 
     /**
      * Obtiene los datos del usuario autenticado usando su email del token JWT.
-     * Usa el endpoint específico getUserByEmail (GET /users/email?email=xxx).
+     * Usa el endpoint getUserByEmail (GET /users/email?email=xxx).
      * El AuthInterceptor agrega automáticamente el token de autenticación.
-     *
-     * @return Usuario autenticado con sus datos actualizados, o null si hay error
      */
     suspend fun fetchAuthenticatedUser(): User? {
         return try {
-            // Extraer el email del token JWT
+            // Obtener email guardado en el token JWT desde SessionManager
             val userEmail = sessionManager.getEmailFromToken()
 
             if (userEmail.isNullOrEmpty()) {
-                Log.e("ProfileRepository", "❌ No se pudo extraer el email del token")
+                // Si no hay email en el token, no se puede consultar el backend
                 return null
             }
-
-            Log.d("ProfileRepository", "📧 Email del usuario autenticado: $userEmail")
 
             // Obtener el usuario por email
             // El interceptor agrega automáticamente: Authorization: Bearer <token>
             val response = authService.getUserByEmail(userEmail)
 
-            Log.d("ProfileRepository", "📡 Respuesta getUserByEmail - Código: ${response.code()}")
+            Log.d("ProfileRepository", "Respuesta getUserByEmail - Código: ${response.code()}")
 
             if (response.isSuccessful) {
+                // Si la respuesta HTTP es 200
                 val user = response.body()
 
                 if (user != null) {
-                    Log.d("ProfileRepository", "✅ Usuario autenticado obtenido exitosamente")
-                    Log.d("ProfileRepository", "👤 ID: ${user.id}")
-                    Log.d("ProfileRepository", "👤 Nombre: ${user.name} ${user.lastname}")
-                    Log.d("ProfileRepository", "📧 Email: ${user.email}")
-                    Log.d("ProfileRepository", "📸 Foto URL: ${user.photo ?: "Sin foto"}")
+                    // Usuario recibido correctamente
                     user
                 } else {
-                    Log.e("ProfileRepository", "❌ Respuesta exitosa pero usuario es nulo")
+                    // En casos con respuesta OK pero sin cuerpo
+                    Log.e("ProfileRepository", " Respuesta exitosa pero usuario es nulo")
                     null
                 }
             } else {
-                val errorBody = response.errorBody()?.string()
-                Log.e("ProfileRepository", "❌ Error al obtener usuario:")
-                Log.e("ProfileRepository", "Código: ${response.code()}")
-                Log.e("ProfileRepository", "Mensaje: ${response.message()}")
-                Log.e("ProfileRepository", "Error body: $errorBody")
+                // Manejo del error si la respuesta no es exitosa
+                response.errorBody()?.string()
                 null
             }
         } catch (e: Exception) {
-            Log.e("ProfileRepository", "❌ Excepción al obtener usuario: ${e.message}", e)
+            // Manejo de excepciones
+            Log.e("ProfileRepository", "Excepción al obtener usuario: ${e.message}", e)
             e.printStackTrace()
             null
         }
@@ -115,10 +103,9 @@ class ProfileRepository(
     /**
      * Obtiene los datos actuales del usuario autenticado.
      * Útil para refrescar los datos del perfil desde el ViewModel.
-     *
-     * @return Usuario con datos actuales, o null si hay error
      */
     suspend fun getCurrentUserData(): User? {
+        // Llama a la función principal de obtención
         return fetchAuthenticatedUser()
     }
 }
