@@ -173,7 +173,7 @@ fun CreatePetScreen(
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
 
-                    Box() {
+                    Box {
                         Text("Especie*")
                         DropdownSelector(
                             label = "Especie*",
@@ -310,15 +310,11 @@ fun CreatePetScreen(
                             enabled = creationState !is PetCreationState.Loading,
                             onClick = {
                                 if (name.isBlank() || selectedSex == null || selectedSpecies == null || selectedBreed == null) {
-                                    showErrorDialog =
-                                        "Por favor, completa todos los campos obligatorios (*)."
+                                    showErrorDialog = "Por favor, completa todos los campos obligatorios (*)."
                                 } else {
-
                                     val pet = PetRequest(
-                                        //user_id = userId,
                                         num_doc = numDoc.ifBlank { null },
                                         name = name,
-                                        photo = selectedImageUri?.toString(),
                                         sex_id = selectedSex!!,
                                         specie_id = selectedSpecies!!,
                                         year_birth = year.toIntOrNull() ?: 0,
@@ -327,7 +323,8 @@ fun CreatePetScreen(
                                         neutered = isNeutered,
                                         breed_id = selectedBreed!!
                                     )
-                                    viewModel.createPet(pet)
+
+                                    viewModel.createPet(pet, selectedImageUri, context)
                                 }
                             },
                             modifier = Modifier.weight(1f)

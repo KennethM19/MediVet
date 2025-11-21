@@ -6,12 +6,12 @@ import com.example.medivet.model.local.database.AppDatabase
 import com.example.medivet.model.local.entities.PetsByNeuteredEntity
 import com.example.medivet.model.local.entities.PetsBySpeciesEntity
 import com.example.medivet.model.model.ChartData
+import com.example.medivet.model.model.PetResponse
 import com.example.medivet.model.services.ApiClient
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import com.example.medivet.model.model.PetResponse
 
 /**
  * Repositorio para los dashboards.
@@ -70,33 +70,33 @@ class DashboardRepository(context: Context) {
     suspend fun syncAllData(): Result<Unit> {
         return withContext(Dispatchers.IO) {
             try {
-                Log.d(TAG, "🔄 Sincronizando datos del dashboard...")
+                Log.d(TAG, "Sincronizando datos del dashboard...")
 
                 // Obtener todas las mascotas del backend
                 val response = apiService.getAllPets(limit = 1000)
 
                 if (!response.isSuccessful) {
                     val error = "Error ${response.code()}: ${response.message()}"
-                    Log.e(TAG, "❌ $error")
+                    Log.e(TAG, "$error")
                     return@withContext Result.failure(Exception(error))
                 }
 
                 val pets = response.body() ?: emptyList()
-                Log.d(TAG, "✅ ${pets.size} mascotas obtenidas del backend")
+                Log.d(TAG, "${pets.size} mascotas obtenidas del backend")
 
                 // Procesar estadísticas de especies
                 val speciesStats = processSpeciesData(pets)
                 dao.replacePetsBySpecies(speciesStats)
-                Log.d(TAG, "✅ Estadísticas de especies guardadas")
+                Log.d(TAG, "Estadísticas de especies guardadas")
 
                 // Procesar estadísticas de castración
                 val neuteredStats = processNeuteredData(pets)
                 dao.replacePetsByNeutered(neuteredStats)
-                Log.d(TAG, "✅ Estadísticas de castración guardadas")
+                Log.d(TAG, "Estadísticas de castración guardadas")
 
                 Result.success(Unit)
             } catch (e: Exception) {
-                Log.e(TAG, "❌ Excepción al sincronizar: ${e.message}", e)
+                Log.e(TAG, "Excepción al sincronizar: ${e.message}", e)
                 Result.failure(e)
             }
         }
@@ -116,13 +116,15 @@ class DashboardRepository(context: Context) {
             .groupBy { it.species?.id }
             .map { (specieId, petsList) ->
                 PetsBySpeciesEntity(
-                    especie = speciesMap[specieId] ?: petsList.firstOrNull()?.species?.name ?: "Desconocido",
+                    especie = speciesMap[specieId] ?: petsList.firstOrNull()?.species?.name
+                    ?: "Desconocido",
                     cantidad = petsList.size,
                     lastUpdated = System.currentTimeMillis()
                 )
             }
             .sortedByDescending { it.cantidad }
     }
+
     /**
      * Procesa los datos de mascotas para crear estadísticas por castración.
      * Agrupa por estado de castración.
@@ -154,7 +156,10 @@ class DashboardRepository(context: Context) {
             val currentTime = System.currentTimeMillis()
             val isValid = (currentTime - lastUpdate) < CACHE_VALIDITY_MS
 
-            Log.d(TAG, "Cache válida: $isValid (última actualización: ${(currentTime - lastUpdate) / 1000}s atrás)")
+            Log.d(
+                TAG,
+                "Cache válida: $isValid (última actualización: ${(currentTime - lastUpdate) / 1000}s atrás)"
+            )
             isValid
         }
     }

@@ -38,12 +38,12 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.medivet.R
-import com.example.medivet.view.navigation.AppScreens
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.medivet.utils.SessionManager
+import com.example.medivet.view.navigation.AppScreens
 import com.example.medivet.viewModel.register.RegisterState
 import com.example.medivet.viewModel.register.RegisterViewModel
 import com.example.medivet.viewModel.register.RegisterViewModelFactory
@@ -55,7 +55,8 @@ fun RegisterSecondScreen(navController: NavHostController) {
     val sessionManager = remember { SessionManager(context) }
     val factory = remember { RegisterViewModelFactory(sessionManager) }
 
-    val navBackStackEntry = remember { navController.getBackStackEntry(AppScreens.RegisterFirstScreen.route) }
+    val navBackStackEntry =
+        remember { navController.getBackStackEntry(AppScreens.RegisterFirstScreen.route) }
     val viewModel: RegisterViewModel = viewModel(
         factory = factory,
         viewModelStoreOwner = navBackStackEntry
@@ -197,15 +198,18 @@ fun RegisterAuthHandler(
     LaunchedEffect(state) {
         when (state) {
             is RegisterState.Success -> {
-                Toast.makeText(context, "Registro exitoso. Verifique su correo.", Toast.LENGTH_LONG).show()
+                Toast.makeText(context, "Registro exitoso. Verifique su correo.", Toast.LENGTH_LONG)
+                    .show()
                 navController.navigate(AppScreens.AuthenticationScreen.route)
                 viewModel.resetState()
             }
+
             is RegisterState.Error -> {
                 // Error: Notificar
                 Toast.makeText(context, state.message, Toast.LENGTH_LONG).show()
                 viewModel.resetState()
             }
+
             else -> {
             }
         }

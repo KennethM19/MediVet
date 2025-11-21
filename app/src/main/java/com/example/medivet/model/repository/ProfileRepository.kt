@@ -34,25 +34,25 @@ class ProfileRepository(
      */
     suspend fun uploadAndUpdateProfilePhoto(uri: Uri, token: String): User? {
         return try {
-            Log.d("ProfileRepository", "🚀 Iniciando carga de foto de perfil...")
+            Log.d("ProfileRepository", "Iniciando carga de foto de perfil...")
 
             // Paso 1: Subir foto al storage
             val storageService = firebaseStorageService ?: FirebaseStorageService(context)
             val photoUrl = storageService.uploadUserProfilePhoto(uri, token)
 
             if (photoUrl.isNullOrEmpty()) {
-                Log.e("ProfileRepository", "❌ La URL de la foto es nula después de la carga")
+                Log.e("ProfileRepository", "La URL de la foto es nula después de la carga")
                 return null
             }
 
-            Log.d("ProfileRepository", "✅ Foto subida exitosamente: $photoUrl")
+            Log.d("ProfileRepository", "Foto subida exitosamente: $photoUrl")
 
             // Paso 2: Obtener los datos actualizados del usuario autenticado
-            Log.d("ProfileRepository", "🔄 Obteniendo datos actualizados del usuario...")
-            return fetchAuthenticatedUser()  // ✅ AGREGAR 'return' AQUÍ
+            Log.d("ProfileRepository", "Obteniendo datos actualizados del usuario...")
+            return fetchAuthenticatedUser()
 
         } catch (e: Exception) {
-            Log.e("ProfileRepository", "❌ Error al subir foto: ${e.message}", e)
+            Log.e("ProfileRepository", "Error al subir foto: ${e.message}", e)
             e.printStackTrace()
             null
         }
@@ -71,42 +71,42 @@ class ProfileRepository(
             val userEmail = sessionManager.getEmailFromToken()
 
             if (userEmail.isNullOrEmpty()) {
-                Log.e("ProfileRepository", "❌ No se pudo extraer el email del token")
+                Log.e("ProfileRepository", "No se pudo extraer el email del token")
                 return null
             }
 
-            Log.d("ProfileRepository", "📧 Email del usuario autenticado: $userEmail")
+            Log.d("ProfileRepository", "Email del usuario autenticado: $userEmail")
 
             // Obtener el usuario por email
             // El interceptor agrega automáticamente: Authorization: Bearer <token>
             val response = authService.getUserByEmail(userEmail)
 
-            Log.d("ProfileRepository", "📡 Respuesta getUserByEmail - Código: ${response.code()}")
+            Log.d("ProfileRepository", "Respuesta getUserByEmail - Código: ${response.code()}")
 
             if (response.isSuccessful) {
                 val user = response.body()
 
                 if (user != null) {
-                    Log.d("ProfileRepository", "✅ Usuario autenticado obtenido exitosamente")
-                    Log.d("ProfileRepository", "👤 ID: ${user.id}")
-                    Log.d("ProfileRepository", "👤 Nombre: ${user.name} ${user.lastname}")
-                    Log.d("ProfileRepository", "📧 Email: ${user.email}")
-                    Log.d("ProfileRepository", "📸 Foto URL: ${user.photo ?: "Sin foto"}")
+                    Log.d("ProfileRepository", "Usuario autenticado obtenido exitosamente")
+                    Log.d("ProfileRepository", "ID: ${user.id}")
+                    Log.d("ProfileRepository", "Nombre: ${user.name} ${user.lastname}")
+                    Log.d("ProfileRepository", "Email: ${user.email}")
+                    Log.d("ProfileRepository", "Foto URL: ${user.photo ?: "Sin foto"}")
                     user
                 } else {
-                    Log.e("ProfileRepository", "❌ Respuesta exitosa pero usuario es nulo")
+                    Log.e("ProfileRepository", "Respuesta exitosa pero usuario es nulo")
                     null
                 }
             } else {
                 val errorBody = response.errorBody()?.string()
-                Log.e("ProfileRepository", "❌ Error al obtener usuario:")
+                Log.e("ProfileRepository", "Error al obtener usuario:")
                 Log.e("ProfileRepository", "Código: ${response.code()}")
                 Log.e("ProfileRepository", "Mensaje: ${response.message()}")
                 Log.e("ProfileRepository", "Error body: $errorBody")
                 null
             }
         } catch (e: Exception) {
-            Log.e("ProfileRepository", "❌ Excepción al obtener usuario: ${e.message}", e)
+            Log.e("ProfileRepository", "Excepción al obtener usuario: ${e.message}", e)
             e.printStackTrace()
             null
         }

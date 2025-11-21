@@ -1,9 +1,8 @@
 package com.example.medivet.model.services
 
+import com.example.medivet.model.model.PetResponse
 import retrofit2.Response
 import retrofit2.http.GET
-import com.example.medivet.model.model.PetResponse
-import retrofit2.http.Header
 import retrofit2.http.Query
 
 interface DashboardApiService {

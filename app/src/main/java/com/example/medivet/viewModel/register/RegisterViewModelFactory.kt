@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.medivet.model.repository.UserRepository
 import com.example.medivet.model.services.ApiClient
 import com.example.medivet.utils.SessionManager
-import java.lang.IllegalArgumentException
 
 class RegisterViewModelFactory(
     private val sessionManager: SessionManager

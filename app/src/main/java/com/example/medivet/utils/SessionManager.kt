@@ -94,11 +94,17 @@ class SessionManager(private val context: Context) {
                     responseBody
                 } else {
                     val errorBody = response.body?.string()
-                    Log.e("SessionManager", "Error del servidor - Código: ${response.code}, Mensaje: ${response.message}, Cuerpo: $errorBody")
+                    Log.e(
+                        "SessionManager",
+                        "Error del servidor - Código: ${response.code}, Mensaje: ${response.message}, Cuerpo: $errorBody"
+                    )
                     null
                 }
             } catch (e: Exception) {
-                Log.e("SessionManager", "Excepción en fetchUserData: ${e.javaClass.simpleName} - ${e.message}")
+                Log.e(
+                    "SessionManager",
+                    "Excepción en fetchUserData: ${e.javaClass.simpleName} - ${e.message}"
+                )
                 e.printStackTrace()
                 null
             }

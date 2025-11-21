@@ -89,13 +89,9 @@ fun AppNavigation() {
             PerfilScreen(navController)
         }
         composable(AppScreens.ChatScreen.route) {
-            val repository = ChatRepository(OkHttpClient())
-            val factory = ChatViewModelFactory(repository)
-            val chatViewModel: ChatViewModel = viewModel(factory = factory)
-
-            ChatScreen(navController, chatViewModel)
+            ChatScreen(navController)
         }
-        composable(AppScreens.DashboardScreen.route){
+        composable(AppScreens.DashboardScreen.route) {
             DashboardScreen(navController)
         }
 

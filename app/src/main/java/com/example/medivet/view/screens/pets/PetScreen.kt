@@ -29,7 +29,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -53,7 +52,7 @@ import com.example.medivet.viewModel.pet.PetsViewModelFactory
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PetScreen( navController: NavHostController, petId: Int?) {
+fun PetScreen(navController: NavHostController, petId: Int?) {
     val context = LocalContext.current
     val sessionManager = SessionManager(context)
     val factory = PetsViewModelFactory(sessionManager)
@@ -138,33 +137,33 @@ fun PetScreen( navController: NavHostController, petId: Int?) {
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        Column (horizontalAlignment = Alignment.CenterHorizontally){
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             ButtonUtilsPet(
-                                onClick = {/* Navegar a hisorial clínico*/},
+                                onClick = {/* Navegar a hisorial clínico*/ },
                                 icon = Icons.Default.ContentPaste,
                                 text = "Historial clínico"
                             )
                             Spacer(modifier = Modifier.width(12.dp))
                             ButtonUtilsPet(
-                                onClick = {/* Navegar a dieta*/},
+                                onClick = {/* Navegar a dieta*/ },
                                 icon = Icons.Default.NoFood,
                                 text = "Dieta"
                             )
                             Spacer(modifier = Modifier.width(12.dp))
                             ButtonUtilsPet(
-                                onClick = {/* Navegar a hisorial clínico*/},
+                                onClick = {/* Navegar a hisorial clínico*/ },
                                 icon = Icons.Default.Medication,
                                 text = "Receta"
                             )
                             Spacer(modifier = Modifier.width(12.dp))
                             ButtonUtilsPet(
-                                onClick = {/* Navegar a dieta*/},
+                                onClick = {/* Navegar a dieta*/ },
                                 icon = Icons.Default.Accessibility,
                                 text = "Actividades"
                             )
                             Spacer(modifier = Modifier.width(12.dp))
                             ButtonUtilsPet(
-                                onClick = {/* Navegar a dieta*/},
+                                onClick = {/* Navegar a dieta*/ },
                                 icon = Icons.Default.StackedLineChart,
                                 text = "Estadísticas"
                             )

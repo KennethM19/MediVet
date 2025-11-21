@@ -6,7 +6,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.medivet.model.model.ChartData
 import com.example.medivet.model.repository.DashboardRepository
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 sealed class DashboardUiState {
@@ -16,6 +19,7 @@ sealed class DashboardUiState {
         val neuteredData: List<ChartData>,
         val isRefreshing: Boolean = false
     ) : DashboardUiState()
+
     data class Error(val message: String) : DashboardUiState()
 }
 
@@ -47,7 +51,7 @@ class DashboardViewModel(context: Context) : ViewModel() {
     private fun loadDashboardData() {
         viewModelScope.launch {
             try {
-                Log.d(TAG, "📊 Cargando datos del dashboard...")
+                Log.d(TAG, "Cargando datos del dashboard...")
 
                 // Observar datos de Room en tiempo real
                 combine(
@@ -64,7 +68,7 @@ class DashboardViewModel(context: Context) : ViewModel() {
                 }
 
             } catch (e: Exception) {
-                Log.e(TAG, "❌ Error al cargar datos: ${e.message}", e)
+                Log.e(TAG, "Error al cargar datos: ${e.message}", e)
                 _uiState.value = DashboardUiState.Error("Error al cargar datos: ${e.message}")
             }
         }
@@ -79,16 +83,16 @@ class DashboardViewModel(context: Context) : ViewModel() {
     private fun syncWithBackend() {
         viewModelScope.launch {
             try {
-                Log.d(TAG, "🔄 Sincronizando con backend...")
+                Log.d(TAG, "Sincronizando con backend...")
                 val result = repository.syncAllData()
 
                 if (result.isSuccess) {
-                    Log.d(TAG, "✅ Sincronización exitosa")
+                    Log.d(TAG, "Sincronización exitosa")
                 } else {
-                    Log.w(TAG, "⚠️ Error en sincronización: ${result.exceptionOrNull()?.message}")
+                    Log.w(TAG, "Error en sincronización: ${result.exceptionOrNull()?.message}")
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "❌ Excepción en sincronización: ${e.message}", e)
+                Log.e(TAG, "Excepción en sincronización: ${e.message}", e)
             }
         }
     }
@@ -99,14 +103,14 @@ class DashboardViewModel(context: Context) : ViewModel() {
     fun refresh() {
         viewModelScope.launch {
             _isRefreshing.value = true
-            Log.d(TAG, "🔄 Refrescando datos...")
+            Log.d(TAG, "Refrescando datos...")
 
             val result = repository.syncAllData()
 
             if (result.isSuccess) {
-                Log.d(TAG, "✅ Datos refrescados")
+                Log.d(TAG, "Datos refrescados")
             } else {
-                Log.e(TAG, "❌ Error al refrescar: ${result.exceptionOrNull()?.message}")
+                Log.e(TAG, "Error al refrescar: ${result.exceptionOrNull()?.message}")
             }
 
             _isRefreshing.value = false
