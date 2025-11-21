@@ -60,11 +60,7 @@ import coil.request.ImageRequest
 import com.example.medivet.utils.SessionManager
 import com.example.medivet.viewModel.perfil.PerfilViewModel
 import com.example.medivet.viewModel.perfil.PerfilViewModelFactory
-import coil.request.ImageRequest
-import androidx.compose.material3.Snackbar
-import androidx.compose.material3.SnackbarDuration
-import coil.request.CachePolicy
-import androidx.compose.runtime.key
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
