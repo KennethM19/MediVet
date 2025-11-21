@@ -7,14 +7,17 @@ import androidx.room.RoomDatabase
 import com.example.medivet.model.local.dao.DashboardDao
 import com.example.medivet.model.local.entities.PetsByNeuteredEntity
 import com.example.medivet.model.local.entities.PetsBySpeciesEntity
+import com.example.medivet.model.local.entities.VaccineRankingEntity
+
 
 
 @Database(
     entities = [
         PetsBySpeciesEntity::class,
-        PetsByNeuteredEntity::class
+        PetsByNeuteredEntity::class,
+        VaccineRankingEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

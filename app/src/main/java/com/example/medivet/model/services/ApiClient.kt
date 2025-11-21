@@ -19,6 +19,7 @@ object ApiClient {
         }
 
         val okHttpClient = OkHttpClient.Builder()
+            // Interceptor que agrega automáticamente el token a todas las peticiones
             .addInterceptor(AuthInterceptor(appContext.applicationContext)) // ✅ seguro
             .addInterceptor(loggingInterceptor)
             .connectTimeout(30, TimeUnit.SECONDS)
@@ -33,6 +34,8 @@ object ApiClient {
             .build()
     }
 
+    // Servicio principal usado por PerfilViewModel y ProfileRepository:
+    // login, getUserByEmail, getCurrentUser, uploadProfilePhoto.
     val apiService: AuthService by lazy { retrofit.create(AuthService::class.java) }
     val petService: PetService by lazy { retrofit.create(PetService::class.java) }
     val dashboardService: DashboardApiService by lazy {

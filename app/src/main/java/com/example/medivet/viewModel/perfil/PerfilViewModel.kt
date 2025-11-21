@@ -2,7 +2,6 @@ package com.example.medivet.viewModel.perfil
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.medivet.model.model.User
@@ -17,18 +16,18 @@ import kotlinx.coroutines.launch
 
 
 class PerfilViewModel(
-    private val context: Context,
-    private val sessionManager: SessionManager
+    private val context: Context,       // Se inyecta el contexto
+    private val sessionManager: SessionManager      // Se inyecta SessionManager (Preferences DataStore)
 ) : ViewModel() {
 
-    // ProfileRepository inicializado con las dependencias correctas
+    // Repositorio de perfil (Capa de Datos + Patrón Repositorio)
     private val profileRepository = ProfileRepository(
-        authService = ApiClient.apiService,
+        authService = ApiClient.apiService,     // Retrofit (HTTP + REST)
         context = context,
-        firebaseStorageService = FirebaseStorageService(context)
+        firebaseStorageService = FirebaseStorageService(context)  // Servicio de almacenamiento remoto
     )
 
-    // Estados de la UI
+    // StateFlow: manejo de estado reactivo de la UI
     private val _user = MutableStateFlow<User?>(null)
     val user: StateFlow<User?> = _user.asStateFlow()
 
@@ -42,36 +41,28 @@ class PerfilViewModel(
     val uploadSuccess: StateFlow<Boolean> = _uploadSuccess.asStateFlow()
 
     init {
-        loadUserData()
+        loadUserData()  // Carga inicial de datos por REST
     }
 
     /**
-     * Carga los datos del usuario autenticado desde el backend.
-     * Usa ProfileRepository que obtiene el usuario por email del token.
+     * Obtiene los datos del usuario desde la API REST.
+     * Llama al repositorio.
+     * Se ejecuta dentro de una corrutina (no bloquea el hilo principal).
      */
     fun loadUserData() {
-        viewModelScope.launch {
+        viewModelScope.launch {         // Corrutina del ViewModel
             try {
                 _isLoading.value = true
-                Log.d("PerfilViewModel", "Cargando datos del usuario...")
 
-                val userData = profileRepository.getCurrentUserData()
+                val userData = profileRepository.getCurrentUserData()     // Retrofit -> REST API
 
                 if (userData != null) {
-                    _user.value = userData
+                    _user.value = userData        // Actualiza la UI
                     _errorMessage.value = null
-                    Log.d(
-                        "PerfilViewModel",
-                        "Usuario cargado: ${userData.name} ${userData.lastname}"
-                    )
-                    Log.d("PerfilViewModel", "Email: ${userData.email}")
-                    Log.d("PerfilViewModel", "Foto: ${userData.photo ?: "Sin foto"}")
                 } else {
                     _errorMessage.value = "No se pudo cargar los datos del usuario"
-                    Log.e("PerfilViewModel", "Usuario no encontrado")
                 }
             } catch (e: Exception) {
-                Log.e("PerfilViewModel", "Error al cargar usuario: ${e.message}", e)
                 _errorMessage.value = "Error al cargar datos: ${e.message}"
             } finally {
                 _isLoading.value = false
@@ -80,49 +71,34 @@ class PerfilViewModel(
     }
 
     /**
-     * Sube una foto de perfil del usuario.
-     * Actualiza automáticamente el estado con los datos del usuario actualizado.
+     * Sube una foto al servidor (Firebase Storage) y actualiza el perfil vía API REST.
+     * Combina dos fuentes de datos (Storage + Backend) - Patrón Repositorio.
      */
     fun uploadProfilePhoto(photoUri: Uri) {
-        viewModelScope.launch {
+        viewModelScope.launch {         // Corrutina para tarea larga
             try {
                 _isLoading.value = true
                 _uploadSuccess.value = false
-                Log.d("PerfilViewModel", "Iniciando carga de foto de perfil...")
 
-                val token = sessionManager.getToken()
+                val token = sessionManager.getToken()       // Preferences DataStore: recuperación del token
 
                 if (token.isNullOrEmpty()) {
                     _errorMessage.value = "Sesión expirada. Por favor, inicia sesión nuevamente"
-                    Log.e("PerfilViewModel", "Token es nulo o vacío")
                     _isLoading.value = false
                     return@launch
                 }
-
-                Log.d(
-                    "PerfilViewModel",
-                    "Token obtenido (primeros 20 chars): ${token.take(20)}..."
-                )
 
                 // Subir foto y obtener usuario actualizado
                 val updatedUser = profileRepository.uploadAndUpdateProfilePhoto(photoUri, token)
 
                 if (updatedUser != null) {
-                    _user.value = updatedUser
+                    _user.value = updatedUser       // Actualiza estado de UI
                     _uploadSuccess.value = true
                     _errorMessage.value = null
-                    Log.d("PerfilViewModel", "Foto actualizada exitosamente")
-                    Log.d(
-                        "PerfilViewModel",
-                        "👤 Usuario: ${updatedUser.name} ${updatedUser.lastname}"
-                    )
-                    Log.d("PerfilViewModel", "Nueva foto URL: ${updatedUser.photo}")
                 } else {
                     _errorMessage.value = "Error al subir la foto. Por favor, intenta de nuevo"
-                    Log.e("PerfilViewModel", "El repositorio devolvió un usuario nulo")
                 }
             } catch (e: Exception) {
-                Log.e("PerfilViewModel", "Excepción al subir foto: ${e.message}", e)
                 _errorMessage.value = "Error inesperado: ${e.message}"
             } finally {
                 _isLoading.value = false
@@ -130,24 +106,18 @@ class PerfilViewModel(
         }
     }
 
-    /**
-     * Refresca los datos del usuario desde el backend.
-     * Útil para actualizar la UI después de cambios externos.
-     */
+     //Refresca los datos del usuario desde el backend (API REST).
+    //Útil para actualizar la UI después de cambios externos.
     fun refreshUserData() {
         loadUserData()
     }
 
-    /**
-     * Limpia el mensaje de error.
-     */
+     //Limpiar el mensaje de error.
     fun clearErrorMessage() {
         _errorMessage.value = null
     }
 
-    /**
-     * Limpia el estado de éxito de carga.
-     */
+    //Limpia el estado de éxito del upload.
     fun clearUploadSuccess() {
         _uploadSuccess.value = false
     }

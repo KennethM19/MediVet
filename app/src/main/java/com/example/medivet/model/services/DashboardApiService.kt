@@ -4,6 +4,7 @@ import com.example.medivet.model.model.PetResponse
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
+import com.example.medivet.model.model.PetVaccineResponse
 
 interface DashboardApiService {
 
@@ -31,5 +32,19 @@ interface DashboardApiService {
         @Query("sort_by") sortBy: String = "name",
         @Query("sort_order") sortOrder: String = "asc"
     ): Response<List<PetResponse>>
+
+
+    /**
+     * Obtiene todas las aplicaciones de vacunas filtradas por especie.
+     * Endpoint: GET /medical-record/pet-vaccine?specie_id=1
+     *
+     * @param specieId 1 = Perro, 2 = Gato
+     *
+     * El interceptor AuthInterceptor agrega automáticamente el token.
+     */
+    @GET("medical-record/pet-vaccine")
+    suspend fun getPetVaccines(
+        @Query("specie_id") specieId: Int
+    ): Response<List<PetVaccineResponse>>
 
 }
