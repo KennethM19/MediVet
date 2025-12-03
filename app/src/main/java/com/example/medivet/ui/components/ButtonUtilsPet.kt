@@ -24,7 +24,7 @@ fun ButtonUtilsPet(
         onClick = onClick,
         modifier = Modifier.fillMaxSize()
     ) {
-        Row (
+        Row(
             modifier = Modifier.fillMaxSize(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center

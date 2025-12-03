@@ -38,7 +38,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,16 +47,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.medivet.R
-import com.example.medivet.model.repository.PetRepository
 import com.example.medivet.utils.SessionManager
-import com.example.medivet.viewModel.pet.PetCreationState
 import com.example.medivet.viewModel.pet.PetsViewModel
 import com.example.medivet.viewModel.pet.PetsViewModelFactory
 
@@ -79,14 +74,14 @@ fun EditPetScreen(navController: NavHostController, petId: Int?) {
         selectedImageUri = uri
     }
 
-    Column ( modifier = Modifier.fillMaxWidth()) {
+    Column(modifier = Modifier.fillMaxWidth()) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(110.dp)
         ) {
             Image(
-                painter = painterResource( id = R.drawable.background),
+                painter = painterResource(id = R.drawable.background),
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
@@ -101,14 +96,14 @@ fun EditPetScreen(navController: NavHostController, petId: Int?) {
             )
         }
 
-        Column (
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.White)
                 .padding(16.dp)
                 .verticalScroll(rememberScrollState())
         ) {
-            Card (
+            Card(
                 shape = RoundedCornerShape(16.dp),
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = Color(0xFFE0F7FA)),
@@ -118,11 +113,11 @@ fun EditPetScreen(navController: NavHostController, petId: Int?) {
                     OutlinedTextField(
                         value = weight,
                         onValueChange = { weight = it },
-                        label =  { Text("Peso", color = Color.Black)},
+                        label = { Text("Peso", color = Color.Black) },
                         modifier = Modifier.fillMaxWidth()
                     )
 
-                    Spacer( modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
 
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
@@ -133,7 +128,7 @@ fun EditPetScreen(navController: NavHostController, petId: Int?) {
                         Switch(checked = isNeutered, onCheckedChange = { isNeutered = it })
                     }
 
-                    Spacer( modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
 
                     Box(
                         modifier = Modifier
@@ -165,7 +160,7 @@ fun EditPetScreen(navController: NavHostController, petId: Int?) {
                         }
                     }
 
-                    Spacer( modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
 
                     Row(
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -187,20 +182,40 @@ fun EditPetScreen(navController: NavHostController, petId: Int?) {
                                     petViewModel.updatePet(id, weight, isNeutered) { success ->
                                         if (success) {
                                             if (selectedImageUri != null) {
-                                                petViewModel.updatePetPhoto(selectedImageUri!!, id, context) { url ->
+                                                petViewModel.updatePetPhoto(
+                                                    selectedImageUri!!,
+                                                    id,
+                                                    context
+                                                ) { url ->
                                                     if (url != null) {
-                                                        Toast.makeText(context, "Mascota actualizada", Toast.LENGTH_SHORT).show()
+                                                        Toast.makeText(
+                                                            context,
+                                                            "Mascota actualizada",
+                                                            Toast.LENGTH_SHORT
+                                                        ).show()
                                                     } else {
-                                                        Toast.makeText(context, "Mascota actualizada", Toast.LENGTH_SHORT).show()
+                                                        Toast.makeText(
+                                                            context,
+                                                            "Mascota actualizada",
+                                                            Toast.LENGTH_SHORT
+                                                        ).show()
                                                     }
                                                     navController.popBackStack()
                                                 }
                                             } else {
-                                                Toast.makeText(context, "Mascota actualizada", Toast.LENGTH_SHORT).show()
+                                                Toast.makeText(
+                                                    context,
+                                                    "Mascota actualizada",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
                                                 navController.popBackStack()
                                             }
                                         } else {
-                                            Toast.makeText(context, "Error al actualizar mascota", Toast.LENGTH_SHORT).show()
+                                            Toast.makeText(
+                                                context,
+                                                "Error al actualizar mascota",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
                                         }
                                     }
                                 }

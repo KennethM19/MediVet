@@ -13,9 +13,9 @@ data class User(
     val address: String = "",
     val num_cellphone: String? = null,
     val num_telephone: String? = null,
-    val email: String = "",
+    val email: String = "",     // Usado por ProfileRepository para obtener usuario por email
     val role_id: Int = 0,
-    val photo: String? = null,
+    val photo: String? = null,      //Aquí se almacena la URL pública devuelta por Firebase Storage
     val type_document: TypeDocument? = null,
     val role: Role? = null
 )

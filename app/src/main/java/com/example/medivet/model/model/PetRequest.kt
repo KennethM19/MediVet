@@ -1,6 +1,7 @@
 package com.example.medivet.model.model
 
 data class PetRequest(
+    val id: Int? = null,               // ID de la mascota
     val num_doc: String? = null,      // DNI de la mascota
     val name: String,                 // Nombre
     val photo: String? = null,        // URL o base64 de la foto

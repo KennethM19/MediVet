@@ -29,49 +29,46 @@ class FirebaseStorageService(private val context: Context) {
         token: String
     ): String? = withContext(Dispatchers.IO) {
         try {
-            Log.d("FirebaseStorageService", "Iniciando carga de foto...")
 
-            // Convertir Uri a File en el hilo de IO
+            // Convierte la Uri seleccionada por el usuario en un archivo físico temporal.
+            // Este archivo es necesario para enviar la imagen como multipart al backend.
             val file = uriToFile(uri)
-            Log.d("FirebaseStorageService", "Archivo temporal creado: ${file.absolutePath}")
 
-            // Crear MultipartBody.Part para la foto
+            // // Prepara el cuerpo de la imagen con tipo "image/*"
             val requestBody = file.asRequestBody("image/*".toMediaType())
-            Log.d("FirebaseStorageService", "Tamaño del archivo: ${file.length()} bytes")
 
             // Crear la solicitud multipart
+            // Este formato coincide exactamente con lo que espera el endpoint upload-photo.
             val multipartBody = MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
                 .addFormDataPart("photo", file.name, requestBody)
                 .build()
 
+            // Construye la petición POST hacia /users/upload-photo
             val request = Request.Builder()
                 .url("$baseUrl/users/upload-photo")
-                .addHeader("Authorization", "Bearer $token")
+                .addHeader(
+                    "Authorization",
+                    "Bearer $token"
+                )    // Token necesario para validar usuario
                 .post(multipartBody)
                 .build()
 
-            Log.d("FirebaseStorageService", "Enviando solicitud a: $baseUrl/users/upload-photo")
-
-            // Ejecutar la solicitud en el hilo de IO
+            // Se envía la solicitud al backend, que sube la foto a Firebase Storage
             val response = client.newCall(request).execute()
-
-            Log.d("FirebaseStorageService", "Código de respuesta: ${response.code}")
 
             if (response.isSuccessful) {
                 val responseBody = response.body?.string()
-                Log.d("FirebaseStorageService", "Respuesta del servidor: $responseBody")
 
+                // Extrae la URL pública devuelta por el backend
+                // Esta URL es la que luego se guarda en BD y se muestra en el perfil del usuario
                 val photoUrl = extractPhotoUrlFromResponse(responseBody)
 
-                // Limpiar archivo temporal
+                // El archivo temporal se borra después de enviarlo al backend
                 file.delete()
-                Log.d("FirebaseStorageService", "Archivo temporal eliminado")
 
                 if (photoUrl != null) {
-                    Log.d("FirebaseStorageService", "URL de foto extraída: $photoUrl")
                 } else {
-                    Log.e("FirebaseStorageService", "No se pudo extraer URL de la respuesta")
                 }
 
                 photoUrl
@@ -91,6 +88,8 @@ class FirebaseStorageService(private val context: Context) {
         }
     }
 
+    // Convierte la Uri de la foto seleccionada a un archivo temporal.
+    // Esto es requerido para poder enviarla al backend como un MultipartBody.Part.
     private suspend fun uriToFile(uri: Uri): File = withContext(Dispatchers.IO) {
         try {
             val inputStream = context.contentResolver.openInputStream(uri)
@@ -112,33 +111,29 @@ class FirebaseStorageService(private val context: Context) {
         }
     }
 
+    // Extrae la URL devuelta por el backend desde el JSON.
+    // El backend puede responder como "url" o "photo_url", por eso se manejan ambos casos.
     private fun extractPhotoUrlFromResponse(responseBody: String?): String? {
         return try {
             if (responseBody == null) {
-                Log.e("FirebaseStorageService", "Cuerpo de respuesta es nulo")
                 return null
             }
 
-            Log.d("FirebaseStorageService", "Parseando respuesta: $responseBody")
-
-            // Intentar extraer la URL buscando "url" (que es lo que devuelve el backend)
+            // Busca el campo principal "url" devuelto por el backend
             val photoUrlPattern = """"url"\s*:\s*"([^"]*)"""".toRegex()
             val matchResult = photoUrlPattern.find(responseBody)
 
             val photoUrl = matchResult?.groupValues?.get(1)
 
             if (photoUrl.isNullOrEmpty()) {
-                Log.w("FirebaseStorageService", "URL no encontrada en la respuesta: $responseBody")
-                // Intentar con el patrón alternativo por si acaso
+                // Alternativa por si el backend responde con "photo_url"
                 val altPattern = """"photo_url"\s*:\s*"([^"]*)"""".toRegex()
                 val altMatch = altPattern.find(responseBody)
                 altMatch?.groupValues?.get(1)
             } else {
-                Log.d("FirebaseStorageService", "URL encontrada exitosamente: $photoUrl")
                 photoUrl
             }
         } catch (e: Exception) {
-            Log.e("FirebaseStorageService", "Error al parsear respuesta JSON: ${e.message}", e)
             null
         }
     }

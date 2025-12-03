@@ -2,13 +2,25 @@ package com.example.medivet.view.screens.pets
 
 import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.*
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -20,6 +32,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -41,6 +56,8 @@ fun ListPetsScreen(
     val factory = PetsViewModelFactory(
         sessionManager = sessionManager
     )
+
+    val lifecycleOwner = LocalLifecycleOwner.current
 
     val petViewModel: PetsViewModel = viewModel(factory = factory)
 
@@ -76,6 +93,19 @@ fun ListPetsScreen(
             }
         }
     ) { padding ->
+        DisposableEffect(lifecycleOwner) {
+            val observer = LifecycleEventObserver { _, event ->
+                if (event == Lifecycle.Event.ON_RESUME) {
+                    petViewModel.loadPets()
+                }
+            }
+
+            lifecycleOwner.lifecycle.addObserver(observer)
+
+            onDispose {
+                lifecycleOwner.lifecycle.removeObserver(observer)
+            }
+        }
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -123,9 +153,17 @@ fun ListPetsScreen(
                             onDeleteClick = {
                                 petViewModel.deletePet(pet.id) { success ->
                                     if (success) {
-                                        Toast.makeText(context, "Mascota eliminada", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(
+                                            context,
+                                            "Mascota eliminada",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
                                     } else {
-                                        Toast.makeText(context, "Error eliminando mascota", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(
+                                            context,
+                                            "Error eliminando mascota",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
                                     }
                                 }
                             }

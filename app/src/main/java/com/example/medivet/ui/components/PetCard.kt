@@ -86,13 +86,15 @@ fun PetCard(
 
             }
             Column {
-                IconButton(onClick = { expanded = true}) {
-                    Icon(Icons.Default.MoreVert,
-                        contentDescription = "Más opciones")
+                IconButton(onClick = { expanded = true }) {
+                    Icon(
+                        Icons.Default.MoreVert,
+                        contentDescription = "Más opciones"
+                    )
                 }
                 DropdownMenu(
                     expanded = expanded,
-                    onDismissRequest =  {expanded = false}
+                    onDismissRequest = { expanded = false }
                 ) {
                     DropdownMenuItem(
                         text = { Text("Ver mascota") },

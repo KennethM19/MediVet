@@ -1,7 +1,7 @@
 package com.example.medivet.view.screens.register
 
 import android.app.DatePickerDialog
-import android.widget.Toast // <-- AÑADIDO
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -43,17 +43,17 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.medivet.R
+import com.example.medivet.utils.SessionManager
 import com.example.medivet.view.navigation.AppScreens
+import com.example.medivet.viewModel.register.RegisterViewModel
+import com.example.medivet.viewModel.register.RegisterViewModelFactory
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.medivet.utils.SessionManager
-import com.example.medivet.viewModel.register.RegisterViewModel
-import com.example.medivet.viewModel.register.RegisterViewModelFactory
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -226,8 +226,10 @@ fun ContinueButton(
     Button(
         onClick = {
             if (docType.isBlank() || docNumber.isBlank() || firstName.isBlank() ||
-                lastName.isBlank() || address.isBlank() || birthDate.isBlank()) {
-                Toast.makeText(context, "Por favor, complete todos los campos.", Toast.LENGTH_LONG).show()
+                lastName.isBlank() || address.isBlank() || birthDate.isBlank()
+            ) {
+                Toast.makeText(context, "Por favor, complete todos los campos.", Toast.LENGTH_LONG)
+                    .show()
                 return@Button
             }
 
@@ -338,7 +340,10 @@ fun DateInputField(
                     Icon(Icons.Default.DateRange, contentDescription = "Seleccionar fecha")
                 }
             },
-            modifier = Modifier.background(Color.White.copy(alpha = 0.85f), shape = MaterialTheme.shapes.small)
+            modifier = Modifier.background(
+                Color.White.copy(alpha = 0.85f),
+                shape = MaterialTheme.shapes.small
+            )
         )
     }
 }

@@ -43,21 +43,21 @@ class MainViewModel(
         viewModelScope.launch {
             try {
                 _isLoading.value = true
-                Log.d("MainViewModel", "🔄 Cargando usuario desde ProfileRepository...")
+                Log.d("MainViewModel", "Cargando usuario desde ProfileRepository...")
 
                 val userData = profileRepository.getCurrentUserData()
 
                 if (userData != null) {
                     _user.value = userData
-                    Log.d("MainViewModel", "✅ Usuario cargado en MainScreen")
-                    Log.d("MainViewModel", "👤 Nombre: ${userData.name} ${userData.lastname}")
-                    Log.d("MainViewModel", "📧 Email: ${userData.email}")
-                    Log.d("MainViewModel", "📸 Foto: ${userData.photo ?: "Sin foto"}")
+                    Log.d("MainViewModel", "Usuario cargado en MainScreen")
+                    Log.d("MainViewModel", "Nombre: ${userData.name} ${userData.lastname}")
+                    Log.d("MainViewModel", "Email: ${userData.email}")
+                    Log.d("MainViewModel", "Foto: ${userData.photo ?: "Sin foto"}")
                 } else {
-                    Log.e("MainViewModel", "❌ No se pudo cargar el usuario")
+                    Log.e("MainViewModel", "No se pudo cargar el usuario")
                 }
             } catch (e: Exception) {
-                Log.e("MainViewModel", "❌ Error al cargar usuario: ${e.message}", e)
+                Log.e("MainViewModel", "Error al cargar usuario: ${e.message}", e)
             } finally {
                 _isLoading.value = false
             }
@@ -69,7 +69,7 @@ class MainViewModel(
      * Llamar cuando se vuelve a MainScreen desde otra pantalla.
      */
     fun refreshUser() {
-        Log.d("MainViewModel", "🔄 Refrescando datos del usuario...")
+        Log.d("MainViewModel", "Refrescando datos del usuario...")
         loadUser()
     }
 
@@ -81,9 +81,9 @@ class MainViewModel(
             try {
                 sessionManager.clearSession()
                 _user.value = null
-                Log.d("MainViewModel", "🚪 Sesión cerrada")
+                Log.d("MainViewModel", "Sesión cerrada")
             } catch (e: Exception) {
-                Log.e("MainViewModel", "❌ Error al cerrar sesión: ${e.message}", e)
+                Log.e("MainViewModel", "Error al cerrar sesión: ${e.message}", e)
             }
         }
     }

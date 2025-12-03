@@ -1,8 +1,7 @@
 package com.example.medivet
 
-import com.example.medivet.model.services.ApiClient
 import android.app.Application
-import android.content.Context
+import com.example.medivet.model.services.ApiClient
 
 class MyApplication : Application() {
 
