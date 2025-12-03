@@ -5,7 +5,6 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.medivet.model.model.PetRequest
 import com.example.medivet.model.model.PetResponse
 import com.example.medivet.model.model.PetUpdate
 import com.example.medivet.model.repository.PetRepository
@@ -14,7 +13,6 @@ import com.example.medivet.utils.SessionManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class PetsViewModel(

@@ -5,6 +5,7 @@ import android.util.Log
 import com.example.medivet.model.local.database.AppDatabase
 import com.example.medivet.model.local.entities.PetsByNeuteredEntity
 import com.example.medivet.model.local.entities.PetsBySpeciesEntity
+import com.example.medivet.model.local.entities.VaccineRankingEntity
 import com.example.medivet.model.model.ChartData
 import com.example.medivet.model.model.PetResponse
 import com.example.medivet.model.services.ApiClient
@@ -161,7 +162,6 @@ class DashboardRepository(context: Context) {
             isValid
         }
     }
-
 
 
     // ========== RANKING DE VACUNAS ==========

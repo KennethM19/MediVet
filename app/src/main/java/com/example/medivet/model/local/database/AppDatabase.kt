@@ -10,7 +10,6 @@ import com.example.medivet.model.local.entities.PetsBySpeciesEntity
 import com.example.medivet.model.local.entities.VaccineRankingEntity
 
 
-
 @Database(
     entities = [
         PetsBySpeciesEntity::class,
