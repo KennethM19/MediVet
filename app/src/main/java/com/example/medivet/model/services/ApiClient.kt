@@ -45,4 +45,8 @@ object ApiClient {
     val chatService: ChatService by lazy {
         retrofit.create(ChatService::class.java)
     }
+
+    val clinicService: ClinicService by lazy {
+        retrofit.create(ClinicService::class.java)
+    }
 }
