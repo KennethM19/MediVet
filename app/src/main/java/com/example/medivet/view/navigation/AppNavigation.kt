@@ -26,22 +26,25 @@ import com.example.medivet.view.screens.pets.ListPetsScreen
 import com.example.medivet.view.screens.pets.PetScreen
 import com.example.medivet.view.screens.register.RegisterFirstScreen
 import com.example.medivet.view.screens.register.RegisterSecondScreen
-import com.example.medivet.view.screens.clinics.ListClinicsScreen
 import com.example.medivet.viewModel.clinic.ClinicViewModel
 import com.example.medivet.viewModel.clinic.ClinicViewModelFactory
 import com.example.medivet.view.screens.clinics.ClinicScreen
-
-
+import com.example.medivet.view.screens.clinics.ClinicAppointmentsMenuScreen
+import com.example.medivet.view.screens.clinics.ScheduleAppointmentScreen
+import com.example.medivet.viewModel.pet.PetsViewModel
+import com.example.medivet.viewModel.pet.PetsViewModelFactory
+import com.example.medivet.view.screens.clinics.MyAppointmentsScreen
 @Composable
 fun AppNavigation() {
     val context = LocalContext.current
     val navController = rememberNavController()
     val sessionManager = remember { SessionManager(context) }
 
-
     val clinicFactory = remember { ClinicViewModelFactory(sessionManager) }
     val clinicViewModel: ClinicViewModel = viewModel(factory = clinicFactory)
 
+    val petsFactory = remember { PetsViewModelFactory(sessionManager) }
+    val petsViewModel: PetsViewModel = viewModel(factory = petsFactory)
 
     NavHost(
         navController = navController,
@@ -109,6 +112,35 @@ fun AppNavigation() {
         ) { backStackEntry ->
             val clinicId = backStackEntry.arguments?.getInt("clinicId")
             ClinicScreen(navController, clinicId, clinicViewModel)
+        }
+        composable(
+            route = AppScreens.ClinicAppointmentsMenuScreen.route + "/{clinicId}/{serviceId}",
+            arguments = listOf(
+                navArgument("clinicId") { type = NavType.IntType },
+                navArgument("serviceId") { type = NavType.IntType }
+            )
+        ) { backStackEntry ->
+            val clinicId = backStackEntry.arguments?.getInt("clinicId")
+            val serviceId = backStackEntry.arguments?.getInt("serviceId")
+            ClinicAppointmentsMenuScreen(navController, clinicId, serviceId)
+        }
+        composable(
+            route = AppScreens.ScheduleAppointmentScreen.route + "/{clinicId}",
+            arguments = listOf(
+                navArgument("clinicId") { type = NavType.IntType },
+            )
+        ) { backStackEntry ->
+            val clinicId = backStackEntry.arguments?.getInt("clinicId")
+
+            ScheduleAppointmentScreen(
+                navController = navController,
+                clinicId = clinicId,
+                clinicViewModel = clinicViewModel,
+                petsViewModel = petsViewModel
+            )
+        }
+        composable(AppScreens.MyAppointmentsScreen.route) {
+            MyAppointmentsScreen(navController, clinicViewModel)
         }
     }
 }

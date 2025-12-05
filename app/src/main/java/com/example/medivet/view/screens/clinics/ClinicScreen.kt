@@ -21,9 +21,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.medivet.R
+import com.example.medivet.view.navigation.AppScreens // <-- Import necesario
 import com.example.medivet.viewModel.clinic.ClinicViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,14 +58,13 @@ fun ClinicScreen(
                     .background(Color(0xFFF0F0F0))
                     .verticalScroll(rememberScrollState())
             ) {
-                // --- Encabezado con Imagen ---
+
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(200.dp)
                 ) {
                     Image(
-
                         painter = painterResource(id = R.drawable.background),
                         contentDescription = null,
                         modifier = Modifier.fillMaxSize(),
@@ -91,7 +90,6 @@ fun ClinicScreen(
                 }
 
                 Spacer(modifier = Modifier.height(60.dp))
-
 
                 Column(
                     modifier = Modifier.padding(16.dp),
@@ -142,7 +140,7 @@ fun ClinicScreen(
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp, vertical = 8.dp),
                         shape = RoundedCornerShape(16.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFFE0F2F1)) // Verde muy suave
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFFE0F2F1))
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -160,10 +158,29 @@ fun ClinicScreen(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(16.dp))
+
+
+                Button(
+                    onClick = {
+
+                        val serviceId = clinic.service?.id ?: 0
+                        navController.navigate(AppScreens.ClinicAppointmentsMenuScreen.route + "/${clinic.id}/$serviceId")
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00BFA5)),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .height(50.dp)
+                ) {
+                    Icon(Icons.Default.CalendarMonth, contentDescription = null, tint = Color.White)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Gestionar Citas", fontWeight = FontWeight.Bold, color = Color.White)
+                }
+
+                Spacer(modifier = Modifier.height(32.dp))
             }
         } else {
-
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text("No se encontró la información de la veterinaria.")
             }
