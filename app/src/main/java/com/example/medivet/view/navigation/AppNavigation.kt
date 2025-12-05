@@ -3,6 +3,7 @@ package com.example.medivet.view.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -16,6 +17,7 @@ import com.example.medivet.view.screens.LoginScreen
 import com.example.medivet.view.screens.PasswordResetScreen
 import com.example.medivet.view.screens.UpdatePasswordScreen
 import com.example.medivet.view.screens.chat.ChatScreen
+import com.example.medivet.view.screens.clinics.ListClinicsScreen
 import com.example.medivet.view.screens.dashboard.DashboardScreen
 import com.example.medivet.view.screens.perfil.PerfilScreen
 import com.example.medivet.view.screens.pets.CreatePetScreen
@@ -24,6 +26,10 @@ import com.example.medivet.view.screens.pets.ListPetsScreen
 import com.example.medivet.view.screens.pets.PetScreen
 import com.example.medivet.view.screens.register.RegisterFirstScreen
 import com.example.medivet.view.screens.register.RegisterSecondScreen
+import com.example.medivet.view.screens.clinics.ListClinicsScreen
+import com.example.medivet.viewModel.clinic.ClinicViewModel
+import com.example.medivet.viewModel.clinic.ClinicViewModelFactory
+import com.example.medivet.view.screens.clinics.ClinicScreen
 
 
 @Composable
@@ -31,6 +37,11 @@ fun AppNavigation() {
     val context = LocalContext.current
     val navController = rememberNavController()
     val sessionManager = remember { SessionManager(context) }
+
+
+    val clinicFactory = remember { ClinicViewModelFactory(sessionManager) }
+    val clinicViewModel: ClinicViewModel = viewModel(factory = clinicFactory)
+
 
     NavHost(
         navController = navController,
@@ -89,6 +100,15 @@ fun AppNavigation() {
         composable(AppScreens.DashboardScreen.route) {
             DashboardScreen(navController)
         }
-
+        composable(AppScreens.ListClinicsScreen.route){
+            ListClinicsScreen(navController, clinicViewModel)
+        }
+        composable(
+            route = AppScreens.ClinicScreen.route + "/{clinicId}",
+            arguments = listOf(navArgument("clinicId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val clinicId = backStackEntry.arguments?.getInt("clinicId")
+            ClinicScreen(navController, clinicId, clinicViewModel)
+        }
     }
 }

@@ -170,7 +170,9 @@ fun MainScreen(
                         MenuItem("Mascotas", Icons.Default.Pets) {
                             navController.navigate("list_pets")
                         }
-                        MenuItem("Veterinarias", Icons.Default.LocalHospital) { /* Navegar */ }
+                        MenuItem("Veterinarias", Icons.Default.LocalHospital) {
+                            navController.navigate("list_clinics")
+                        }
                         MenuItem("Consulta", Icons.Default.Chat) {
                             navController.navigate("chat_screen")
                         }
