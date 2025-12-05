@@ -65,6 +65,9 @@ dependencies {
     // NAVIGATION
     implementation(libs.androidx.navigation.compose)
 
+    // WorkManager con soporte para Corrutinas
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
+
     // VIEWMODEL
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.2")
 
@@ -146,4 +149,5 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
 }
