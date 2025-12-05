@@ -74,7 +74,6 @@ fun MainScreen(
     navController: NavHostController,
     sessionManager: SessionManager
 ) {
-    Log.d("CLINIC_DEBUG", "MainScreen COMENZÓ A DIBUJARSE")
     val context = LocalContext.current
 
     var token by remember { mutableStateOf<String?>(null) }
@@ -82,13 +81,11 @@ fun MainScreen(
     // 1. Obtener token
     LaunchedEffect(Unit) {
         token = sessionManager.getToken()
-        Log.d("CLINIC_DEBUG", "TOKEN OBTENIDO: $token")
     }
 
     // 2. Crear viewModel solo si el token ya existe
     val closestClinicViewModel: ClosestClinicViewModel? =
         if (token != null) {
-            Log.d("CLINIC_DEBUG", "CREANDO ViewModel con token: $token")
             viewModel(factory = ClosestClinicViewModelFactory(context, token))
         } else null
 
@@ -97,7 +94,6 @@ fun MainScreen(
         ActivityResultContracts.RequestPermission()
     ) { granted ->
         if (granted) {
-            Log.d("CLINIC_DEBUG", "PERMISO UBICACIÓN OTORGADO → loadClosestClinic()")
             closestClinicViewModel?.loadClosestClinic()
         } else {
             Log.d("CLINIC_DEBUG", "PERMISO UBICACIÓN DENEGADO")
@@ -107,15 +103,12 @@ fun MainScreen(
     // 4. Cuando el ViewModel esté listo, verificar permisos
     LaunchedEffect(closestClinicViewModel) {
         if (closestClinicViewModel != null) {
-            Log.d("CLINIC_DEBUG", "ViewModel LISTO → verificando permisos")
 
             val locationManager = LocationManager(context)
 
             if (!locationManager.hasPermission()) {
-                Log.d("CLINIC_DEBUG", "NO HAY PERMISO → SOLICITANDO...")
                 permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
             } else {
-                Log.d("CLINIC_DEBUG", "PERMISO YA OTORGADO → Ejecutando loadClosestClinic()")
                 closestClinicViewModel.loadClosestClinic()
             }
         }
@@ -125,9 +118,6 @@ fun MainScreen(
     val closestClinic by (closestClinicViewModel?.closestClinic?.collectAsState()
         ?: remember { mutableStateOf<ClinicResponse?>(null) })
 
-    LaunchedEffect(closestClinic) {
-        Log.d("CLINIC_DEBUG", "closestClinic cambió: $closestClinic")
-    }
 
     // 6. User ViewModel
     val factory = remember { MainViewModelFactory(sessionManager, context) }
@@ -149,7 +139,6 @@ fun MainScreen(
 
         Box(modifier = Modifier.fillMaxSize()) {
 
-            // 🔵 Fondo de pantalla (atrás de todo)
             Image(
                 painter = painterResource(id = R.drawable.background),
                 contentDescription = "Fondo",
@@ -157,7 +146,6 @@ fun MainScreen(
                 modifier = Modifier.fillMaxSize()
             )
 
-            // 🔵 Contenido encima del fondo
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -168,7 +156,6 @@ fun MainScreen(
                 verticalArrangement = Arrangement.Top
             ) {
 
-                // ------------------ CARD DE PERFIL ------------------
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
@@ -229,7 +216,6 @@ fun MainScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // ------------------ MENU PRINCIPAL ------------------
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
@@ -256,7 +242,6 @@ fun MainScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // ------------------ RECORDATORIOS ------------------
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
@@ -275,7 +260,6 @@ fun MainScreen(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // ------------------ CLÍNICA MÁS CERCANA ------------------
                 if (closestClinic != null) {
                     Box(
                         modifier = Modifier
@@ -308,7 +292,6 @@ fun MainScreen(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // ------------------ CERRAR SESIÓN ------------------
                 Button(
                     onClick = {
                         viewModel.signOut()
