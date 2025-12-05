@@ -117,6 +117,7 @@ dependencies {
     implementation("com.google.firebase:firebase-auth:23.0.0")
     implementation("com.google.firebase:firebase-analytics:22.1.0")
     implementation("com.google.firebase:firebase-storage:21.0.0")
+    implementation(libs.play.services.location)
 
     // Room para caché local
     val room_version = "2.6.1"
