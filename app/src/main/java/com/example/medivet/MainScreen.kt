@@ -1,5 +1,9 @@
 package com.example.medivet
 
+import android.Manifest
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -14,8 +18,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.Chat
@@ -38,11 +44,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -52,8 +61,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.example.medivet.model.model.ClinicResponse
+import com.example.medivet.utils.LocationManager
 import com.example.medivet.utils.SessionManager
 import com.example.medivet.view.navigation.AppScreens
+import com.example.medivet.viewModel.clinic.ClosestClinicViewModel
+import com.example.medivet.viewModel.clinic.ClosestClinicViewModelFactory
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,7 +74,62 @@ fun MainScreen(
     navController: NavHostController,
     sessionManager: SessionManager
 ) {
+    Log.d("CLINIC_DEBUG", "MainScreen COMENZÓ A DIBUJARSE")
     val context = LocalContext.current
+
+    var token by remember { mutableStateOf<String?>(null) }
+
+    // 1. Obtener token
+    LaunchedEffect(Unit) {
+        token = sessionManager.getToken()
+        Log.d("CLINIC_DEBUG", "TOKEN OBTENIDO: $token")
+    }
+
+    // 2. Crear viewModel solo si el token ya existe
+    val closestClinicViewModel: ClosestClinicViewModel? =
+        if (token != null) {
+            Log.d("CLINIC_DEBUG", "CREANDO ViewModel con token: $token")
+            viewModel(factory = ClosestClinicViewModelFactory(context, token))
+        } else null
+
+    // 3. Crear launcher para solicitar permisos de ubicación
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            Log.d("CLINIC_DEBUG", "PERMISO UBICACIÓN OTORGADO → loadClosestClinic()")
+            closestClinicViewModel?.loadClosestClinic()
+        } else {
+            Log.d("CLINIC_DEBUG", "PERMISO UBICACIÓN DENEGADO")
+        }
+    }
+
+    // 4. Cuando el ViewModel esté listo, verificar permisos
+    LaunchedEffect(closestClinicViewModel) {
+        if (closestClinicViewModel != null) {
+            Log.d("CLINIC_DEBUG", "ViewModel LISTO → verificando permisos")
+
+            val locationManager = LocationManager(context)
+
+            if (!locationManager.hasPermission()) {
+                Log.d("CLINIC_DEBUG", "NO HAY PERMISO → SOLICITANDO...")
+                permissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            } else {
+                Log.d("CLINIC_DEBUG", "PERMISO YA OTORGADO → Ejecutando loadClosestClinic()")
+                closestClinicViewModel.loadClosestClinic()
+            }
+        }
+    }
+
+    // 5. Observar clínica
+    val closestClinic by (closestClinicViewModel?.closestClinic?.collectAsState()
+        ?: remember { mutableStateOf<ClinicResponse?>(null) })
+
+    LaunchedEffect(closestClinic) {
+        Log.d("CLINIC_DEBUG", "closestClinic cambió: $closestClinic")
+    }
+
+    // 6. User ViewModel
     val factory = remember { MainViewModelFactory(sessionManager, context) }
     val viewModel: MainViewModel = viewModel(factory = factory)
 
@@ -78,12 +146,10 @@ fun MainScreen(
             )
         }
     ) { padding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-        ) {
-            // Fondo
+
+        Box(modifier = Modifier.fillMaxSize()) {
+
+            // 🔵 Fondo de pantalla (atrás de todo)
             Image(
                 painter = painterResource(id = R.drawable.background),
                 contentDescription = "Fondo",
@@ -91,21 +157,25 @@ fun MainScreen(
                 modifier = Modifier.fillMaxSize()
             )
 
+            // 🔵 Contenido encima del fondo
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .padding(padding)
+                    .verticalScroll(rememberScrollState())
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Top
             ) {
+
+                // ------------------ CARD DE PERFIL ------------------
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
                     elevation = CardDefaults.cardElevation(8.dp)
                 ) {
                     Column(
-                        modifier = Modifier
-                            .padding(16.dp),
+                        modifier = Modifier.padding(16.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Box(
@@ -118,7 +188,6 @@ fun MainScreen(
                             contentAlignment = Alignment.Center
                         ) {
                             if (!user?.photo.isNullOrEmpty()) {
-                                // ✅ Mostrar foto con Coil
                                 AsyncImage(
                                     model = ImageRequest.Builder(context)
                                         .data(user?.photo)
@@ -129,7 +198,6 @@ fun MainScreen(
                                     contentScale = ContentScale.Crop
                                 )
                             } else {
-                                // Placeholder cuando no hay foto
                                 Box(
                                     modifier = Modifier
                                         .fillMaxSize()
@@ -161,6 +229,7 @@ fun MainScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                // ------------------ MENU PRINCIPAL ------------------
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
@@ -187,14 +256,13 @@ fun MainScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                // ------------------ RECORDATORIOS ------------------
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
                     elevation = CardDefaults.cardElevation(6.dp)
                 ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp)
-                    ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
                         Text("Próximo recordatorio", fontWeight = FontWeight.Bold)
                         Spacer(modifier = Modifier.height(8.dp))
                         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -207,6 +275,40 @@ fun MainScreen(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
+                // ------------------ CLÍNICA MÁS CERCANA ------------------
+                if (closestClinic != null) {
+                    Box(
+                        modifier = Modifier
+                            .clickable {
+                                navController.navigate(
+                                    AppScreens.ClinicScreen.route + "/${closestClinic!!.id}"
+                                )
+                            }
+                    ) {
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(16.dp),
+                            elevation = CardDefaults.cardElevation(6.dp)
+                        ) {
+                            Column(modifier = Modifier.padding(16.dp)) {
+                                Text("Clínica más cercana", fontWeight = FontWeight.Bold)
+                                Spacer(Modifier.height(8.dp))
+                                Text(closestClinic!!.name)
+                                Text(closestClinic!!.address)
+                            }
+                        }
+                    }
+                } else {
+                    Text(
+                        "Buscando la clínica más cercana...",
+                        color = Color.Gray,
+                        modifier = Modifier.padding(8.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // ------------------ CERRAR SESIÓN ------------------
                 Button(
                     onClick = {
                         viewModel.signOut()
@@ -222,12 +324,14 @@ fun MainScreen(
             }
         }
     }
+
 }
+
 
 @Composable
 fun MenuItem(
     title: String,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: ImageVector,
     onClick: () -> Unit
 ) {
     Row(
